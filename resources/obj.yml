@@ -1,0 +1,12 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "application configuration", date: "2024-12-11"}
+
+
+## Factory
+#
+lmtask_task_factory:
+  class_name: zensols.lmtask.task.TaskFactory
+  _task_pattern: >-
+    eval({'import': ['re']}):
+      re.compile(r'^lmtask_task_((?!factory)[a-z_]+)' +
+                 '${conf_esc:dollar}'.encode('utf-8').decode())

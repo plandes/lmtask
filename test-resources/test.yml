@@ -1,0 +1,87 @@
+#@meta {desc: 'tast app config', date: '2025-01-14'}
+
+
+## Resource
+#
+lmtask_llama_model_args:
+  torch_dtype: "eval({'import': ['torch']}): torch.float16"
+  device_map: auto
+
+lmtask_llama_test_desc_set_resource:
+  class_name: zensols.lmtask.llama.LlamaGeneratorResource
+  model_id: meta-llama/Llama-3.1-8B-Instruct
+  model_args: 'instance: lmtask_llama_model_args'
+
+lmtask_llama_test_desc_not_set_model_id_resource:
+  class_name: zensols.lmtask.llama.LlamaGeneratorResource
+  model_id: someuser/not_set_with_user
+  model_args: 'instance: lmtask_llama_model_args'
+
+lmtask_llama_test_desc_not_set_checkpoint_resource:
+  class_name: zensols.lmtask.llama.LlamaGeneratorResource
+  model_id: /data/model/outputs/checkpoint-123
+  model_args: 'instance: lmtask_llama_model_args'
+
+lmtask_llama_test_task_resource:
+  class_name: zensols.lmtask.llama.LlamaGeneratorResource
+  model_id: meta-llama/Llama-3.1-8B-Instruct
+  model_desc: LlaMA 3.1 8B Instruct
+  model_args: 'instance: lmtask_llama_model_args'
+
+lmtask_llama_generator:
+  class_name: zensols.lmtask.generate.ModelTextGenerator
+
+
+## Generator
+#
+lmtask_constant_generator:
+  class_name: zensols.lmtask.generate.ConstantTextGenerator
+  response: "it's 12 noon"
+
+lmtask_test_poem_stash:
+  class_name: zensols.db.sqlite.SqliteDbStash
+  path: 'path: target/poem.sqlite3'
+
+lmtask_test_poem_caching_generator:
+  class_name: zensols.lmtask.generate.CachingGenerator
+  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _stash: 'instance: lmtask_test_poem_stash'
+
+
+## Task objects
+#
+lmtask_test_task_broken_record:
+  class_name: zensols.lmtask.generate.GenerateTask
+  description: 'give consistent messages'
+  request_class: 'class: zensols.lmtask.task.TaskRequest'
+  response_class: 'class: zensols.lmtask.task.TaskResponse'
+  generator: 'instance: lmtask_constant_generator'
+  resource: 'instance: lmtask_llama_test_task_resource'
+
+lmtask_test_task_echo:
+  class_name: zensols.lmtask.instruct.InstructTask
+  description: 'echo messages back'
+  request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
+  response_class: 'class: zensols.lmtask.task.TaskResponse'
+  generator: 'instance: lmtask_constant_generator'
+  resource: 'instance: lmtask_llama_test_task_resource'
+  inference_template: 'instruct: {{request.instruction}}'
+
+lmtask_test_task_poem:
+  class_name: zensols.lmtask.instruct.InstructTask
+  description: 'writes nice poems'
+  request_class: 'class: zensols.lmtask.task.TaskRequest'
+  response_class: 'class: zensols.lmtask.task.TaskResponse'
+  generator: 'instance: lmtask_test_poem_caching_generator'
+  role: 'You creative poet.'
+  resource: 'instance: lmtask_llama_test_task_resource'
+
+
+## Factory
+#
+lmtask_task_factory:
+  class_name: zensols.lmtask.task.TaskFactory
+  _task_pattern: >-
+    eval({'import': ['re']}):
+      re.compile(r'^lmtask_test_task_((?!factory)[a-z_]+)' +
+                 '${conf_esc:dollar}'.encode('utf-8').decode())

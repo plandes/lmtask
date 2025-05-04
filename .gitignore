@@ -1,0 +1,6 @@
+*.pyc
+*_flymake.py
+/target
+/data
+/_unsloth_temporary_saved_buffers
+/*.log

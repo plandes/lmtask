@@ -1,0 +1,8 @@
+NER tag the sentence with the output as a JSON array. Each entry in the output
+JSON has the format:
+
+{% raw %}{"text": {{text}}, "label": {{label}}, "span": [{{start}}, {{end}}]}{% endraw %}
+
+Tag all tokens. Only output JSON and do not include the introduction or
+summary. The sentence to tag is:
+{{request.instruction}}

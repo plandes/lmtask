@@ -1,0 +1,92 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "configured tasks", date: "2025-01-07"}
+
+
+### Base generation
+#
+lmtask_task_base_generate:
+  class_name: zensols.lmtask.generate.GenerateTask
+  description: 'base generate text'
+  generator: 'alias: lmtask_default:lmtask_base_generator'
+  request_class: 'class: zensols.lmtask.task.TaskRequest'
+  response_class: 'class: zensols.lmtask.task.TaskResponse'
+  resource: 'instance: ${lmtask_default:lmtask_base_resource}'
+
+
+## Instruct generation
+#
+lmtask_instgen_stash:
+  class_name: zensols.db.sqlite.SqliteDbStash
+  path: 'path: ${default:data_dir}/task/instgen.sqlite3'
+
+lmtask_instgen_caching_generator:
+  class_name: zensols.lmtask.generate.CachingGenerator
+  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _stash: 'instance: lmtask_instgen_stash'
+
+lmtask_task_instruct_generate:
+  class_name: zensols.lmtask.instruct.InstructTask
+  description: 'base generate text'
+  1.condition:
+    if: ${lmtask_default:cache}
+    then:
+      generator: 'instance: lmtask_instgen_caching_generator'
+    else:
+      generator: 'alias: lmtask_default:lmtask_instruct_generator'
+  request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
+  response_class: 'class: zensols.lmtask.task.TaskResponse'
+  resource: 'instance: ${lmtask_default:lmtask_instruct_resource}'
+
+
+## Sentiment
+#
+lmtask_sentiment_stash:
+  class_name: zensols.db.sqlite.SqliteDbStash
+  path: 'path: ${default:data_dir}/task/sentiment.sqlite3'
+
+lmtask_sentiment_caching_generator:
+  class_name: zensols.lmtask.generate.CachingGenerator
+  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _stash: 'instance: lmtask_sentiment_stash'
+
+lmtask_task_sentiment:
+  class_name: zensols.lmtask.instruct.InstructTask
+  description: 'classifies sentiment'
+  1.condition:
+    if: ${lmtask_default:cache}
+    then:
+      generator: 'instance: lmtask_sentiment_caching_generator'
+    else:
+      generator: 'alias: lmtask_default:lmtask_instruct_generator'
+  request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
+  response_class: 'class: zensols.lmtask.task.JSONTaskResponse'
+  resource: 'instance: ${lmtask_default:lmtask_instruct_resource}'
+  inference_template: 'resource(zensols.lmtask): resources/prompts/sentiment.txt'
+  role: 'You are a sentiment analyzer.'
+
+
+## Named entity recognition
+#
+lmtask_ner_stash:
+  class_name: zensols.db.sqlite.SqliteDbStash
+  path: 'path: ${default:data_dir}/task/ner.sqlite3'
+
+lmtask_ner_caching_generator:
+  class_name: zensols.lmtask.generate.CachingGenerator
+  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _stash: 'instance: lmtask_ner_stash'
+
+lmtask_task_ner:
+  class_name: zensols.lmtask.instruct.InstructTask
+  description: 'tags named entities'
+  1.condition:
+    if: ${lmtask_default:cache}
+    then:
+      generator: 'instance: lmtask_ner_caching_generator'
+    else:
+      generator: 'alias: lmtask_default:lmtask_instruct_generator'
+  request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
+  response_class: 'class: zensols.lmtask.task.JSONTaskResponse'
+  resource: 'instance: ${lmtask_default:lmtask_instruct_resource}'
+  inference_template: 'resource(zensols.lmtask): resources/prompts/ner.txt'
+  role: 'You are a NER tagger.'

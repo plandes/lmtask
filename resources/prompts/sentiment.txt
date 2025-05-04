@@ -1,0 +1,15 @@
+Classify each sentences for sentement as JSON.  Each sentence to
+classify is newline separated.  The categories for senteiment are:
+
+"+" for positive,
+"-" for negative,
+"n" for neutral.
+
+Each entry in the output JSON has the format:
+
+{% raw %}[{"index": {{0-index of the sentence}}, "sentence": {{sentence}}, "label": {{sentiment}}}]{% endraw %}
+
+Do not include the introduction or summary.  The sentences to classify are
+below the dashed line.
+----------------------------------------
+{{request.instruction}}

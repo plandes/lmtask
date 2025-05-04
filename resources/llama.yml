@@ -1,0 +1,50 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "llama default-like objects", date: "2025-02-02"}
+
+
+## Resources
+#
+lmtask_llama_model_args:
+  torch_dtype: "eval({'import': ['torch']}): torch.float16"
+  device_map: auto
+
+lmtask_llama_base_resource:
+  class_name: zensols.lmtask.llama.LlamaGeneratorResource
+  model_id: meta-llama/Llama-3.1-8B
+  model_args: 'asdict: lmtask_llama_model_args'
+
+lmtask_llama_instruct_resource:
+  class_name: zensols.lmtask.llama.LlamaGeneratorResource
+  model_id: meta-llama/Llama-3.1-8B-Instruct
+  model_args: 'asdict: lmtask_llama_model_args'
+
+
+## Generators
+#
+lmtask_llama_base_generator:
+  class_name: zensols.lmtask.generate.ReplaceTextGenerator
+  resource: 'alias: lmtask_default:lmtask_base_resource'
+  generate_params: >-
+    call({'param': {'method': 'asdict'}}): lmtask_model_generate_args
+  tokenize_decode_params:
+    skip_special_tokens: true
+  replacements:
+    - ['<\|begin_of_text\|>', '']
+    - ['<\|end_of_text\|>', '']
+
+lmtask_llama_instruct_generator:
+  class_name: zensols.lmtask.instruct.InstructModelTextGenerator
+  resource: 'alias: lmtask_default:lmtask_instruct_resource'
+  generate_params: >-
+    call({'param': {'method': 'asdict'}}): lmtask_model_generate_args
+  replacements:
+    - ['<\|start_header_id\|>.+<\|end_header_id\|>', '']
+    - ['<\|eot_id\|>', '']
+    - ['<\|begin_of_text\|>', '']
+    - ['<\|end_of_text\|>', '']
+
+
+## Training
+#
+lmtask_trainer_hf_source_resource:
+  class_name: zensols.lmtask.llama.LlamaGeneratorResource
