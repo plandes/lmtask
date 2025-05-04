@@ -1,4 +1,4 @@
-# LLM for tasks API
+# Inferencing and Training Large Language Model Tasks
 
 [![PyPI][pypi-badge]][pypi-link]
 [![Python 3.11][python311-badge]][python311-link]
@@ -20,8 +20,8 @@ Features:
   (optional feature).
 * [Command-line](#command-line) interface to inference, pre-train and
   post-train LLM models.
-* [Advanced API](#api) to read responses and accept partial output for max
-  token cutoffs.
+* [Advanced API](#python-api) to read responses and accept partial output for
+  max token cutoffs.
 * [Unsloth] support.
 * Chat template integration when supported.
 * Extendable interfaces with LLMs with built in support for Llama 3.
@@ -116,7 +116,7 @@ lmtask -c trainconf/imdb.yml train
 ```
 
 
-### API
+### Python API
 
 The Python API can be used to access tasks directly.
 
