@@ -4,3 +4,7 @@
 /data
 /_unsloth_temporary_saved_buffers
 /*.log
+
+# pixi environments
+.pixi
+/pyproject.toml
