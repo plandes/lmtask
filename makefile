@@ -14,7 +14,6 @@ ADD_CLEAN_ALL +=	data
 
 ## Project
 #
-ENTRY = 		./lmtask
 GEN_PROMPT = 		"Once upon a time, in a galaxy, far far away,"
 
 
@@ -28,30 +27,33 @@ include ./zenbuild/main.mk
 # stream text with the default base generation task
 .PHONY:			stream
 stream:
-			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
+			@$(MAKE) $(PY_MAKE_ARGS) invoke \
 				ARG="stream base_generate 'He' \
 				--override=lmtask_model_generate_args.temperature=0.5"
 
 # classify two sentences as sentiment
 .PHONY:			classify
 classify:
-			@$(MAKE) ARG="instruct sentiment \
+			@$(MAKE) $(PY_MAKE_ARGS) invoke ARG="instruct sentiment \
 				'HuggingFace is a great API!\nBut the docs could improve.'"
 
 # train a new model on the tinystory corpus
 .PHONY:			traintinystory
 traintinystory:
-			@$(MAKE) ARG="-c trainconf/tinystory.yml train"
+			@$(MAKE) $(PY_MAKE_ARGS) invoke \
+				ARG="-c trainconf/tinystory.yml train"
 
 # train a new model on the databricks instruct corpus
 .PHONY:			trainimdb
 trainimdb:
-			@$(MAKE) ARG="-c trainconf/imdb.yml train"
+			@$(MAKE) $(PY_MAKE_ARGS) invoke \
+				ARG="-c trainconf/imdb.yml train"
 
 # test the trained tiny story generation model
 .PHONY:			testtinystory
 testtinystory:
-			@$(MAKE) ARG="-c trainconf/tinystory.yml \
+			@$(MAKE) $(PY_MAKE_ARGS) invok \
+				ARG="-c trainconf/tinystory.yml \
 				stream tinystory $(GEN_PROMPT)"
 
 # test the trained imdb instrudct model

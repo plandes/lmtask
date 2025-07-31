@@ -12,8 +12,11 @@ def create_harness(args: str = None) -> ConfigurationImporterCliHarness:
 
 
 def run():
-    from zensols.deeplearn import TorchConfig
-    TorchConfig.init()
+    try:
+        from zensols.deeplearn import TorchConfig
+        TorchConfig.init()
+    except Exception:
+        pass
     harness: ConfigurationImporterCliHarness = create_harness('-c trainconf/tinystory.yml')
     harness.run()
 
