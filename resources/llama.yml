@@ -5,7 +5,8 @@
 ## Resources
 #
 lmtask_llama_model_args:
-  torch_dtype: "eval({'import': ['torch']}): torch.float16"
+  #torch_dtype: bfloat16
+  torch_dtype: auto
   device_map: auto
 
 lmtask_llama_base_resource:
@@ -48,3 +49,16 @@ lmtask_llama_instruct_generator:
 #
 lmtask_trainer_hf_source_resource:
   class_name: zensols.lmtask.llama.LlamaGeneratorResource
+
+lmtask_trainer_hf_peft:
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+    - lm_head
+#    - embed_tokens
+

@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, ClassVar, Dict, Set, Tuple
+from typing import Any, ClassVar, Dict, Set, Union, Tuple
 from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
 import logging
@@ -90,7 +90,7 @@ class ModelResult(Dictable):
     output_dir: Path = field(default=None)
     """The directory of the models checkpoints."""
 
-    trainer_params: Dict[str, Any] = field(default=None)
+    train_params: Dict[str, Any] = field(default=None)
     """The training parameters used to configure the trainer."""
 
     config: Configurable = field(default=None)
@@ -112,11 +112,11 @@ class ModelResult(Dictable):
         return self.train_output.metrics
 
     def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
-        targs: TrainingArguments = self.trainer_params['args']
+        targs: TrainingArguments = self.train_params['args']
         dct: Dict[str, Any] = super()._from_dictable(*args, **kwargs)
         dct = cp.deepcopy(dct)
-        dct['trainer_params'].pop('args')
-        dct['trainer_params']['args'] = json.loads(targs.to_json_string())
+        dct['train_params'].pop('args')
+        dct['train_params']['args'] = json.loads(targs.to_json_string())
         dct['config'] = self.config.asdict()
         return dct
 
@@ -125,10 +125,10 @@ class ModelResult(Dictable):
               include_config: bool = False):
         dct: Dict[str, Any] = cp.deepcopy(self.asdict())
         # move long params to end since now dicts are stable ordered
-        for key in 'trainer_params config'.split():
+        for key in 'train_params config'.split():
             dct[key] = dct.pop(key)
         if not include_training_arguments:
-            dct['trainer_params'].pop('args')
+            dct['train_params'].pop('args')
         if not include_config:
             dct.pop('config')
         self._write_object(dct, depth, writer)
@@ -148,50 +148,83 @@ class Trainer(Dictable, metaclass=ABCMeta):
     resource: TrainerResource = field()
     """Used to create the model and tokenzier."""
 
-    trainer_params: Dict[str, Any] = field()
+    train_params: Dict[str, Any] = field()
     """The training parameters used to configure the trainer."""
 
-    source: TaskDatasetFactory = field()
+    eval_params: Dict[str, Any] = field()
+    """The evaluation parameters used to configure the trainer."""
+
+    train_source: TaskDatasetFactory = field()
     """A factory that creates new datasets used to train using this instance."""
 
+    eval_source: TaskDatasetFactory = field()
+    """A factory that creates new datasets used to evaluation."""
+
+    peft_output_dir: Union[str, Path] = field()
+    """The directory to save the Peft model."""
+
+    merged_output_dir: Union[str, Path] = field()
+    """The directory to save the base + perf in one model."""
+
+    def __post_init__(self):
+        for attr in 'peft_output_dir merged_output_dir'.split():
+            val = getattr(self, attr)
+            if isinstance(val, str):
+                setattr(self, attr, Path(val))
+
     def _get_training_params(self) -> Dict[str, Any]:
-        params: Dict[str, Any] = cp.deepcopy(self.trainer_params)
-        params['dataset_text_field'] = self.source.text_field
+        from trl import SFTConfig
+        params: Dict[str, Any] = cp.deepcopy(self.train_params)
+        args: SFTConfig = params['args']
+        assert isinstance(args, SFTConfig)
+        assert hasattr(args, 'dataset_text_field')
+        args.dataset_text_field = self.train_source.text_field
+        if self.eval_source is not None:
+            params['eval_dataset'] = self.eval_source.create()
+            args.metric_for_best_model = \
+                f'eval_{self.eval_source.text_field}_loss'
+            args.__dict__.update(self.eval_params)
         return params
 
     @abstractmethod
-    def _train(self, params: Dict[str, Any], ds: Dataset) -> TrainOutput:
+    def _train(self, params: Dict[str, Any], train_ds: Dataset,
+               eval_ds: Dataset = None) -> TrainOutput:
         pass
 
     def train(self) -> ModelResult:
         """Train the model."""
         params: Dict[str, Any] = self._get_training_params()
-        train_dataset: Dataset = self.source.create()
+        train_dataset: Dataset = self.train_source.create()
+        checkpoint_dir = Path(params['args'].output_dir)
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        self.peft_output_dir.mkdir(parents=True, exist_ok=True)
+        if self.merged_output_dir is not None:
+            self.merged_output_dir.mkdir(parents=True, exist_ok=True)
         with time('model trained'):
             output: TrainOutput = self._train(params, train_dataset)
         result: ModelResult = ModelResult(output)
         result.output_dir = Path(params['args'].output_dir)
-        result.trainer_params = params
+        result.train_params = params
         result.config = self.config
         logger.info(f'training complete: {result}')
         return result
 
     def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
         dct: Dict[str, Any] = super()._from_dictable(*args, **kwargs)
-        dct['trainer_params'] = self._get_training_params()
+        dct['train_params'] = self._get_training_params()
         return dct
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_training_arguments: bool = False):
         dct: Dict[str, Any] = cp.deepcopy(self.asdict())
-        args: TrainingArguments = dct['trainer_params'].pop('args')
-        dct.pop('source')
+        args: TrainingArguments = dct['train_params'].pop('args')
+        dct.pop('train_source')
         if include_training_arguments:
             sio = StringIO()
             self._write_block(str(args), depth=2, writer=sio)
-            dct['trainer_params']['args'] = sio.getvalue().strip()
+            dct['train_params']['args'] = sio.getvalue().strip()
         dct.pop('config')
         self._write_object(dct, depth, writer)
-        if self.source is not None:
-            self._write_line('source:', depth, writer)
-            self._write_object(self.source, depth + 1, writer)
+        if self.train_source is not None:
+            self._write_line('train_source:', depth, writer)
+            self._write_object(self.train_source, depth + 1, writer)

@@ -1,5 +1,6 @@
 #@meta {desc: "tiny story trainer config", date: "2025-02-03"}
 #@meta {url: "https://colab.research.google.com/drive/1ef-tab5bhkvWmBOObepl1WgJvfvSzn5Q?usp=sharing"}
+#@meta {doc: "some parameters overwrite defaults to make it easy to port this config"}
 
 
 ## Defaults
@@ -18,26 +19,96 @@ lmtask_trainer_default:
   source_model: 'meta-llama/Llama-3.1-8B'
 
 lmtask_trainer_hf:
-  source: 'instance: lmtask_tinystory_source'
+  train_source: 'instance: lmtask_tinystory_train_source'
+  eval_source: 'instance: lmtask_tinystory_eval_source'
 
 lmtask_trainer_hf_training_arguments:
+  learning_rate: 5e-6
   num_train_epochs: 1
+  #warmup_ratio: 0.1
+  optim: 'paged_adamw_32bit'
+  lr_scheduler_type: 'cosine'
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  logging_steps: 2
 
-lmtask_tinystory_source:
+lmtask_trainer_hf_peft:
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+    - lm_head
+    - embed_tokens
+
+lmtask_trainer_hf_peft:
+  class_name: peft.LoraConfig
+  r: 128
+  lora_alpha: 32
+  lora_dropout: 0.05
+
+lmtask_tinystory_train_source:
   class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
   source: roneneldan/TinyStories
   load_args:
-    split: train[:2500]
+    split: 'train[:2500]'
+    #split: 'train[:500]'
   task: 'instance: lmtask_task_tinystory'
+
+lmtask_tinystory_eval_source:
+  class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
+  source: roneneldan/TinyStories
+  load_args:
+    split: 'validation[:250]'
+    #split: 'validation[:50]'
+  task: 'instance: lmtask_task_tinystory'
+
+
+lmtask_llama_tinystory_hf_bnb_4bit_config:
+  class_name: transformers.BitsAndBytesConfig
+  load_in_4bit: true
+  # quantize to 4-bit normalized float
+  bnb_4bit_quant_type: 'nf4'
+  bnb_4bit_compute_dtype: 'bfloat16'
+  # apply double quantization for constants
+  bnb_4bit_use_double_quant: true
+
+lmtask_llama_tinystory_model_args:
+  device_map: auto
+  torch_dtype: auto
+  #quantization_config: 'instance: lmtask_llama_tinystory_hf_bnb_4bit_config'
 
 
 ## Inference
 #
 lmtask_llama_tinystory_resource:
   class_name: zensols.lmtask.llama.LlamaGeneratorResource
+  bail: True
+  #quantization_config: 'instance: lmtask_TRASH_hf_bnb_config'
   model_desc: LlaMA 3.1 8B Instruct trained on the tiny story corpus
-  model_id: '${lmtask_trainer_default:checkpoint_dir}/checkpoint-312'
-  model_args: 'instance: lmtask_llama_model_args'
+  #model_args: 'instance: lmtask_llama_model_args'
+  model_args: 'instance: lmtask_llama_tinystory_model_args'
+  # model_args:
+  #   device_map: auto
+  #   torch_dtype: auto
+  #
+  #model_id: '${lmtask_trainer_default:peft_output_dir}'
+  #model_class: 'class: peft.AutoPeftModelForCausalLM'
+  #tokenizer_id: '${lmtask_trainer_default:source_model}'
+  #
+  #model_id: ${lmtask_trainer_default:source_model}
+  #
+  #model_id: data/tinystory/model/merged
+  #
+  #model_id : 'data/tinystory/model/base/checkpoint-32'
+  model_id: '${lmtask_trainer_default:source_model}'
+  peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
+  #model_class: 'class: peft.AutoPeftModelForCausalLM'
+  #tokenizer_id: '${lmtask_trainer_default:source_model}'
+
 
 lmtask_tinystory_stash:
   class_name: zensols.db.sqlite.SqliteDbStash
@@ -60,12 +131,3 @@ lmtask_task_tinystory:
     else:
       generator: 'alias: lmtask_default:lmtask_base_generator'
   resource: 'instance: lmtask_llama_base_resource'
-
-
-## tmp
-lmtask_llama_base_resource:
-  model_id: meta-llama/Llama-3.1-8B
-#quant_args = instance: llmtask_quant_args
-
-lmtask_llama_instruct_resource:
-  model_id: meta-llama/Llama-3.1-8B-Instruct

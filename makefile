@@ -14,7 +14,7 @@ ADD_CLEAN_ALL +=	data
 
 ## Project
 #
-GEN_PROMPT = 		"Once upon a time, in a galaxy, far far away,"
+GEN_PROMPT = 		'Once upon a time, in a galaxy, far far away,'
 
 
 ## Includes
@@ -34,7 +34,7 @@ stream:
 # classify two sentences as sentiment
 .PHONY:			classify
 classify:
-			@$(MAKE) $(PY_MAKE_ARGS) invoke ARG="instruct sentiment \
+			@$(MAKE) $(PY_MAKE_ARGS) pyharn ARG="instruct sentiment \
 				'HuggingFace is a great API!\nBut the docs could improve.'"
 
 # train a new model on the tinystory corpus
@@ -42,6 +42,18 @@ classify:
 traintinystory:
 			@$(MAKE) $(PY_MAKE_ARGS) invoke \
 				ARG="-c trainconf/tinystory.yml train"
+
+## TODO
+tmp:
+			@CUDA_VISIBLE_DEVICES=0,1,2,3,4,5 \
+			$(MAKE) $(PY_MAKE_ARGS) invoke \
+				ARG="-c trainconf/tinystory.yml train"
+
+# accelerate
+.PHONY:			traintinystoryacc
+traintinystoryacc:	$(PY_PYPROJECT_FILE)
+			$(PY_PX_BIN) run accelerate launch \
+				./harness.py -c trainconf/tinystory.yml train
 
 # train a new model on the databricks instruct corpus
 .PHONY:			trainimdb
@@ -52,9 +64,9 @@ trainimdb:
 # test the trained tiny story generation model
 .PHONY:			testtinystory
 testtinystory:
-			@$(MAKE) $(PY_MAKE_ARGS) invok \
+			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
 				ARG="-c trainconf/tinystory.yml \
-				stream tinystory $(GEN_PROMPT)"
+					stream tinystory $(GEN_PROMPT)"
 
 # test the trained imdb instrudct model
 .PHONY:			testimdb

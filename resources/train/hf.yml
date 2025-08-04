@@ -3,17 +3,23 @@
 
 ## Resource
 #
-lmtask_trainer_hf_bnb_config:
+lmtask_trainer_hf_bnb_4bit_config:
   class_name: transformers.BitsAndBytesConfig
   load_in_4bit: true
   # quantize to 4-bit normalized float
   bnb_4bit_quant_type: 'nf4'
-  bnb_4bit_compute_dtype: 'float16'
+  bnb_4bit_compute_dtype: 'bfloat16'
   # apply double quantization for constants
   bnb_4bit_use_double_quant: true
 
+lmtask_trainer_hf_bnb_8bit_config:
+  class_name: transformers.BitsAndBytesConfig
+  load_in_8bit: true
+
 lmtask_trainer_hf_source_model_args:
-  quantization_config: 'instance: lmtask_trainer_hf_bnb_config'
+  # lora configuration
+  #quantization_config: 'instance: lmtask_trainer_hf_bnb_4bit_config'
+  # train over configured/available GPUs
   device_map: auto
   # do not reuse the query,key,value computations from previous tokens; if set
   # to true, it would speed up the decoding process
@@ -21,7 +27,7 @@ lmtask_trainer_hf_source_model_args:
   # setting pretraining_tp (temperature) to a value different than 1 will
   # activate the more accurate but slower computation of the linear layers,
   # which should better match the original logits
-  pretraining_tp: 1
+  #pretraining_tp: 1
 
 lmtask_trainer_hf_source_resource:
   model_id: ${lmtask_trainer_default:source_model}
@@ -31,20 +37,10 @@ lmtask_trainer_hf_peft:
   class_name: peft.LoraConfig
   # choose any number > 0; suggested 8, 16, 32, 64, 128
   r: 64
-  # add for continual pretraining
-  target_modules:
-    - q_proj
-    - k_proj
-    - v_proj
-    - o_proj
-    - gate_proj
-    - up_proj
-    - down_proj
-    - embed_tokens
-    - lm_head
-  lora_alpha: 32
+  # scales the learned weights
+  lora_alpha: 16
   # supports any, but 0 is optimized
-  lora_dropout: 0.1
+  lora_dropout: 0
   # supports any, but 'none' is optimized
   bias: 'none'
   # Overview of the supported task types:
@@ -65,48 +61,73 @@ lmtask_trainer_hf_train_resource:
 
 ## HuggingFace trainer
 #
+# https://medium.com/@heyamit10/fine-tuning-llama-3-a-practical-guide-0989df65dbfc
 lmtask_trainer_hf_training_arguments:
-  class_name: transformers.TrainingArguments
+  class_name: trl.SFTConfig
+  # checkpoints directory is used to store intermediate models
   output_dir: 'path: ${lmtask_trainer_default:checkpoint_dir}'
-  # load 2 batches into gpu ram at each step
-  per_device_train_batch_size: 2
-  # after 2 steps (since 2 batches per step), we will reach 4 batches
-  # accumulated so now update weights for next gradient decision.
-  gradient_accumulation_steps: 8
-  # ratio of total training steps used for a linear warmup from 0 to learning_rate
-  warmup_ratio: 0.1
-  optim: 'paged_adamw_32bit'
-  # learning rate
-  learning_rate: 5e-5
-  # learning rate will decrease over time to make convergence faster
-  lr_scheduler_type: 'cosine'
   # total number of training epochs to perform (if not an integer, will perform
   # the decimal part percents of the last epoch before stopping training)
   num_train_epochs: 1
+  #
+  max_length: ${lmtask_trainer_default:max_seq_length}
+  # load X batches into gpu ram at each step
+  per_device_train_batch_size: 8
+  # number of processes to use for processing the dataset
+  dataset_num_proc: 8
+  # ratio of total training steps used for a linear warmup from 0 to learning_rate
+  #warmup_ratio: 0.1
+  #optim: 'paged_adamw_32bit'
+  # learning rate starting point for llama
+  learning_rate: 2e-5
+  # learning rate will decrease over time to make convergence faster
+  #lr_scheduler_type: 'cosine'
   # If set to a positive number, the total number of training steps to
   # perform. Overrides num_train_epochs. For a finite dataset, training is
   # reiterated through the dataset (if all data is exhausted) until max_steps
   # is reached
   #max_steps: 1
-  # Logging is done every logging_steps
-  logging_steps: 10
+  # log ever X steps
+  logging_steps: 5
+  # determines when model checkpoints are saved. "steps" means checkpoints are
+  # saved after a certain number of steps rather than at the end of an epoch
+  save_steps: 20
+  save_strategy: 'steps'
+  #
   # Whether to use fp16 16-bit (mixed) precision training instead of 32-bit
-  # training.
-  fp16: true
+  # training; adding this gives the following error:
+  #     "AssertionError: No inf checks were recorded for this optimizer"
+  #
+  # https://stackoverflow.com/questions/75969294/assertionerror-no-inf-checks-were-recorded-for-this-optimizer
+  #fp16: true
+  #
   # save model weights every time weights are updated (which is after 2 steps
   # after 4 batches are accumulated)
   gradient_checkpointing: true
+  # after 2 steps (since 2 batches per step), we will reach 4 batches
+  # accumulated so now update weights for next gradient decision.
+  gradient_accumulation_steps: 2
+  # random seed
   seed: 0
   # used for WandB
   report_to: 'none'
 
+lmtask_trainer_hf_eval_arguments:
+  do_eval: true
+  per_device_eval_batch_size: 8
+  load_best_model_at_end: true
+  eval_strategy: 'steps'
+
 lmtask_trainer_hf_trainer_arguments:
-  max_seq_length: ${lmtask_trainer_default:max_seq_length}
+  #max_seq_length: ${lmtask_trainer_default:max_seq_length}
   args: 'instance: lmtask_trainer_hf_training_arguments'
-  dataset_num_proc: 8
-  peft_config: 'instance: lmtask_trainer_hf_peft'
+  #peft_config: 'instance: lmtask_trainer_hf_peft'
 
 lmtask_trainer_hf:
   class_name: zensols.lmtask.hf.HuggingFaceTrainer
   resource: 'instance: lmtask_trainer_hf_train_resource'
-  trainer_params: 'asdict: lmtask_trainer_hf_trainer_arguments'
+  train_params: 'asdict: lmtask_trainer_hf_trainer_arguments'
+  eval_params: 'asdict: lmtask_trainer_hf_eval_arguments'
+  peft_output_dir: ${lmtask_trainer_default:peft_output_dir}
+  merged_output_dir: ${lmtask_trainer_default:merged_output_dir}
+  eval_source: null

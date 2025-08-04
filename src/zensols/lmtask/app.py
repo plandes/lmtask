@@ -122,9 +122,9 @@ class Application(object):
                 f"Configuration has no '{def_property}' in section " +
                 f"'{def_sec}'; missing --config?")
         trainer: Trainer = self.config_factory(trainer_name)
-        if trainer.source is None:
+        if trainer.train_source is None:
             raise ApplicationError(
-                f'Configuration did not set dataset source on {trainer_name}')
+                f'Configuration did not set train source on {trainer_name}')
         return trainer
 
     def dataset_sample(self, max_sample: int = 1):
@@ -137,7 +137,7 @@ class Application(object):
         from . import TaskDatasetFactory
         from .train import Trainer
         trainer: Trainer = self._get_trainer()
-        dsf: TaskDatasetFactory = trainer.source
+        dsf: TaskDatasetFactory = trainer.train_source
         ds: Dataset = dsf.create()
         for row in it.islice(ds, max_sample):
             print('_' * 40)
@@ -248,22 +248,19 @@ class PrototypeApplication(object):
             res = task.process(req)
             res.write()
 
-    def _tmp(self):
-        pass
-
     def proto(self, run: int = 0):
         {
             0: self._tmp,
             1: self.app.show_task,
-            2: lambda: self.app.generate(
+            2: lambda: self.app.instruct(
                 task_name='instruct_generate',
                 instruction='Write a poem about a cat in 50 words or less.',
                 output_format=_Format.full),
-            3: lambda: self.app.generate(
+            3: lambda: self.app.instruct(
                 task_name='sentiment',
                 instruction='I love football.\nI hate olives.\nEarth is big.',
                 output_format=_Format.full),
-            4: lambda: self.app.generate(
+            4: lambda: self.app.instruct(
                 task_name='ner',
                 instruction='Obama was the 44th president of the United States.',
                 output_format=_Format.full),

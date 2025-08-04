@@ -22,40 +22,37 @@ project:
     # Python interpreter versions
     version:
       # constraint on install eligibility
-      required: '>=3.11,<3.13'
+      required: '>=3.11,<3.14'
       # last supported version of Python supported for the project
-      previous: '3.11.12'
+      #previous: '3.11.12'
+      previous: '3.12.10'
       # Python version supported for current development
       current: '3.12.10'
       # version of Python used to build/link specific to the host
       package_host: '3.11.6'
     # pypi dependencies added to 'project'
     dependencies:
-      - 'jinja2>=3.1'
+      - 'jinja2~=3.1'
       ## third party frameworks
-      - 'transformers==4.48.3'
-      - 'bitsandbytes==0.42.0'
+      - 'transformers~=4.54.1'
       # parsing
       - 'partial-json-parser==0.2.1.1.post5'
       # training
-      - 'datasets==2.21.0'
-      - 'accelerate==0.34.2'
-      - 'peft==0.14.0'
-      - 'trl==0.8.6'
-      - 'xformers==0.0.25.post1'
-      ## framework
-      - 'zensols.db==1.4.1'
-      - 'zensols.nlp==1.12.7'
-      # inference
-#      - 'zensols.deeplearn==1.14.1'
+      - 'datasets~=4.0.0'
+      - 'accelerate~=1.9.0'
+      - 'peft~=0.17.0'
+      - 'trl==0.20.0'
+      - 'torch~=2.7.1'
+      ## caching
+      - 'zensols.db~=1.4.1'
   # the program is called on the command line
   has_entry_points: true
-# build:
-#   table_appends:
-#     tool.pixi.dependencies:
-#       xformers: '<0.0.26'
-  # pyproject_template_files:
-  #   - dep.toml
+build:
+  table_appends:
+    # training on linux (no binary packages available for osx-arm64
+    tool.pixi.target.linux-64.pypi-dependencies:
+      bitsandbytes: '~=0.46.1'
+      xformers: '~=0.0.31.post1'
 doc:
   api_config:
     intersphinx_mapping:

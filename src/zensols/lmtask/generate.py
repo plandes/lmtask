@@ -19,9 +19,11 @@ import textwrap as tw
 from datasets import Dataset
 from datasets.formatting.formatting import LazyBatch
 from transformers import (
-    PreTrainedTokenizer, PreTrainedModel, AutoModelForCausalLM, AutoTokenizer,
+    AutoModel, AutoTokenizer,
+    PreTrainedTokenizer, PreTrainedModel, AutoModelForCausalLM,
     BatchEncoding, BitsAndBytesConfig, TextIteratorStreamer
 )
+from peft import PeftModel
 from zensols.util import time, Hasher
 from zensols.persist import persisted, Stash, FileTextUtil
 from zensols.config import Dictable, ConfigFactory
@@ -43,29 +45,53 @@ class GeneratorResource(Dictable):
     """
     _MODEL_DESC_PAT: ClassVar[re.Pattern] = re.compile(r'^(?:.*\/)(.+)$')
 
+    name: str = field()
+    """The section of this configured instance in the application config."""
+
     model_id: Union[str, Path] = field()
     """The HF model ID or path to the model."""
 
+    model_class: Type[AutoModel] = field(default=AutoModelForCausalLM)
+    """The class used to create the model with
+    :meth:`~transformers.AutoModel.from_pretrained`.
+
+    """
+    tokenizer_class: Type[AutoTokenizer] = field(default=AutoTokenizer)
+    """The class used to create the tokenizer with
+    :meth:`~transformers.AutoTokenizer.from_pretrained.
+
+    """
+    peft_model_id: Union[str, Path] = field(default=None)
+    """The HF model ID or path to the Peft model or ``None`` if there is none.
+
+    """
+    # peft_model_class: Type[AutoPeftModel] = field(default=AutoPeftModel)
+    # """The class used to create the Peft model with
+    # :meth:`~peft.AutoPeftModel.from_pretrained`.
+
+    # """
     model_desc: str = field(default=None)
     """A human readable description of the model this resource contains."""
 
     system_role_name: str = field(default='system')
     """The default name of the system's role."""
 
-    quant_args: Dict[str, Any] = field(default=None)
-    """The quantization arguments given to the
-    :class:`transformers.BitsAndBytesConfig` class.
+    # quantization_config: BitsAndBytesConfig = field(default=None)
+    # """The quantization argument or ``None`` if no quantizing is used."""
 
-    """
     model_args: Dict[str, Any] = field(default_factory=dict)
     """The arguments given to the HF model ``from_pretrained`` method.
 
     """
+    bail: bool = field(default=False)
+
     def __post_init__(self):
         if isinstance(self.model_id, Path):
             self.model_id = str(self.model_id)
         if self.model_desc is None:
             self.model_desc = self._shorten_model_id(self.model_id)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'created generator: {self.name}')
 
     @classmethod
     def _shorten_model_id(cls: Type, model_id: str):
@@ -92,12 +118,6 @@ class GeneratorResource(Dictable):
         """A normalized file name friendly string based on :obj:`model_desc`."""
         return FileTextUtil.normalize_text(self.model_desc)
 
-    def _get_quant_config(self) -> BitsAndBytesConfig:
-        if self.quant_args is not None:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'quant params: {self.quant_args}')
-            return BitsAndBytesConfig(**self.quant_args)
-
     @property
     @persisted('_resource_cache_pw', cache_global=True)
     def _resource_cache(self) -> Dict[str, _Resource]:
@@ -114,40 +134,40 @@ class GeneratorResource(Dictable):
         """Make any necessary updates programatically."""
         pass
 
-    def _load_tokenizer(self) -> PreTrainedTokenizer:
+    def _load_tokenizer(self, model_id: str) -> PreTrainedTokenizer:
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'creating tokenizer: {self.model_id}')
+            logger.debug(f'creating tokenizer: {model_id}')
         params: Dict[str, Any] = {}
-        qconf: BitsAndBytesConfig = self._get_quant_config()
-        if qconf is not None:
-            params['quantization_config'] = qconf
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'tokenizer params: {params}')
-        tokenizer = AutoTokenizer.from_pretrained(self.model_id, **params)
+        tokenizer = self.tokenizer_class.from_pretrained(model_id, **params)
         self.configure_tokenizer(tokenizer)
         return tokenizer
 
-    @property
-    def tokenizer(self) -> PreTrainedTokenizer:
-        """The model's tokenzier."""
-        res: _Resource = self._resource_cache[self.model_id]
-        if res.tokenizer is None:
-            res.tokenizer = self._load_tokenizer()
-        return res.tokenizer
-
-    def _load_model(self) -> PreTrainedModel:
+    def _load_model(self, model_id: str) -> PreTrainedModel:
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'creating model: {self.model_id}')
+            logger.debug(f'loading model {model_id} for generator: {self.name}')
+            self.write_to_log(logger, logging.DEBUG)
         params: Dict[str, Any] = dict(self.model_args)
-        qconf: BitsAndBytesConfig = self._get_quant_config()
-        if qconf is not None:
-            params['quantization_config'] = qconf
+        # if self.quantization_config is not None:
+        #     params['quantization_config'] = self.quantization_config
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model params: {params}')
-        with time(f'loaded model: {self.model_id}', logging.DEBUG):
-            model = AutoModelForCausalLM.from_pretrained(
-                self.model_id, **params)
-        self.configure_model(model)
+        with time(f'loaded model: {model_id}', logging.DEBUG):
+            if self.peft_model_id is None:
+                model = self.model_class.from_pretrained(model_id, **params)
+            else:
+                from peft import AutoPeftModelForCausalLM
+                model = AutoPeftModelForCausalLM.from_pretrained(
+                    self.peft_model_id, **params)
+            self.configure_model(model)
+            # model = self.model_class.from_pretrained(model_id, **params)
+            # self.configure_model(model)
+            # if self.peft_model_id is not None:
+            #     #print(f'peft model: {self.peft_model_id}')
+            #     model = PeftModel.from_pretrained(model, self.peft_model_id)#, device='cuda:0')#**params)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'model type: {type(model)}')
         return model
 
     def clear(self, include_cuda: bool = True):
@@ -157,12 +177,20 @@ class GeneratorResource(Dictable):
             torch.cuda.empty_cache()
 
     @property
+    def tokenizer(self) -> PreTrainedTokenizer:
+        """The model's tokenzier."""
+        res: _Resource = self._resource_cache[self.model_id]
+        if res.tokenizer is None:
+            res.tokenizer = self._load_tokenizer(self.model_id)
+        return res.tokenizer
+
+    @property
     @persisted('_model')
     def model(self) -> PreTrainedModel:
         """The LLM."""
         res: _Resource = self._resource_cache[self.model_id]
         if res.model is None:
-            res.model = self._load_model()
+            res.model = self._load_model(self.model_id)
         return res.model
 
     def __repr__(self):
@@ -305,9 +333,10 @@ class ModelTextGenerator(TextGenerator):
             input_text: str = tokenizer.decode(
                 input_ids[0], **self._get_tokenize_decode_params())
             logger.trace(f'input text: <<{input_text}>>')
-        model_output: Tensor = model.generate(
-            input_ids,
-            **self._get_generate_params())
+        with torch.no_grad():
+            model_output: Tensor = model.generate(
+                input_ids,
+                **self._get_generate_params())
         model_output = self._process_output(input_ids, model_output)
         model_output_raw: str = tokenizer.decode(
             model_output, **self._get_tokenize_decode_params())
@@ -328,6 +357,8 @@ class ModelTextGenerator(TextGenerator):
                       ``None``, no modification will be done on the text output
 
         """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'stream ouput of prompt: <<{prompt}>>')
         mr: GeneratorResource = self.resource
         tokenizer: PreTrainedTokenizer = mr.tokenizer
         model: PreTrainedModel = mr.model
@@ -453,6 +484,8 @@ class GenerateTask(Task):
     def _process(self, request: TaskRequest) -> TaskResponse:
         """Process a query (see :meth:`process`)."""
         request = self._prepare_request(request)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'processing generate task request: {request}')
         try:
             gen_output: GeneratorOutput = self.generator.generate(
                 prompt=request.model_input)
