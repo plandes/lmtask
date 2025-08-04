@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add LoRA generator configuration.
 - Separate and configure LoRA adapter output directory.
 - Add trainer evaluation dataset.
+- Disable adding end of sentence token in `GenerateTask` (turn on by setting
+  `add_train_eos` is `True`).  Now the `SFTTrainer` does this by default.
+- `InstructTask.apply_chat_template` defaults to ``False``.  Now the
+  `SFTTrainer` does this by default.
 
 
 ## [0.0.1] - 2025-05-04

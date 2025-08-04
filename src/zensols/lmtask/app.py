@@ -249,7 +249,11 @@ class PrototypeApplication(object):
             res.write()
 
     def _tmp(self):
-        pass
+        from . import Task
+        task: Task = self.app.task_factory.create('base_generate')
+        task.generator.generate_params['temperature'] = 0.01
+        self.prompt = 'One day, a little girl named'
+        task.generator.stream(self.prompt)
 
     def proto(self, run: int = 0):
         {

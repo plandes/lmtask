@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Tuple, Union
 from dataclasses import dataclass, field
 import sys
 import logging
+import warnings
 from pathlib import Path
 from io import TextIOBase
 from jinja2 import Template, Environment, BaseLoader
@@ -103,11 +104,18 @@ class InstructTask(GenerateTask):
     chat_template_args: Dict[str, Any] = field(default_factory=dict)
     """Arguments given to ``apply_chat_template``."""
 
-    apply_chat_template: bool = field(default=True)
+    apply_chat_template: bool = field(default=False)
     """Whether format the prompt into one that conforms to the model's instruct
     syntax.
 
     """
+    def __post_init__(self):
+        if self.add_train_eos:
+            warnings.warn(
+                message=("Field 'add_train_eos' is 'True' in InstructTask" +
+                         "but not needed since it applies a chat template."),
+                category=UserWarning)
+
     def _apply_instruct_chat_template(self, prompt: str) -> str:
         """Format ``prompt`` into one that conforms to the instruct syntax."""
         role_namme: str = self.resource.system_role_name
