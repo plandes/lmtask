@@ -5,8 +5,7 @@
 ## Resources
 #
 lmtask_llama_model_args:
-  #torch_dtype: bfloat16
-  torch_dtype: auto
+  torch_dtype: bfloat16
   device_map: auto
 
 lmtask_llama_base_resource:

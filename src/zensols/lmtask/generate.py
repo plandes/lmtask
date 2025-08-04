@@ -74,8 +74,6 @@ class GeneratorResource(Dictable):
     """The arguments given to the HF model ``from_pretrained`` method.
 
     """
-    bail: bool = field(default=False)
-
     def __post_init__(self):
         if isinstance(self.model_id, Path):
             self.model_id = str(self.model_id)
@@ -465,6 +463,12 @@ class GenerateTask(Task):
     This is also used by :class:`.InstructTask` for its chat template.
 
     """
+    add_train_eos: bool = field(default=False)
+    """Whether to add the end of sentence token to the output when mapping the
+    dataset for training.  Newer versions of the :class:`.trl.SFTTrainer` class
+    add (and force) this already.
+
+    """
     def _process(self, request: TaskRequest) -> TaskResponse:
         """Process a query (see :meth:`process`)."""
         request = self._prepare_request(request)
@@ -490,10 +494,12 @@ class GenerateTask(Task):
         def map_batch(batch: LazyBatch) -> Dict[str, List[Dict[str, Any]]]:
             return {field: list(map(lambda s: s + eos_token, batch[field]))}
 
-        field: str = factory.text_field
-        tokenizer: PreTrainedTokenizer = self.resource.tokenizer
-        eos_token: str = tokenizer.eos_token
-        return ds.map(map_batch, batched=True)
+        if self.add_train_eos:
+            field: str = factory.text_field
+            tokenizer: PreTrainedTokenizer = self.resource.tokenizer
+            eos_token: str = tokenizer.eos_token
+            ds = ds.map(map_batch, batched=True)
+        return ds
 
     def clear(self):
         super().clear()
