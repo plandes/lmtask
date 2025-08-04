@@ -21,7 +21,6 @@ Features:
   post-train LLM models.
 * [Advanced API](#python-api) to read responses and accept partial output for
   max token cutoffs.
-* [Unsloth] support.
 * Chat template integration when supported.
 * Extendable interfaces with LLMs with built in support for Llama 3.
 * [Easy to configure datasets](#datasets) processed by model trainers
@@ -216,5 +215,3 @@ Copyright (c) 2025 Paul Landes
 [pypi-badge]: https://img.shields.io/pypi/v/zensols.lmtask.svg
 [python311-badge]: https://img.shields.io/badge/python-3.11-blue.svg
 [python311-link]: https://www.python.org/downloads/release/python-3110
-
-[Unsloth]: https://unsloth.ai

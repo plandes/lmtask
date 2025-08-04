@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Removed
+- Unsloth configuration and API.
+
 ### Changed
 - Switch build tools to [pixi].
 - Removed [zensols.deeplearn] dependency.
