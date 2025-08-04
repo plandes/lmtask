@@ -9,7 +9,7 @@ default:
   data_dir: ${default:root_dir}/data/tinystory
 
 lmtask_default:
-  lmtask_base_resource: lmtask_llama_tinystory_resource
+  lmtask_base_resource: lmtask_llama_tinystory_inference_resource
 
 
 ## Train
@@ -17,6 +17,20 @@ lmtask_default:
 lmtask_trainer_default:
   trainer_name: 'lmtask_trainer_hf'
   source_model: 'meta-llama/Llama-3.1-8B'
+
+lmtask_tinystory_train_source:
+  class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
+  source: roneneldan/TinyStories
+  load_args:
+    split: 'train[:2500]'
+  task: 'instance: lmtask_task_tinystory'
+
+lmtask_tinystory_eval_source:
+  class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
+  source: roneneldan/TinyStories
+  load_args:
+    split: 'validation[:250]'
+  task: 'instance: lmtask_task_tinystory'
 
 lmtask_trainer_hf:
   train_source: 'instance: lmtask_tinystory_train_source'
@@ -49,21 +63,6 @@ lmtask_trainer_hf_peft:
   lora_alpha: 32
   lora_dropout: 0.05
 
-lmtask_tinystory_train_source:
-  class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
-  source: roneneldan/TinyStories
-  load_args:
-    split: 'train[:2500]'
-  task: 'instance: lmtask_task_tinystory'
-
-lmtask_tinystory_eval_source:
-  class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
-  source: roneneldan/TinyStories
-  load_args:
-    split: 'validation[:250]'
-  task: 'instance: lmtask_task_tinystory'
-
-
 lmtask_llama_tinystory_hf_bnb_4bit_config:
   class_name: transformers.BitsAndBytesConfig
   load_in_4bit: true
@@ -82,7 +81,7 @@ lmtask_llama_tinystory_model_args:
 
 ## Inference
 #
-lmtask_llama_tinystory_resource:
+lmtask_llama_tinystory_inference_resource:
   class_name: zensols.lmtask.llama.LlamaGeneratorResource
   model_desc: LlaMA 3.1 8B Instruct trained on the tiny story corpus
   model_args: 'instance: lmtask_llama_tinystory_model_args'
