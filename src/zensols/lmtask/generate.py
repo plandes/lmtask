@@ -21,9 +21,8 @@ from datasets.formatting.formatting import LazyBatch
 from transformers import (
     AutoModel, AutoTokenizer,
     PreTrainedTokenizer, PreTrainedModel, AutoModelForCausalLM,
-    BatchEncoding, BitsAndBytesConfig, TextIteratorStreamer
+    BatchEncoding, TextIteratorStreamer
 )
-from peft import PeftModel
 from zensols.util import time, Hasher
 from zensols.persist import persisted, Stash, FileTextUtil
 from zensols.config import Dictable, ConfigFactory
@@ -65,19 +64,11 @@ class GeneratorResource(Dictable):
     """The HF model ID or path to the Peft model or ``None`` if there is none.
 
     """
-    # peft_model_class: Type[AutoPeftModel] = field(default=AutoPeftModel)
-    # """The class used to create the Peft model with
-    # :meth:`~peft.AutoPeftModel.from_pretrained`.
-
-    # """
     model_desc: str = field(default=None)
     """A human readable description of the model this resource contains."""
 
     system_role_name: str = field(default='system')
     """The default name of the system's role."""
-
-    # quantization_config: BitsAndBytesConfig = field(default=None)
-    # """The quantization argument or ``None`` if no quantizing is used."""
 
     model_args: Dict[str, Any] = field(default_factory=dict)
     """The arguments given to the HF model ``from_pretrained`` method.
@@ -149,8 +140,6 @@ class GeneratorResource(Dictable):
             logger.debug(f'loading model {model_id} for generator: {self.name}')
             self.write_to_log(logger, logging.DEBUG)
         params: Dict[str, Any] = dict(self.model_args)
-        # if self.quantization_config is not None:
-        #     params['quantization_config'] = self.quantization_config
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model params: {params}')
         with time(f'loaded model: {model_id}', logging.DEBUG):
@@ -161,11 +150,6 @@ class GeneratorResource(Dictable):
                 model = AutoPeftModelForCausalLM.from_pretrained(
                     self.peft_model_id, **params)
             self.configure_model(model)
-            # model = self.model_class.from_pretrained(model_id, **params)
-            # self.configure_model(model)
-            # if self.peft_model_id is not None:
-            #     #print(f'peft model: {self.peft_model_id}')
-            #     model = PeftModel.from_pretrained(model, self.peft_model_id)#, device='cuda:0')#**params)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model type: {type(model)}')
         return model
