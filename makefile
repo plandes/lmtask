@@ -43,12 +43,6 @@ traintinystory:
 			@$(MAKE) $(PY_MAKE_ARGS) invoke \
 				ARG="-c trainconf/tinystory.yml train"
 
-## TODO
-tmp:
-			@CUDA_VISIBLE_DEVICES=0,1,2,3,4,5 \
-			$(MAKE) $(PY_MAKE_ARGS) invoke \
-				ARG="-c trainconf/tinystory.yml train"
-
 # accelerate
 .PHONY:			traintinystoryacc
 traintinystoryacc:	$(PY_PYPROJECT_FILE)
@@ -71,5 +65,5 @@ testtinystory:
 # test the trained imdb instrudct model
 .PHONY:			testimdb
 testimdb:
-			@$(MAKE) ARG="-c trainconf/imdb.yml \
-				stream imdb $(GEN_PROMPT)"
+			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
+				ARG="-c trainconf/imdb.yml stream imdb $(GEN_PROMPT)"

@@ -9,7 +9,7 @@ default:
   data_dir: ${default:root_dir}/data/tinystory
 
 lmtask_default:
-  lmtask_base_resource: lmtask_llama_tinystory_inference_resource
+  base_resource: lmtask_llama_tinystory_inference_resource
 
 
 ## Train
@@ -95,7 +95,7 @@ lmtask_tinystory_stash:
 
 lmtask_tinystory_caching_generator:
   class_name: zensols.lmtask.generate.CachingGenerator
-  _delegate: 'alias: lmtask_default:lmtask_base_generator'
+  _delegate: 'alias: lmtask_default:base_generator'
   _stash: 'instance: lmtask_tinystory_stash'
 
 lmtask_task_tinystory:
@@ -108,5 +108,5 @@ lmtask_task_tinystory:
     then:
       generator: 'instance: lmtask_tinystory_caching_generator'
     else:
-      generator: 'alias: lmtask_default:lmtask_base_generator'
+      generator: 'alias: lmtask_default:base_generator'
   resource: 'instance: lmtask_llama_base_resource'

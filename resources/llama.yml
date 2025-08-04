@@ -23,7 +23,7 @@ lmtask_llama_instruct_resource:
 #
 lmtask_llama_base_generator:
   class_name: zensols.lmtask.generate.ReplaceTextGenerator
-  resource: 'alias: lmtask_default:lmtask_base_resource'
+  resource: 'alias: lmtask_default:base_resource'
   generate_params: >-
     call({'param': {'method': 'asdict'}}): lmtask_model_generate_args
   tokenize_decode_params:
@@ -34,7 +34,7 @@ lmtask_llama_base_generator:
 
 lmtask_llama_instruct_generator:
   class_name: zensols.lmtask.instruct.InstructModelTextGenerator
-  resource: 'alias: lmtask_default:lmtask_instruct_resource'
+  resource: 'alias: lmtask_default:instruct_resource'
   generate_params: >-
     call({'param': {'method': 'asdict'}}): lmtask_model_generate_args
   replacements:

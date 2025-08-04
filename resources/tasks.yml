@@ -7,10 +7,10 @@
 lmtask_task_base_generate:
   class_name: zensols.lmtask.generate.GenerateTask
   description: 'base generate text'
-  generator: 'alias: lmtask_default:lmtask_base_generator'
+  generator: 'alias: lmtask_default:base_generator'
   request_class: 'class: zensols.lmtask.task.TaskRequest'
   response_class: 'class: zensols.lmtask.task.TaskResponse'
-  resource: 'instance: ${lmtask_default:lmtask_base_resource}'
+  resource: 'instance: ${lmtask_default:base_resource}'
 
 
 ## Instruct generation
@@ -21,7 +21,7 @@ lmtask_instgen_stash:
 
 lmtask_instgen_caching_generator:
   class_name: zensols.lmtask.generate.CachingGenerator
-  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _delegate: 'alias: lmtask_default:instruct_generator'
   _stash: 'instance: lmtask_instgen_stash'
 
 lmtask_task_instruct_generate:
@@ -32,10 +32,10 @@ lmtask_task_instruct_generate:
     then:
       generator: 'instance: lmtask_instgen_caching_generator'
     else:
-      generator: 'alias: lmtask_default:lmtask_instruct_generator'
+      generator: 'alias: lmtask_default:instruct_generator'
   request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
   response_class: 'class: zensols.lmtask.task.TaskResponse'
-  resource: 'instance: ${lmtask_default:lmtask_instruct_resource}'
+  resource: 'instance: ${lmtask_default:instruct_resource}'
 
 
 ## Sentiment
@@ -46,7 +46,7 @@ lmtask_sentiment_stash:
 
 lmtask_sentiment_caching_generator:
   class_name: zensols.lmtask.generate.CachingGenerator
-  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _delegate: 'alias: lmtask_default:instruct_generator'
   _stash: 'instance: lmtask_sentiment_stash'
 
 lmtask_task_sentiment:
@@ -57,10 +57,10 @@ lmtask_task_sentiment:
     then:
       generator: 'instance: lmtask_sentiment_caching_generator'
     else:
-      generator: 'alias: lmtask_default:lmtask_instruct_generator'
+      generator: 'alias: lmtask_default:instruct_generator'
   request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
   response_class: 'class: zensols.lmtask.task.JSONTaskResponse'
-  resource: 'instance: ${lmtask_default:lmtask_instruct_resource}'
+  resource: 'instance: ${lmtask_default:instruct_resource}'
   inference_template: 'resource(zensols.lmtask): resources/prompts/sentiment.txt'
   role: 'You are a sentiment analyzer.'
 
@@ -73,7 +73,7 @@ lmtask_ner_stash:
 
 lmtask_ner_caching_generator:
   class_name: zensols.lmtask.generate.CachingGenerator
-  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _delegate: 'alias: lmtask_default:instruct_generator'
   _stash: 'instance: lmtask_ner_stash'
 
 lmtask_task_ner:
@@ -84,9 +84,9 @@ lmtask_task_ner:
     then:
       generator: 'instance: lmtask_ner_caching_generator'
     else:
-      generator: 'alias: lmtask_default:lmtask_instruct_generator'
+      generator: 'alias: lmtask_default:instruct_generator'
   request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
   response_class: 'class: zensols.lmtask.task.JSONTaskResponse'
-  resource: 'instance: ${lmtask_default:lmtask_instruct_resource}'
+  resource: 'instance: ${lmtask_default:instruct_resource}'
   inference_template: 'resource(zensols.lmtask): resources/prompts/ner.txt'
   role: 'You are a NER tagger.'

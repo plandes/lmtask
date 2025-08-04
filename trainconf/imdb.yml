@@ -8,7 +8,7 @@ default:
   data_dir: ${default:root_dir}/data/imdb
 
 lmtask_default:
-  lmtask_instruct_resource: lmtask_imdb_inference_resource
+  instruct_resource: lmtask_imdb_inference_resource
 
 
 ## Train
@@ -98,7 +98,7 @@ lmtask_imdb_stash:
 
 lmtask_imdb_caching_generator:
   class_name: zensols.lmtask.generate.CachingGenerator
-  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _delegate: 'alias: lmtask_default:instruct_generator'
   _stash: 'instance: lmtask_imdb_stash'
 
 lmtask_task_imdb:
@@ -111,7 +111,7 @@ lmtask_task_imdb:
     then:
       generator: 'instance: lmtask_imdb_caching_generator'
     else:
-      generator: 'alias: lmtask_default:lmtask_instruct_generator'
+      generator: 'alias: lmtask_default:instruct_generator'
   resource: 'instance: lmtask_llama_instruct_resource'
   role: 'You are a sentiment classifier.'
   train_template: |-

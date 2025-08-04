@@ -133,6 +133,7 @@ class Application(object):
         :param max_sample: the number of sample to print
 
         """
+        from pprint import pprint
         import itertools as it
         from . import TaskDatasetFactory
         from .train import Trainer
@@ -141,7 +142,7 @@ class Application(object):
         ds: Dataset = dsf.create()
         for row in it.islice(ds, max_sample):
             print('_' * 40)
-            print(row[dsf.text_field])
+            pprint(row)
 
     def show_trainer(self, long_output: bool = False):
         """Print configuration and dataset stats of the configured
