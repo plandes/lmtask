@@ -104,28 +104,36 @@ class InstructTask(GenerateTask):
     chat_template_args: Dict[str, Any] = field(default_factory=dict)
     """Arguments given to ``apply_chat_template``."""
 
-    apply_chat_template: bool = field(default=False)
+    apply_chat_template: bool = field(default=True)
     """Whether format the prompt into one that conforms to the model's instruct
     syntax.
 
     """
+    train_apply_chat_template: bool = field(default=False)
+    """Like :obj:`apply_chat_template`, but whether to apply during training.
+    If this is ``False``, a conversational ``messages`` with dictionary list is
+    used instead.
+
+    """
     def __post_init__(self):
-        if self.add_train_eos:
+        if self.train_add_eos:
             warnings.warn(
-                message=("Field 'add_train_eos' is 'True' in InstructTask" +
+                message=("Field 'train_add_eos' is 'True' in InstructTask" +
                          "but not needed since it applies a chat template."),
                 category=UserWarning)
 
-    def _apply_instruct_chat_template(self, prompt: str) -> str:
-        """Format ``prompt`` into one that conforms to the instruct syntax."""
+    def _apply_messages(self, prompt: str) -> List[Dict[str, str]]:
         role_namme: str = self.resource.system_role_name
-        messages = [
+        return [
             {'role': role_namme, 'content': self.role},
             {'role': 'user', 'content': prompt}
         ]
+
+    def _apply_instruct_chat_template(self, prompt: str) -> str:
+        """Format ``prompt`` into one that conforms to the instruct syntax."""
         tokenizer: PreTrainedTokenizer = self.resource.tokenizer
         return tokenizer.apply_chat_template(
-            messages,
+            conversation=self._apply_messages(prompt),
             tokenize=False,
             return_dict=False,
             **self.chat_template_args)
@@ -156,17 +164,19 @@ class InstructTask(GenerateTask):
     def _prepare_dataset(self, ds: Dataset, factory: TaskDatasetFactory) -> \
             Dataset:
         def map_batch(batch: LazyBatch) -> Dict[str, List[Dict[str, Any]]]:
-            texts: List[str] = []
+            texts: List[Union[str, List[Dict[str, str]]]] = []
             for data in zip(*tuple(map(lambda k: batch[k], keys))):
                 params: Dict[str, Any] = dict(zip(keys, data))
                 params['task'] = self
                 prompt: str = template.render(**params)
-                if self.apply_chat_template:
-                    prompt = self._apply_instruct_chat_template(prompt)
-                texts.append(prompt)
+                if self.train_apply_chat_template:
+                    texts.append(self._apply_instruct_chat_template(prompt))
+                else:
+                    texts.append(self._apply_messages(prompt))
             return {field: texts}
 
-        field: str = factory.text_field
+        field: str = factory.text_field if self.train_apply_chat_template \
+            else factory.messages_field
         template: Template = self._create_template(self.train_template)
         keys: Tuple[str, ...] = tuple(ds.features.keys())
         return ds.map(map_batch, batched=True)

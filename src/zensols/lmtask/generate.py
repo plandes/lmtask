@@ -19,10 +19,10 @@ import textwrap as tw
 from datasets import Dataset
 from datasets.formatting.formatting import LazyBatch
 from transformers import (
-    AutoModel, AutoTokenizer,
-    PreTrainedTokenizer, PreTrainedModel, AutoModelForCausalLM,
-    BatchEncoding, TextIteratorStreamer
+    AutoModel, AutoTokenizer, PreTrainedTokenizer, PreTrainedModel,
+    AutoModelForCausalLM, BatchEncoding, TextIteratorStreamer
 )
+from peft import AutoPeftModelForCausalLM
 from zensols.util import time, Hasher
 from zensols.persist import persisted, Stash, FileTextUtil
 from zensols.config import Dictable, ConfigFactory
@@ -62,6 +62,11 @@ class GeneratorResource(Dictable):
     """
     peft_model_id: Union[str, Path] = field(default=None)
     """The HF model ID or path to the Peft model or ``None`` if there is none.
+
+    """
+    peft_model_class: Type[AutoModel] = field(default=AutoPeftModelForCausalLM)
+    """The class used to create the model with
+    :meth:`~transformers.AutoModel.from_pretrained`.
 
     """
     model_desc: str = field(default=None)
@@ -123,7 +128,8 @@ class GeneratorResource(Dictable):
         """Make any necessary updates programatically."""
         pass
 
-    def _load_tokenizer(self, model_id: str) -> PreTrainedTokenizer:
+    def _load_tokenizer(self) -> PreTrainedTokenizer:
+        model_id: str = self.model_id
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating tokenizer: {model_id}')
         params: Dict[str, Any] = {}
@@ -133,20 +139,22 @@ class GeneratorResource(Dictable):
         self.configure_tokenizer(tokenizer)
         return tokenizer
 
-    def _load_model(self, model_id: str) -> PreTrainedModel:
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'loading model {model_id} for generator: {self.name}')
-            self.write_to_log(logger, logging.DEBUG)
+    def _load_model(self) -> PreTrainedModel:
+        model_id: str = self.model_id
         params: Dict[str, Any] = dict(self.model_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model params: {params}')
         with time(f'loaded model: {model_id}', logging.DEBUG):
+            cls: Type[AutoModel]
             if self.peft_model_id is None:
-                model = self.model_class.from_pretrained(model_id, **params)
+                cls = self.model_class
             else:
-                from peft import AutoPeftModelForCausalLM
-                model = AutoPeftModelForCausalLM.from_pretrained(
-                    self.peft_model_id, **params)
+                cls = self.peft_model_class
+                model_id = self.peft_model_id
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'loading {model_id}, generator: {self.name}')
+                self.write_to_log(logger, logging.DEBUG)
+            model = cls.from_pretrained(model_id, **params)
             self.configure_model(model)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model type: {type(model)}')
@@ -163,7 +171,7 @@ class GeneratorResource(Dictable):
         """The model's tokenzier."""
         res: _Resource = self._resource_cache[self.model_id]
         if res.tokenizer is None:
-            res.tokenizer = self._load_tokenizer(self.model_id)
+            res.tokenizer = self._load_tokenizer()
         return res.tokenizer
 
     @property
@@ -172,7 +180,7 @@ class GeneratorResource(Dictable):
         """The LLM."""
         res: _Resource = self._resource_cache[self.model_id]
         if res.model is None:
-            res.model = self._load_model(self.model_id)
+            res.model = self._load_model()
         return res.model
 
     def __repr__(self):
@@ -463,7 +471,7 @@ class GenerateTask(Task):
     This is also used by :class:`.InstructTask` for its chat template.
 
     """
-    add_train_eos: bool = field(default=False)
+    train_add_eos: bool = field(default=False)
     """Whether to add the end of sentence token to the output when mapping the
     dataset for training.  Newer versions of the :class:`.trl.SFTTrainer` class
     add (and force) this already.
@@ -494,7 +502,7 @@ class GenerateTask(Task):
         def map_batch(batch: LazyBatch) -> Dict[str, List[Dict[str, Any]]]:
             return {field: list(map(lambda s: s + eos_token, batch[field]))}
 
-        if self.add_train_eos:
+        if self.train_add_eos:
             field: str = factory.text_field
             tokenizer: PreTrainedTokenizer = self.resource.tokenizer
             eos_token: str = tokenizer.eos_token

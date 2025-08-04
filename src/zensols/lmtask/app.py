@@ -248,12 +248,29 @@ class PrototypeApplication(object):
             res = task.process(req)
             res.write()
 
+    def _example_imdb(self, debug: bool = False):
+        # this needs proto_args='proto -c trainconf/dbinstruct.yml'
+        import datasets
+        from datasets import Dataset
+        task: Task = self.app.task_factory.create('imdb')
+        ds: Dataset = datasets.load_dataset('stanfordnlp/imdb', split='test')
+        ds = ds.shuffle(seed=0)
+        ds = ds.select(range(50))
+        for review in ds:
+            req = InstructTaskRequest(instruction=review['text'])
+            if debug:
+                req = task.prepare_request(req)
+                req.write()
+            res: TaskResponse = task.process(req)
+            if debug:
+                res.write(include_model_output_raw=True)
+            should: str = 'positive' if review['label'] == 1 else 'negative'
+            pred: str = res.model_output.strip()
+            correct: bool = (should == pred)
+            print(f'should: {should}, pred: {pred}, correct: {correct}')
+
     def _tmp(self):
-        from . import Task
-        task: Task = self.app.task_factory.create('base_generate')
-        task.generator.generate_params['temperature'] = 0.01
-        self.prompt = 'One day, a little girl named'
-        task.generator.stream(self.prompt)
+        pass
 
     def proto(self, run: int = 0):
         {
@@ -278,5 +295,6 @@ class PrototypeApplication(object):
             9: self._example_prompt_population,
             10: self._example_tiny_story,
             11: self._example_databricks_instruct,
-            12: self.app.dataset_sample,
+            12: self._example_imdb,
+            13: self.app.dataset_sample,
         }[run]()

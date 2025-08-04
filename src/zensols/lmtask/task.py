@@ -182,7 +182,13 @@ class TaskDatasetFactory(Dictable, metaclass=ABCMeta):
     """The task that helps format text in datasets."""
 
     text_field: str = field(default='text')
-    """The target field used by the trainer."""
+    """The target text field used by the trainer."""
+
+    messages_field: str = field(default='messages')
+    """The target conversational field used by the trainer."""
+
+    eval_field: str = field(default='text')
+    """The field used for comparison with the the evaluation dataset."""
 
     def _pre_process(self, ds: Dataset) -> Dataset:
         return ds

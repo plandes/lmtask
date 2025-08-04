@@ -8,7 +8,7 @@ default:
   data_dir: ${default:root_dir}/data/imdb
 
 lmtask_default:
-  lmtask_instruct_resource: lmtask_imdb_resource
+  lmtask_instruct_resource: lmtask_imdb_inference_resource
 
 
 ## Train
@@ -17,14 +17,8 @@ lmtask_trainer_default:
   trainer_name: 'lmtask_trainer_hf'
   source_model: 'meta-llama/Llama-3.1-8B-Instruct'
 
-lmtask_trainer_hf:
-  source: 'instance: lmtask_imdb_source'
-
-lmtask_trainer_hf_training_arguments:
-  num_train_epochs: 1
-
 # a dataset factory instance used by the trainer (lmtask_trainer_hf)
-lmtask_imdb_source:
+lmtask_imdb_train_source:
   class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
   # the dataset name (downloaded if not already); this can be a `pathlib.Path`,
   # Pandas dataframe or Zensols Stash
@@ -44,13 +38,59 @@ lmtask_imdb_source:
     ds = ds.select(range(7_000))
 
 
+lmtask_trainer_hf:
+  train_source: 'instance: lmtask_imdb_train_source'
+
+lmtask_trainer_hf_training_arguments:
+  num_train_epochs: 1
+  optim: 'paged_adamw_32bit'
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 4
+  logging_steps: 2
+
+lmtask_trainer_hf_peft:
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+    - lm_head
+    - embed_tokens
+
+lmtask_trainer_hf_peft:
+  class_name: peft.LoraConfig
+  r: 128
+  lora_alpha: 32
+  lora_dropout: 0.05
+
+lmtask_llama_imdb_hf_bnb_4bit_config:
+  class_name: transformers.BitsAndBytesConfig
+  load_in_4bit: true
+  # quantize to 4-bit normalized float
+  bnb_4bit_quant_type: 'nf4'
+  bnb_4bit_compute_dtype: 'bfloat16'
+  # apply double quantization for constants
+  bnb_4bit_use_double_quant: true
+
+lmtask_llama_imdb_model_args:
+  device_map: auto
+  # uncomment to load weights as a 16-bit float
+  #torch_dtype: float16
+  # uncommen to add quantization
+  #quantization_config: 'instance: lmtask_llama_imdb_hf_bnb_4bit_config'
+
+
 ## Inference
 #
-lmtask_imdb_resource:
+lmtask_imdb_inference_resource:
   class_name: zensols.lmtask.llama.LlamaGeneratorResource
   model_desc: LlaMA 3.1 8B Instruct trained on the IMDB corpus
-  model_id: '${lmtask_trainer_default:checkpoint_dir}/checkpoint-437'
-  model_args: 'instance: lmtask_llama_model_args'
+  model_args: 'asdict: lmtask_llama_imdb_model_args'
+  model_id: '${lmtask_trainer_default:source_model}'
+  peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
 
 lmtask_imdb_stash:
   class_name: zensols.db.sqlite.SqliteDbStash
@@ -75,10 +115,10 @@ lmtask_task_imdb:
   resource: 'instance: lmtask_llama_instruct_resource'
   role: 'You are a sentiment classifier.'
   train_template: |-
-    Only output the sentiment.
+    Only output the sentiment as either ```positive``` or ```negative```.
     ### Review:{{ instruction }}
     ### Sentiment:```{{ output }}```
   inference_template: |-
-    Only output the sentiment.
+    Only output the sentiment as either 'positive' or 'negative'.
     ### Review:{{ request.instruction }}
     ### Sentiment:

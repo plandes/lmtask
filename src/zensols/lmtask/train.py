@@ -182,7 +182,7 @@ class Trainer(Dictable, metaclass=ABCMeta):
         if self.eval_source is not None:
             params['eval_dataset'] = self.eval_source.create()
             args.metric_for_best_model = \
-                f'eval_{self.eval_source.text_field}_loss'
+                f'eval_{self.eval_source.eval_field}_loss'
             args.__dict__.update(self.eval_params)
         return params
 

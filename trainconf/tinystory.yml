@@ -72,11 +72,12 @@ lmtask_llama_tinystory_hf_bnb_4bit_config:
   # apply double quantization for constants
   bnb_4bit_use_double_quant: true
 
-lmtask_llama_tinystory_model_args:
+lmtask_llama_imdb_model_args:
   device_map: auto
-  torch_dtype: auto
+  # uncomment to load weights as a 16-bit float
+  #torch_dtype: float16
   # uncommen to add quantization
-  #quantization_config: 'instance: lmtask_llama_tinystory_hf_bnb_4bit_config'
+  #quantization_config: 'instance: lmtask_llama_imdb_hf_bnb_4bit_config'
 
 
 ## Inference
