@@ -17,7 +17,7 @@ lmtask_trainer_hf_bnb_8bit_config:
   load_in_8bit: true
 
 lmtask_trainer_hf_source_model_args:
-  # lora configuration
+  # uncomment to add lora configuration
   #quantization_config: 'instance: lmtask_trainer_hf_bnb_4bit_config'
   # train over configured/available GPUs
   device_map: auto
@@ -119,9 +119,7 @@ lmtask_trainer_hf_eval_arguments:
   eval_strategy: 'steps'
 
 lmtask_trainer_hf_trainer_arguments:
-  #max_seq_length: ${lmtask_trainer_default:max_seq_length}
   args: 'instance: lmtask_trainer_hf_training_arguments'
-  #peft_config: 'instance: lmtask_trainer_hf_peft'
 
 lmtask_trainer_hf:
   class_name: zensols.lmtask.hf.HuggingFaceTrainer
