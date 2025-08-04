@@ -63,21 +63,12 @@ lmtask_trainer_hf_peft:
   lora_alpha: 32
   lora_dropout: 0.05
 
-lmtask_llama_tinystory_hf_bnb_4bit_config:
-  class_name: transformers.BitsAndBytesConfig
-  load_in_4bit: true
-  # quantize to 4-bit normalized float
-  bnb_4bit_quant_type: 'nf4'
-  bnb_4bit_compute_dtype: 'bfloat16'
-  # apply double quantization for constants
-  bnb_4bit_use_double_quant: true
-
-lmtask_llama_imdb_model_args:
+lmtask_llama_tinystory_model_args:
   device_map: auto
   # uncomment to load weights as a 16-bit float
   #torch_dtype: float16
   # uncommen to add quantization
-  #quantization_config: 'instance: lmtask_llama_imdb_hf_bnb_4bit_config'
+  #quantization_config: 'instance: lmtask_quant_4bit_config'
 
 
 ## Inference
@@ -87,7 +78,7 @@ lmtask_llama_tinystory_inference_resource:
   model_desc: LlaMA 3.1 8B Instruct trained on the tiny story corpus
   model_args: 'instance: lmtask_llama_tinystory_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
-  peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
+  #peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
 
 lmtask_tinystory_stash:
   class_name: zensols.db.sqlite.SqliteDbStash

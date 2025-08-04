@@ -66,4 +66,5 @@ testtinystory:
 .PHONY:			testimdb
 testimdb:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
-				ARG="-c trainconf/imdb.yml stream imdb $(GEN_PROMPT)"
+				ARG="-c trainconf/imdb.yml \
+					instruct imdb 'I loved the movie'"

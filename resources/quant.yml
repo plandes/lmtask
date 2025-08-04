@@ -1,0 +1,15 @@
+#@meta {desc: "quantization", date: "2025-08-04"}
+
+
+lmtask_quant_4bit_config:
+  class_name: transformers.BitsAndBytesConfig
+  load_in_4bit: true
+  # quantize to 4-bit normalized float
+  bnb_4bit_quant_type: 'nf4'
+  bnb_4bit_compute_dtype: 'bfloat16'
+  # apply double quantization for constants
+  bnb_4bit_use_double_quant: true
+
+lmtask_quant_8bit_config:
+  class_name: transformers.BitsAndBytesConfig
+  load_in_8bit: true
