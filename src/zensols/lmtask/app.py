@@ -248,6 +248,9 @@ class PrototypeApplication(object):
             res = task.process(req)
             res.write()
 
+    def _tmp(self):
+        pass
+
     def proto(self, run: int = 0):
         {
             0: self._tmp,
