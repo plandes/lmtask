@@ -56,9 +56,6 @@ lmtask_trainer_hf_peft:
     - down_proj
     - lm_head
     - embed_tokens
-
-lmtask_trainer_hf_peft:
-  class_name: peft.LoraConfig
   r: 128
   lora_alpha: 32
   lora_dropout: 0.05
