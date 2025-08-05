@@ -78,7 +78,7 @@ lmtask_llama_tinystory_inference_resource:
   model_desc: LlaMA 3.1 8B Instruct trained on the tiny story corpus
   model_args: 'instance: lmtask_llama_tinystory_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
-  #peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
+  peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
 
 lmtask_tinystory_stash:
   class_name: zensols.db.sqlite.SqliteDbStash
