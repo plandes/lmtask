@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.0.2] - 2025-08-06
 ### Removed
 - Unsloth configuration and API.
 
@@ -32,7 +33,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/lmtask/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/plandes/lmtask/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/plandes/lmtask/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/plandes/lmtask/compare/v0.0.0...v0.0.1
 
 [pixi]: https://pixi.sh

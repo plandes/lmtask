@@ -44,7 +44,7 @@ lmtask_test_poem_stash:
 
 lmtask_test_poem_caching_generator:
   class_name: zensols.lmtask.generate.CachingGenerator
-  _delegate: 'alias: lmtask_default:lmtask_instruct_generator'
+  _delegate: 'alias: lmtask_default:instruct_generator'
   _stash: 'instance: lmtask_test_poem_stash'
 
 
