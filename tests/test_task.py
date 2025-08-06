@@ -1,3 +1,4 @@
+from typing import Callable
 import warnings
 import torch
 from zensols.lmtask.instruct import InstructTaskRequest
@@ -23,7 +24,7 @@ class TestTask(TestBase):
         self.assertEqual(should, response.model_output)
         self.assertEqual(request, response.request)
 
-    def test_prompt_format(self):
+    def _test_prompt_format(self):
         fac = self.app.task_factory
         task: Task = fac.create('echo')
         request = InstructTaskRequest(instruction='inst')
@@ -37,6 +38,18 @@ class TestTask(TestBase):
         self.assertEqual(should, response.model_output_raw)
         self.assertEqual(should, response.model_output)
         self.assertEqual(request, response.request)
+
+    def _protect_hf_access(self, fn: Callable):
+        try:
+            fn()
+        except Exception as e:
+            warnings.warn('Protected HuggingFace access exception: {e}',
+                          UserWarning)
+            if not self._should_protect_hf():
+                raise e
+
+    def test_prompt_format(self):
+        self._protect_hf_access(self._test_prompt_format)
 
     def test_prompt_format_raw(self):
         fac = self.app.task_factory

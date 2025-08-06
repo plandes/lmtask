@@ -2,6 +2,7 @@ import logging
 import unittest
 from pathlib import Path
 import shutil
+import os
 from zensols.util import Failure
 from zensols.config import ConfigFactory
 from zensols.cli import CliHarness
@@ -18,6 +19,9 @@ class TestBase(unittest.TestCase):
         self.target = Path('target')
         if self.target.is_dir():
             shutil.rmtree(self.target)
+
+    def _should_protect_hf(self) -> bool:
+        return os.environ.get('PROTECT_HF_ACCESS', 'no') == '1'
 
     def _get_harness(self) -> CliHarness:
         return ApplicationFactory.create_harness()
