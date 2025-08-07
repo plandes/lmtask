@@ -91,8 +91,8 @@ lmtask_trainer_hf_training_arguments:
   logging_steps: 5
   # determines when model checkpoints are saved. "steps" means checkpoints are
   # saved after a certain number of steps rather than at the end of an epoch
-  save_steps: 20
-  save_strategy: 'steps'
+  #save_steps: 20
+  #save_strategy: 'steps'
   #
   # Whether to use fp16 16-bit (mixed) precision training instead of 32-bit
   # training; adding this gives the following error:
