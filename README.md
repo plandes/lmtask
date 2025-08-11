@@ -2,6 +2,7 @@
 
 [![PyPI][pypi-badge]][pypi-link]
 [![Python 3.11][python311-badge]][python311-link]
+[![Python 3.12][python312-badge]][python312-link]
 
 A large language model (LLM) API to train and inference specifically for tasks.
 The API provides utility classes and configuration to streamline project's
@@ -215,3 +216,5 @@ Copyright (c) 2025 Paul Landes
 [pypi-badge]: https://img.shields.io/pypi/v/zensols.lmtask.svg
 [python311-badge]: https://img.shields.io/badge/python-3.11-blue.svg
 [python311-link]: https://www.python.org/downloads/release/python-3110
+[python312-badge]: https://img.shields.io/badge/python-3.12-blue.svg
+[python312-link]: https://www.python.org/downloads/release/python-3120
