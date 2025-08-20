@@ -203,7 +203,7 @@ class Trainer(Dictable, metaclass=ABCMeta):
         with time('model trained'):
             output: TrainOutput = self._train(params, train_dataset)
         result: ModelResult = ModelResult(output)
-        result.output_dir = Path(params['args'].output_dir)
+        result.output_dir = self.peft_output_dir
         result.train_params = params
         result.config = self.config
         logger.info(f'training complete: {result}')

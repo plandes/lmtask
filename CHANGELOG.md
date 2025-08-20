@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.1.1] - 2025-08-20
+### Changed
+- Pickled training results go to the Peft output model's directory.
+- Training steps configuration was commented out to allow client projects to
+  keep the HF library defaults.
+
+
 ## [0.1.0] - 2025-08-06
 ### Removed
 - Unsloth configuration and API.
@@ -33,7 +40,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/lmtask/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/plandes/lmtask/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/plandes/lmtask/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/plandes/lmtask/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/plandes/lmtask/compare/v0.0.0...v0.0.1
 
