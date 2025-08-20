@@ -1,0 +1,85 @@
+zensols.lmtask package
+======================
+
+Submodules
+----------
+
+zensols.lmtask.app module
+-------------------------
+
+.. automodule:: zensols.lmtask.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.lmtask.cli module
+-------------------------
+
+.. automodule:: zensols.lmtask.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.lmtask.dataset module
+-----------------------------
+
+.. automodule:: zensols.lmtask.dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.lmtask.generate module
+------------------------------
+
+.. automodule:: zensols.lmtask.generate
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.lmtask.hf module
+------------------------
+
+.. automodule:: zensols.lmtask.hf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.lmtask.instruct module
+------------------------------
+
+.. automodule:: zensols.lmtask.instruct
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.lmtask.llama module
+---------------------------
+
+.. automodule:: zensols.lmtask.llama
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.lmtask.task module
+--------------------------
+
+.. automodule:: zensols.lmtask.task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.lmtask.train module
+---------------------------
+
+.. automodule:: zensols.lmtask.train
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.lmtask
+   :members:
+   :undoc-members:
+   :show-inheritance:
