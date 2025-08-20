@@ -108,7 +108,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/11/a7/81dba5010f7e733de88af9555725146fc133be97ce36533867f4c7e75066/xxhash-3.5.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/98/28/3ab7acc5b51f4434b181b0cee8f1f4b77a65919700a355fb3617f9488874/yarl-1.20.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/bzip2-1.0.8-h99b78c6_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.7.14-hbd8a1cb_0.conda
@@ -186,7 +186,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3f/d6/8ca450d6fe5b71ce521b4e5db69622383d039e2b253e9b2f24f93265b52c/xxhash-3.5.0-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/50/ec/72991ae51febeb11a42813fc259f0d4c8e0507f2b74b5514618d8b640365/yarl-1.20.1-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/win-64/bzip2-1.0.8-h2466b09_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.7.14-h4c7d964_0.conda
@@ -265,7 +265,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/d9/6b/1c443fe6cfeb4ad1dcf231cdec96eb94fb43d6498b4469ed8b51f8b59a37/xxhash-3.5.0-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/eb/83/5d9092950565481b413b31a23e75dd3418ff0a277d6e0abf3729d4d1ce25/yarl-1.20.1-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
   default:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
@@ -366,7 +366,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/11/a7/81dba5010f7e733de88af9555725146fc133be97ce36533867f4c7e75066/xxhash-3.5.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/98/28/3ab7acc5b51f4434b181b0cee8f1f4b77a65919700a355fb3617f9488874/yarl-1.20.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/bzip2-1.0.8-h99b78c6_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.7.14-hbd8a1cb_0.conda
@@ -436,7 +436,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3f/d6/8ca450d6fe5b71ce521b4e5db69622383d039e2b253e9b2f24f93265b52c/xxhash-3.5.0-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/50/ec/72991ae51febeb11a42813fc259f0d4c8e0507f2b74b5514618d8b640365/yarl-1.20.1-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/win-64/bzip2-1.0.8-h2466b09_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.7.14-h4c7d964_0.conda
@@ -507,7 +507,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/d9/6b/1c443fe6cfeb4ad1dcf231cdec96eb94fb43d6498b4469ed8b51f8b59a37/xxhash-3.5.0-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/eb/83/5d9092950565481b413b31a23e75dd3418ff0a277d6e0abf3729d4d1ce25/yarl-1.20.1-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
   testcur:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
@@ -608,7 +608,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/11/a7/81dba5010f7e733de88af9555725146fc133be97ce36533867f4c7e75066/xxhash-3.5.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/98/28/3ab7acc5b51f4434b181b0cee8f1f4b77a65919700a355fb3617f9488874/yarl-1.20.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/bzip2-1.0.8-h99b78c6_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.7.14-hbd8a1cb_0.conda
@@ -678,7 +678,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3f/d6/8ca450d6fe5b71ce521b4e5db69622383d039e2b253e9b2f24f93265b52c/xxhash-3.5.0-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/50/ec/72991ae51febeb11a42813fc259f0d4c8e0507f2b74b5514618d8b640365/yarl-1.20.1-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/win-64/bzip2-1.0.8-h2466b09_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.7.14-h4c7d964_0.conda
@@ -749,7 +749,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/d9/6b/1c443fe6cfeb4ad1dcf231cdec96eb94fb43d6498b4469ed8b51f8b59a37/xxhash-3.5.0-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/eb/83/5d9092950565481b413b31a23e75dd3418ff0a277d6e0abf3729d4d1ce25/yarl-1.20.1-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
   testprev:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
@@ -850,7 +850,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/11/a7/81dba5010f7e733de88af9555725146fc133be97ce36533867f4c7e75066/xxhash-3.5.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/98/28/3ab7acc5b51f4434b181b0cee8f1f4b77a65919700a355fb3617f9488874/yarl-1.20.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
       osx-arm64:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/bzip2-1.0.8-h99b78c6_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.7.14-hbd8a1cb_0.conda
@@ -920,7 +920,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/3f/d6/8ca450d6fe5b71ce521b4e5db69622383d039e2b253e9b2f24f93265b52c/xxhash-3.5.0-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/50/ec/72991ae51febeb11a42813fc259f0d4c8e0507f2b74b5514618d8b640365/yarl-1.20.1-cp312-cp312-macosx_11_0_arm64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
       win-64:
       - conda: https://conda.anaconda.org/conda-forge/win-64/bzip2-1.0.8-h2466b09_7.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/ca-certificates-2025.7.14-h4c7d964_0.conda
@@ -991,7 +991,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/d9/6b/1c443fe6cfeb4ad1dcf231cdec96eb94fb43d6498b4469ed8b51f8b59a37/xxhash-3.5.0-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/eb/83/5d9092950565481b413b31a23e75dd3418ff0a277d6e0abf3729d4d1ce25/yarl-1.20.1-cp312-cp312-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/81/36/04df9df0d5c41c6a7c8838e06eb8563b609e03791a9b4a0d48c9d60ae400/zensols_db-1.4.1-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
 packages:
 - conda: https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
   sha256: fe51de6107f9edc7aa4f786a70f4a883943bc9d39b3bb7307c04c41410990726
@@ -4041,10 +4041,10 @@ packages:
   - pandas~=2.3.0
   - zensols-util~=1.15.11
   requires_python: '>=3.11,<3.13'
-- pypi: https://files.pythonhosted.org/packages/26/6d/dc7360b6425dbe13c191f674100176544a60921714e869cc110204749b38/zensols_util-1.15.11-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/c0/e3/7627467df8953674f0c0adcda12c0c128369403ecdfe257a2f5de553cc84/zensols_util-1.15.12-py3-none-any.whl
   name: zensols-util
-  version: 1.15.11
-  sha256: 519aedcb82d38e3c7f7949cc4b4ed16a441fb273f652a202b9b2ee198eac6ecc
+  version: 1.15.12
+  sha256: ae7d5ca0cdc00e566706ace1e9f05207fecff246b84e0d613f50ba315dd03191
   requires_dist:
   - configparser~=5.2.0
   - frozendict~=2.4.6
