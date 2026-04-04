@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Removed
+- Support for Python 3.11.
+
+### Changed
+- Fix Sphinx build by adding `numpy` dependency.
+- Add support for Python 3.13.
+
+
 ## [0.1.1] - 2025-08-20
 ### Changed
 - Pickled training results go to the Peft output model's directory.

@@ -22,14 +22,13 @@ project:
     # Python interpreter versions
     version:
       # constraint on install eligibility
-      required: '>=3.11,<3.14'
+      required: '>=3.12,<3.15'
       # last supported version of Python supported for the project
-      #previous: '3.11.12'
       previous: '3.12.10'
       # Python version supported for current development
-      current: '3.12.10'
+      current: '3.13.11'
       # version of Python used to build/link specific to the host
-      package_host: '3.11.6'
+      package_host: '3.13.10'
     # pypi dependencies added to 'project'
     dependencies:
       - 'jinja2~=3.1'
@@ -44,12 +43,13 @@ project:
       - 'trl==0.20.0'
       - 'torch~=2.7.1'
       ## caching
-      - 'zensols.db~=1.4.1'
+      - 'zensols.db~=1.5.0'
+      - 'numpy~=2.4.0'
   # the program is called on the command line
   has_entry_points: true
 build:
   table_appends:
-    # training on linux (no binary packages available for osx-arm64
+    # training on linux (no binary packages available for osx-arm64)
     tool.pixi.target.linux-64.pypi-dependencies:
       bitsandbytes: '~=0.46.1'
       xformers: '~=0.0.31.post1'
@@ -57,8 +57,8 @@ doc:
   api_config:
     intersphinx_mapping:
       util:
-        modules: [zensols.util, zensols.persist, zensols.config, zensols.cli, zensols.multi]
-        url: '{RP_DOC_IM_URL}/{package}/'
+        modules: ['zensols.util']
+        url: "{RP_DOC_IM_URL}/{package}/"
       numpy:
         modules: ['numpy']
         url: 'https://numpy.org/doc/stable'
@@ -69,10 +69,7 @@ doc:
         modules: ['torch']
         url: 'https://lightning.ai/docs/torchmetrics/stable'
       nlp:
-        modules: ['zensols.nlp']
-        url: '{RP_DOC_IM_URL}/{package}/'
-      deeplearn:
-        modules: ['zensols.deeplearn']
+        modules: ['zensols.db']
         url: '{RP_DOC_IM_URL}/{package}/'
 envdist:
   platforms: [linux-64]
