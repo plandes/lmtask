@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 from dataclasses import dataclass
-from transformers import PreTrainedTokenizer, PreTrainedModel
+from transformers import PreTrainedTokenizer
 from .generate import GeneratorResource
 
 
@@ -31,6 +31,3 @@ class LlamaGeneratorResource(GeneratorResource):
     """
     def configure_tokenizer(self, tokenizer: PreTrainedTokenizer):
         tokenizer.pad_token = '<|finetune_right_pad_id|>'
-
-    def configure_model(self, model: PreTrainedModel):
-        model.config.pad_token_id = model.config.eos_token_id

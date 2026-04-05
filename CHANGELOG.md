@@ -12,8 +12,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support for Python 3.11.
 
 ### Changed
-- Fix Sphinx build by adding `numpy` dependency.
 - Add support for Python 3.13.
+- Fix Sphinx build by adding `numpy` dependency.
+- Upgrade dependencies:
+  - `transformers`: 5.5
+  - `torch`: 2.10
+  - `bitsandbytes`: 0.49
+  - `xformers`: 0.0.35
 
 
 ## [0.1.1] - 2025-08-20

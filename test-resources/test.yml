@@ -4,7 +4,7 @@
 ## Resource
 #
 lmtask_llama_model_args:
-  torch_dtype: "eval({'import': ['torch']}): torch.float16"
+  dtype: "eval({'import': ['torch']}): torch.float16"
   device_map: auto
 
 lmtask_llama_test_desc_set_resource:
