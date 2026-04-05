@@ -1,10 +1,11 @@
+
 """Interactive chat interfaces, which are superset to chat templates.
 
 """
 __author__ = 'Paul Landes'
 
 from dataclasses import dataclass
-from transformers import PreTrainedTokenizer
+from transformers import PreTrainedTokenizer, PreTrainedModel
 from .generate import GeneratorResource
 
 
@@ -31,3 +32,9 @@ class LlamaGeneratorResource(GeneratorResource):
     """
     def configure_tokenizer(self, tokenizer: PreTrainedTokenizer):
         tokenizer.pad_token = '<|finetune_right_pad_id|>'
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+
+    def configure_model(self, model: PreTrainedModel):
+        model.config.pad_token_id = self.tokenizer.pad_token_id
+        model.generation_config.pad_token_id = self.tokenizer.pad_token_id

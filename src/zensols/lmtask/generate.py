@@ -167,6 +167,7 @@ class GeneratorResource(Dictable):
             torch.cuda.empty_cache()
 
     @property
+    @persisted('_tokenizer')
     def tokenizer(self) -> PreTrainedTokenizer:
         """The model's tokenzier."""
         res: _Resource = self._resource_cache[self.model_id]

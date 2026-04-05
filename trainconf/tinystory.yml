@@ -38,7 +38,7 @@ lmtask_trainer_hf:
 
 lmtask_trainer_hf_training_arguments:
   learning_rate: 5e-6
-  num_train_epochs: 1
+  num_train_epochs: 3
   optim: 'paged_adamw_32bit'
   lr_scheduler_type: 'cosine'
   per_device_train_batch_size: 2

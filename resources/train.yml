@@ -116,6 +116,7 @@ lmtask_trainer_hf_eval_arguments:
   do_eval: true
   per_device_eval_batch_size: 8
   load_best_model_at_end: true
+  metric_for_best_model: 'eval_loss'
   eval_strategy: 'steps'
 
 lmtask_trainer_hf_trainer_arguments:

@@ -187,9 +187,6 @@ class TaskDatasetFactory(Dictable, metaclass=ABCMeta):
     messages_field: str = field(default='messages')
     """The target conversational field used by the trainer."""
 
-    eval_field: str = field(default='text')
-    """The field used for comparison with the the evaluation dataset."""
-
     def _pre_process(self, ds: Dataset) -> Dataset:
         return ds
 

@@ -9,7 +9,6 @@ import logging
 from pathlib import Path
 import json
 import yaml
-from datasets import Dataset
 from zensols.config import ConfigFactory
 from zensols.cli import ApplicationError
 from .instruct import InstructTaskRequest
@@ -135,6 +134,7 @@ class Application(object):
         """
         from pprint import pprint
         import itertools as it
+        from datasets import Dataset
         from . import TaskDatasetFactory
         from .train import Trainer
         trainer: Trainer = self._get_trainer()
@@ -204,6 +204,8 @@ class PrototypeApplication(object):
     def _example_stream_base(self):
         from . import Task
         task: Task = self.app.task_factory.create('base_generate')
+        task.generator.generate_params['max_new_tokens'] = 300
+        task.generator.generate_params['temperature'] = 0.001
         task.generator.stream(self.prompt)
 
     def _example_stream_instruct(self):
@@ -220,15 +222,33 @@ class PrototypeApplication(object):
         req.write()
 
     def _example_tiny_story(self):
-        # this needs proto_args='proto -c trainconf/tinystory.yml'
+        """Needs ``proto_args='proto -c trainconf/tinystory.yml'`` in the
+        harness args.
+
+        """
         from . import Task
         task: Task = self.app.task_factory.create('tinystory')
-        task.generator.generate_params['max_length'] = 500
-        task.generator.generate_params['temperature'] = 0.9
+        task.generator.generate_params['max_new_tokens'] = 300
+        task.generator.generate_params['temperature'] = 0.001
         task.generator.stream(self.prompt)
 
+    def _dump_tiny(self):
+        from datasets import Dataset
+        from . import TaskDatasetFactory
+        from .train import Trainer
+        trainer: Trainer = self.app._get_trainer()
+        dsf: TaskDatasetFactory = trainer.train_source
+        ds: Dataset = dsf.create()
+        with open('tiny.txt', 'w') as f:
+            for row in ds:
+                print(row['text'], file=f)
+                print('_' * 40, file=f)
+
     def _example_databricks_instruct(self):
-        # this needs proto_args='proto -c trainconf/dbinstruct.yml'
+        """Needs ``proto_args='proto -c trainconf/dbinstruct.yml'`` in the
+        harness args.
+
+        """
         from . import Task, InstructTaskRequest
         task: Task = self.app.task_factory.create('instruct_databricks')
         req = InstructTaskRequest(
@@ -250,7 +270,10 @@ class PrototypeApplication(object):
             res.write()
 
     def _example_imdb(self, debug: bool = False):
-        # this needs proto_args='proto -c trainconf/dbinstruct.yml'
+        """Needs ``proto_args='proto -c trainconf/dbinstruct.yml'`` in the
+        harness args.
+
+        """
         import datasets
         from datasets import Dataset
         task: Task = self.app.task_factory.create('imdb')
