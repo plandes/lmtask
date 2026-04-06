@@ -71,11 +71,13 @@ lmtask_llama_tinystory_model_args:
 ## Inference
 #
 lmtask_llama_tinystory_inference_resource:
-  class_name: zensols.lmtask.llama.LlamaGeneratorResource
+  class_name: ${lmtask_llama_base_resource:class_name}
   model_desc: LlaMA 3.1 8B Instruct trained on the tiny story corpus
   model_args: 'instance: lmtask_llama_tinystory_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
   peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
+  code_tokenizer: ${lmtask_llama_base_resource:code_tokenizer}
+  code_model: ${lmtask_llama_base_resource:code_model}
 
 lmtask_tinystory_stash:
   class_name: zensols.db.sqlite.SqliteDbStash

@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Add support for Python 3.13.
+- Replace the Llama specific generator with a generic code + config based
+  class.
 - Fix Sphinx build by adding `numpy` dependency.
 - Upgrade dependencies:
   - `transformers`: 5.5

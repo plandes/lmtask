@@ -296,7 +296,7 @@ class PrototypeApplication(object):
     def _tmp(self):
         pass
 
-    def proto(self, run: int = 0):
+    def proto(self, run: int = 10):
         {
             0: self._tmp,
             1: self.app.show_task,

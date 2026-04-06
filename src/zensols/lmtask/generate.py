@@ -189,6 +189,32 @@ class GeneratorResource(Dictable):
 
 
 @dataclass
+class ConfigGeneratorResource(GeneratorResource):
+    """Allows inline Python codee to configure tokenizers and models.
+
+    """
+    code_tokenizer: str = field(default=None)
+    """The Python code to configure the tokenizer.  When called, ``tokenizer``
+    will be an instance of :class:`~transformers.PreTrainedTokenizer`.
+
+    """
+    code_model: str = field(default=None)
+    """The Python code to configure the model.  When called, ``model``
+    will be an instance of :class:`~transformers.PreTrainedModel`.
+
+    """
+    def configure_tokenizer(self, tokenizer: PreTrainedTokenizer):
+        if self.code_tokenizer is not None:
+            _locs = locals()
+            exec(self.code_tokenizer, None, _locs)
+
+    def configure_model(self, model: PreTrainedModel):
+        if self.code_model is not None:
+            _locs = locals()
+            exec(self.code_model, None, _locs)
+
+
+@dataclass
 class GeneratorOutput(Dictable):
     """Container instances of model output from :class:`.TextGenerator`.
 
