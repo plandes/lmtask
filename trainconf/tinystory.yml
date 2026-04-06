@@ -9,7 +9,7 @@ default:
   data_dir: ${default:root_dir}/data/tinystory
 
 lmtask_default:
-  base_resource: lmtask_llama_tinystory_inference_resource
+  base_resource: lmtask_tinystory_inference_resource
 
 
 ## Train
@@ -60,7 +60,7 @@ lmtask_trainer_hf_peft:
   lora_alpha: 32
   lora_dropout: 0.05
 
-lmtask_llama_tinystory_model_args:
+lmtask_tinystory_model_args:
   device_map: auto
   # uncomment to load weights as a 16-bit float
   #torch_dtype: float16
@@ -70,10 +70,10 @@ lmtask_llama_tinystory_model_args:
 
 ## Inference
 #
-lmtask_llama_tinystory_inference_resource:
+lmtask_tinystory_inference_resource:
   class_name: ${lmtask_llama_base_resource:class_name}
   model_desc: LlaMA 3.1 8B Instruct trained on the tiny story corpus
-  model_args: 'instance: lmtask_llama_tinystory_model_args'
+  model_args: 'instance: lmtask_tinystory_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
   peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
   code_tokenizer: ${lmtask_llama_base_resource:code_tokenizer}
@@ -99,4 +99,5 @@ lmtask_task_tinystory:
       generator: 'instance: lmtask_tinystory_caching_generator'
     else:
       generator: 'alias: lmtask_default:base_generator'
-  resource: 'instance: lmtask_llama_base_resource'
+  # base model 
+  resource: 'alias: lmtask_default:base_resource'
