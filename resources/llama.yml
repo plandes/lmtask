@@ -45,7 +45,6 @@ lmtask_llama_instruct_resource:
   model_args: ${lmtask_llama_base_resource:model_args}
   code_tokenizer: ${lmtask_llama_base_resource:code_tokenizer}
   code_model: ${lmtask_llama_base_resource:code_model}
-  
 
 
 ## Generators

@@ -294,7 +294,7 @@ class PrototypeApplication(object):
             print(f'should: {should}, pred: {pred}, correct: {correct}')
 
     def _tmp(self):
-        pass
+        self.config_factory.config.write()
 
     def proto(self, run: int = 10):
         {

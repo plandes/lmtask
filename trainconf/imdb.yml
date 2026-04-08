@@ -2,6 +2,14 @@
 #@meta {url: "https://huggingface.co/docs/trl/en/sft_trainer"}
 
 
+project:
+  import:
+    ts_imp:
+      config_file: 'resource(zensols.lmtask): resources/llama.conf'
+      merge: parent
+      type: importini
+
+
 ## Defaults
 #
 default:

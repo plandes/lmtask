@@ -3,6 +3,14 @@
 #@meta {doc: "some parameters overwrite defaults to make it easy to port this config"}
 
 
+project:
+  import:
+    ts_imp:
+      config_file: 'resource(zensols.lmtask): resources/llama.conf'
+      merge: parent
+      type: importini
+
+
 ## Defaults
 #
 default:

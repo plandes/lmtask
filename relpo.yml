@@ -43,8 +43,9 @@ project:
       - 'trl==1.0.0'
       - 'torch~=2.10.0'
       ## caching
-      - 'zensols.db~=1.5.0'
       - 'numpy~=2.4.0'
+      - 'zensols.util~=1.16.7'
+      - 'zensols.db~=1.5.0'
   # the program is called on the command line
   has_entry_points: true
 build:
