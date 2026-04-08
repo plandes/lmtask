@@ -107,5 +107,5 @@ lmtask_task_tinystory:
       generator: 'instance: lmtask_tinystory_caching_generator'
     else:
       generator: 'alias: lmtask_default:base_generator'
-  # base model 
+  # base model
   resource: 'alias: lmtask_default:base_resource'
