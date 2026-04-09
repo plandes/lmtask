@@ -1,0 +1,72 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "qwen default-like objects", date: "2026-04-09"}
+
+
+# lmtask_model_args:
+#   add_generation_prompt: false
+
+
+## Resources
+#
+lmtask_qwen_base_resource:
+  class_name: zensols.lmtask.generate.ConfigGeneratorResource
+  model_id: ${lmtask_default:base_model_id}
+  model_args: 'asdict: lmtask_model_args'
+  code_tokenizer: null
+  code_model: null
+  # code_tokenizer: |
+  #   tokenizer.pad_token = '<|finetune_right_pad_id|>'
+  #   if tokenizer.pad_token is None:
+  #     tokenizer.pad_token = tokenizer.eos_token
+  # code_model: |
+  #   model.config.pad_token_id = self.tokenizer.pad_token_id
+  #   model.generation_config.pad_token_id = self.tokenizer.pad_token_id
+
+lmtask_qwen_instruct_resource:
+  class_name: ${lmtask_qwen_base_resource:class_name}
+  model_id: ${lmtask_default:instruct_model_id}
+  model_args: ${lmtask_qwen_base_resource:model_args}
+  code_tokenizer: ${lmtask_qwen_base_resource:code_tokenizer}
+  code_model: ${lmtask_qwen_base_resource:code_model}
+
+
+## Generators
+#
+lmtask_qwen_base_generator:
+  class_name: zensols.lmtask.generate.ReplaceTextGenerator
+  resource: 'alias: lmtask_default:base_resource'
+  generate_params: >-
+    call({'param': {'method': 'asdict'}}): lmtask_model_generate_args
+  tokenize_decode_params:
+    skip_special_tokens: true
+  replacements:
+    - ['<\|im_start\|>\s*', '']
+    - ['<\|im_end\|>', '']
+    - ['^.+</think>', '', DOTALL]
+
+lmtask_qwen_instruct_generator:
+  class_name: zensols.lmtask.instruct.InstructModelTextGenerator
+  resource: 'alias: lmtask_default:instruct_resource'
+  generate_params: >-
+    call({'param': {'method': 'asdict'}}): lmtask_model_generate_args
+  replacements: ${lmtask_qwen_base_generator:replacements}
+
+
+## Training
+#
+lmtask_trainer_hf_source_resource:
+  class_name: ${lmtask_qwen_base_resource:class_name}
+  code_tokenizer: ${lmtask_qwen_base_resource:code_tokenizer}
+  code_model: ${lmtask_qwen_base_resource:code_model}
+
+lmtask_trainer_hf_peft:
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+    - lm_head
+#    - embed_tokens
