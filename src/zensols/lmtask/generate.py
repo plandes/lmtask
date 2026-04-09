@@ -3,13 +3,17 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import List, Tuple, Dict, Iterable, Any, Union, Type, ClassVar
+from typing import (
+    List, Tuple, Dict, Iterable, Any, Union, Type, Optional, ClassVar
+)
 from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
 import sys
 import logging
 import re
 import collections
+from functools import reduce
+from operator import or_
 from threading import Thread
 from pathlib import Path
 from io import TextIOBase
@@ -23,7 +27,7 @@ from transformers import (
     AutoModelForCausalLM, BatchEncoding, TextIteratorStreamer
 )
 from peft import AutoPeftModelForCausalLM
-from zensols.util import time, Hasher
+from zensols.util import time, Hasher, APIError
 from zensols.persist import persisted, Stash, FileTextUtil
 from zensols.config import Dictable, ConfigFactory
 from . import TaskError, Task, TaskRequest, TaskResponse, TaskDatasetFactory
@@ -420,30 +424,66 @@ class ReplaceTextGenerator(ModelTextGenerator):
     expressions.  This is helpful for removing special tokens.
 
     """
-    replacements: Tuple[Tuple[Union[str, re.Pattern], str], ...] = \
+    replacements: Tuple[Tuple[Union[str, re.Pattern], str, Optional[str]], ...] = \
         field(default=())
-    """The a tuple ``(<regular expression>, <replacement>)`` to replace in the
-    parsed output from the model.  String patters are compiled with
+    """The a tuple ``(<regular expression>, <replacement>[, flags])`` to replace
+    in the parsed output from the model.  String patters are compiled with
     :func:`re.compile`.
+
+    The third element is a comma-separate list of regular expression :mod:`re`
+    flags, such as ``DOTALL`` gets passed as ``re.subs(..., flags=re.DOTALL)``.
 
     """
     def __post_init__(self):
-        def map_expr(expr: Tuple[Union[str, re.Pattern], str]):
-            pat = expr[0]
-            if isinstance(pat, str):
+        def map_expr(expr: Tuple[Union[str, re.Pattern, Optional[str]], str]):
+            expr = list(expr)
+            if isinstance(expr[0], str):
                 try:
-                    pat = re.compile(pat)
+                    flags: re.RegexFlag = re.NOFLAG
+                    if len(expr) > 2:
+                        flags_str: str = re.split(r'\s*,\s*', expr[2])
+                        flags: re.RegexFlag = self._to_re_flags(flags_str)
+                    expr[0] = re.compile(expr[0], flags)
                 except Exception as e:
                     raise TaskError(
                         "Could not compile task name regex: " +
-                        f"'{pat}' in <<{self.replacements}>>") from e
-            return (pat, expr[1])
+                        f"'{expr[0]}' in <<{self.replacements}>>") from e
+            return tuple(expr)
 
         super().__post_init__()
         self.replacements = tuple(map(map_expr, self.replacements))
 
+    @staticmethod
+    def _to_re_flags(flag_names: Iterable[str]) -> re.RegexFlag:
+        """Convert regex flag names into a combined `re` flag value.
+
+        Example:
+            strings_to_re_flags(["DOTALL", "IGNORECASE"])
+            -> re.DOTALL | re.IGNORECASE
+        """
+        if flag_names is None:
+            return re.NOFLAG if hasattr(re, 'NOFLAG') else re.RegexFlag(0)
+        flags = []
+        for name in flag_names:
+            if not isinstance(name, str):
+                cls: str = type(name).__name__
+                raise APIError(f'Regex flag name must be a string, got {cls}')
+            try:
+                value = getattr(re, name)
+            except AttributeError as exc:
+                raise APIError(f'Unknown regex flag: {name!r}') from exc
+            if not isinstance(value, re.RegexFlag):
+                raise APIError(f'Not a valid regex flag: {name!r}')
+            flags.append(value)
+        if not flags:
+            return re.NOFLAG if hasattr(re, 'NOFLAG') else re.RegexFlag(0)
+        return reduce(or_, flags)
+
     def _replace_output(self, text: str) -> str:
-        for expr, repl in self.replacements:
+        tup: Tuple[Any, ...]
+        for tup in self.replacements:
+            expr: str = tup[0]
+            repl: str = tup[1]
             text = re.sub(expr, repl, text)
         return text
 
