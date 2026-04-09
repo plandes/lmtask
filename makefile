@@ -14,6 +14,7 @@ ADD_CLEAN_ALL +=	data
 
 ## Project
 #
+CONFIG =		trainconf/tinystory-qwen.yml
 GEN_PROMPT = 		'Once upon a time, in a galaxy, far far away,'
 
 
@@ -40,14 +41,13 @@ classify:
 # train a new model on the tinystory corpus
 .PHONY:			traintinystory
 traintinystory:
-			@$(MAKE) $(PY_MAKE_ARGS) invoke \
-				ARG="-c trainconf/tinystory.yml train"
+			@$(MAKE) $(PY_MAKE_ARGS) invoke ARG="-c $(CONFIG) train"
 
 # accelerate
 .PHONY:			traintinystoryacc
 traintinystoryacc:	$(PY_PYPROJECT_FILE)
 			$(PY_PX_BIN) run accelerate launch \
-				./harness.py -c trainconf/tinystory.yml train
+				./harness.py -c $(CONFIG) train
 
 # train a new model on the databricks instruct corpus
 .PHONY:			trainimdb
@@ -59,8 +59,7 @@ trainimdb:
 .PHONY:			testtinystory
 testtinystory:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
-				ARG="-c trainconf/tinystory.yml \
-					stream tinystory $(GEN_PROMPT)"
+				ARG="-c $(CONFIG) stream tinystory $(GEN_PROMPT)"
 
 # test the trained imdb instrudct model
 .PHONY:			testimdb

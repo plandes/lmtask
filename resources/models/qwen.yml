@@ -14,13 +14,6 @@ lmtask_qwen_base_resource:
   model_args: 'asdict: lmtask_model_args'
   code_tokenizer: null
   code_model: null
-  # code_tokenizer: |
-  #   tokenizer.pad_token = '<|finetune_right_pad_id|>'
-  #   if tokenizer.pad_token is None:
-  #     tokenizer.pad_token = tokenizer.eos_token
-  # code_model: |
-  #   model.config.pad_token_id = self.tokenizer.pad_token_id
-  #   model.generation_config.pad_token_id = self.tokenizer.pad_token_id
 
 lmtask_qwen_instruct_resource:
   class_name: ${lmtask_qwen_base_resource:class_name}

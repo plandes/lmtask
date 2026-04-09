@@ -199,7 +199,7 @@ class PrototypeApplication(object):
         req = TaskRequest(self.prompt)
         req.write()
         res = task.process(req)
-        res.write(include_model_raw=True)
+        res.write(include_model_output_raw=True)
 
     def _example_stream_base(self):
         from . import Task
@@ -296,7 +296,7 @@ class PrototypeApplication(object):
     def _tmp(self):
         self.config_factory.config.write()
 
-    def proto(self, run: int = 10):
+    def proto(self, run: int = 0):
         {
             0: self._tmp,
             1: self.app.show_task,

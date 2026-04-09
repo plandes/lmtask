@@ -8,7 +8,7 @@ def create_harness(args: str = None) -> ConfigurationImporterCliHarness:
     return ConfigurationImporterCliHarness(
         app_factory_class='zensols.lmtask.ApplicationFactory',
         proto_args=args,
-        proto_factory_kwargs={'reload_pattern': r'^zensols.lmtask.'})
+        proto_factory_kwargs={'reload_pattern': r'^zensols.lmtask.(?!task)'})
 
 
 def run():
