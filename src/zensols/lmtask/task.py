@@ -142,8 +142,7 @@ class JSONTaskResponse(TaskResponse):
     @property
     def any_failures(self) -> bool:
         """Whether any failures were created during JSON parsing."""
-        return any(map(lambda x: isinstance(x, Failure),
-                       self.model_output_json))
+        return isinstance(self.model_output_json, Failure)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_request: bool = False, include_model_output: bool = False,
