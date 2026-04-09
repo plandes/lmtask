@@ -1,6 +1,14 @@
 #@meta {desc: 'tast app config', date: '2025-01-14'}
 
 
+project:
+  import:
+    ts_imp:
+      config_file: 'resource(zensols.lmtask): resources/models/llama.conf'
+      merge: parent
+      type: importini
+
+
 ## Resource
 #
 lmtask_llama_model_args:
