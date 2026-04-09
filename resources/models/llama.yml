@@ -53,7 +53,7 @@ lmtask_llama_base_generator:
   tokenize_decode_params:
     skip_special_tokens: true
   replacements:
-    - ['<\|begin_of_text\|>', '']
+    - ['<\|begin_of_text\|>\s*', '']
     - ['<\|end_of_text\|>', '']
 
 lmtask_llama_instruct_generator:
