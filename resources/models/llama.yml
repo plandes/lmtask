@@ -23,14 +23,10 @@
 
 ## Resources
 #
-lmtask_llama_model_args:
-  dtype: bfloat16
-  device_map: auto
-
 lmtask_llama_base_resource:
   class_name: zensols.lmtask.generate.ConfigGeneratorResource
   model_id: ${lmtask_default:base_model_id}
-  model_args: 'asdict: lmtask_llama_model_args'
+  model_args: 'asdict: lmtask_model_args'
   code_tokenizer: |
     tokenizer.pad_token = '<|finetune_right_pad_id|>'
     if tokenizer.pad_token is None:
