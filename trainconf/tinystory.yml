@@ -80,7 +80,7 @@ lmtask_tinystory_model_args:
 #
 lmtask_tinystory_inference_resource:
   class_name: ${lmtask_llama_base_resource:class_name}
-  model_desc: LlaMA 3.1 8B Instruct trained on the tiny story corpus
+  model_desc: Base model trained on the tiny story corpus
   model_args: 'instance: lmtask_tinystory_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
   peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
