@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Replace the Llama specific generator with a generic code + config based
   class.
 - Fix Sphinx build by adding `numpy` dependency.
+- Move Llama configuration to `resources/models`.
+- Copy `zensols.deeplearn.torchconfig` (rather than add heavy dependency).
+  This was added for reproducibility of experiments.
 - Upgrade dependencies:
   - `transformers`: 5.5
   - `torch`: 2.10
