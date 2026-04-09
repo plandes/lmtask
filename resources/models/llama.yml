@@ -29,7 +29,7 @@ lmtask_llama_model_args:
 
 lmtask_llama_base_resource:
   class_name: zensols.lmtask.generate.ConfigGeneratorResource
-  model_id: meta-llama/Llama-3.1-8B
+  model_id: ${lmtask_default:base_model_id}
   model_args: 'asdict: lmtask_llama_model_args'
   code_tokenizer: |
     tokenizer.pad_token = '<|finetune_right_pad_id|>'
@@ -41,7 +41,7 @@ lmtask_llama_base_resource:
 
 lmtask_llama_instruct_resource:
   class_name: ${lmtask_llama_base_resource:class_name}
-  model_id: meta-llama/Llama-3.1-8B-Instruct
+  model_id: ${lmtask_default:instruct_model_id}
   model_args: ${lmtask_llama_base_resource:model_args}
   code_tokenizer: ${lmtask_llama_base_resource:code_tokenizer}
   code_model: ${lmtask_llama_base_resource:code_model}

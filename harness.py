@@ -6,7 +6,6 @@ from zensols.cli import ConfigurationImporterCliHarness
 def create_harness(args: str = None) -> ConfigurationImporterCliHarness:
     args: str = 'proto' + ('' if args is None else f' {args}')
     return ConfigurationImporterCliHarness(
-        #src_dir_name='src',
         app_factory_class='zensols.lmtask.ApplicationFactory',
         proto_args=args,
         proto_factory_kwargs={'reload_pattern': r'^zensols.lmtask.'})
