@@ -3,28 +3,32 @@
 #@meta {doc: "some parameters overwrite defaults to make it easy to port this config"}
 
 
+## Imports
+#
 project:
   import:
-    ts_imp:
+    model_imp:
       config_file: 'resource(zensols.lmtask): resources/models/gemma.conf'
       merge: parent
       type: importini
+    train_imp:
+      config_file: 'resource(zensols.lmtask): resources/models/gemma-train.yml'
+      merge: child
+      type: importyaml
 
 
 ## Defaults
 #
-default:
-  data_dir: ${default:root_dir}/data/tinystory-gemma
-
 lmtask_default:
-  base_resource: lmtask_tinystory_inference_resource
+  dataset_name: tinystory
+  model_name: gemma
 
 
 ## Train
 #
 lmtask_trainer_default:
-  trainer_name: 'lmtask_trainer_hf'
   #source_model: 'google/gemma-4-E4B'
+  source_model: 'google/gemma-4-E2B'
 
 lmtask_tinystory_train_source:
   class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
@@ -40,10 +44,6 @@ lmtask_tinystory_eval_source:
     split: 'validation[:250]'
   task: 'instance: lmtask_task_tinystory'
 
-lmtask_trainer_hf:
-  train_source: 'instance: lmtask_tinystory_train_source'
-  eval_source: 'instance: lmtask_tinystory_eval_source'
-
 lmtask_trainer_hf_training_arguments:
   learning_rate: 5e-6
   num_train_epochs: 3
@@ -57,48 +57,3 @@ lmtask_trainer_hf_peft:
   r: 128
   lora_alpha: 32
   lora_dropout: 0.05
-
-lmtask_trainer_hf_source_resource:
-  # override because gemma doesn't take ``use_cache``
-  model_args:
-    device_map: auto
-
-lmtask_tinystory_model_args:
-  device_map: auto
-  # uncomment to load weights as a 16-bit float
-  #torch_dtype: float16
-  # uncommen to add quantization
-  #quantization_config: 'instance: lmtask_quant_4bit_config'
-
-
-## Inference
-#
-lmtask_tinystory_inference_resource:
-  class_name: ${lmtask_gemma_base_resource:class_name}
-  model_desc: Base model trained on the tiny story corpus
-  model_args: 'instance: lmtask_tinystory_model_args'
-  model_id: '${lmtask_trainer_default:source_model}'
-  peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
-
-lmtask_tinystory_stash:
-  class_name: zensols.db.sqlite.SqliteDbStash
-  path: 'path: ${default:data_dir}/task/tinystory.sqlite3'
-
-lmtask_tinystory_caching_generator:
-  class_name: zensols.lmtask.generate.CachingGenerator
-  _delegate: 'alias: lmtask_default:base_generator'
-  _stash: 'instance: lmtask_tinystory_stash'
-
-lmtask_task_tinystory:
-  class_name: zensols.lmtask.generate.GenerateTask
-  description: 'trained on the tiny story corpus'
-  request_class: 'class: zensols.lmtask.task.TaskRequest'
-  response_class: 'class: zensols.lmtask.task.TaskResponse'
-  1.condition:
-    if: ${lmtask_default:cache}
-    then:
-      generator: 'instance: lmtask_tinystory_caching_generator'
-    else:
-      generator: 'alias: lmtask_default:base_generator'
-  # base model
-  resource: 'alias: lmtask_default:base_resource'

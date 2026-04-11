@@ -314,6 +314,9 @@ class ModelTextGenerator(TextGenerator):
     generation_config: Dict[str, Any] = field(default_factory=dict)
     """The generation parameter for the model defaults ``generation_config``."""
 
+    remove_generation_config: Tuple[str, ...] = field(default=())
+    """Attributes to set to ``None`` on the generation config."""
+
     def _process_output(self, input_ids: Tensor, model_output: Tensor) -> \
             Tensor:
         return model_output[0]
@@ -346,11 +349,11 @@ class ModelTextGenerator(TextGenerator):
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
             tokenizer=tokenizer))
+        for attr in self.remove_generation_config:
+            setattr(mr.model.generation_config, attr, None)
         if len(self.generation_config) > 0:
-            gen_config: Dict[str, Any] = \
-                copy.deepcopy(mr.model.generation_config)
-            gen_config.update(self.generation_config)
-            params['generation_config'] = gen_config
+            for attr, val in self.generation_config.items():
+                setattr(mr.model.generation_config, attr, val)
         return params
 
     def _generate(self, prompt: str) -> GeneratorOutput:

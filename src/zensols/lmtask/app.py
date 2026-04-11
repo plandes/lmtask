@@ -205,7 +205,6 @@ class PrototypeApplication(object):
         from . import Task
         task: Task = self.app.task_factory.create('base_generate')
         task.generator.generate_params['max_new_tokens'] = 300
-        task.generator.generate_params['temperature'] = 0.001
         task.generator.stream(self.prompt)
 
     def _example_stream_instruct(self):
@@ -229,7 +228,6 @@ class PrototypeApplication(object):
         from . import Task
         task: Task = self.app.task_factory.create('tinystory')
         task.generator.generate_params['max_new_tokens'] = 300
-        task.generator.generate_params['temperature'] = 0.001
         task.generator.stream(self.prompt)
 
     def _dump_tiny(self):

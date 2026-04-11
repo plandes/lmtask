@@ -32,6 +32,8 @@ class Gemma4GeneratorResource(GeneratorResource):
 
     """
     def _configure_peft(self, model: PeftModel):
+        for attr in 'temperature top_p top_k'.split():
+            setattr(model.generation_config, attr, None)
         _unwrap_gemma4_clippable_linear(model)
 
     def _configure_model(self, model: PreTrainedModel):

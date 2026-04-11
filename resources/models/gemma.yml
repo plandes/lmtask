@@ -35,6 +35,7 @@ lmtask_gemma_base_generator:
   replacements:
     - ['<bos>', '']
     - ['<eos>', '']
+  remove_generation_config: ['temperature', 'top_k', 'top_p']
 
 lmtask_gemma_instruct_generator:
   class_name: zensols.lmtask.instruct.InstructModelTextGenerator
@@ -45,31 +46,3 @@ lmtask_gemma_instruct_generator:
     - ['^```json(.+)```', '\1', DOTALL]
     - ['^```json\n', '']
     - ['<turn\|>', '']
-
-
-## Training
-#
-lmtask_trainer_hf_source_resource:
-  class_name: ${lmtask_gemma_base_resource:class_name}
-
-
-## temporary fix for error:
-##
-# ValueError: Target module Gemma4ClippableLinear((linear): ...) is not
-# supported. Currently, only the following modules are supported...
-#
-# See Gemma4HFTrainerResource class doc.
-lmtask_trainer_hf_peft:
-  target_modules:
-    - q_proj
-    - k_proj
-    - v_proj
-    - o_proj
-    - gate_proj
-    - up_proj
-    - down_proj
-  bias: none
-  task_type: CAUSAL_LM
-
-lmtask_trainer_hf_train_resource:
-  class_name: zensols.lmtask.gemma4.Gemma4HFTrainerResource

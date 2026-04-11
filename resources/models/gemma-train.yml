@@ -1,0 +1,90 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "gemma training configuration", date: "2026-04-11"}
+
+
+## Defaults
+#
+default:
+  data_dir: ${default:root_dir}/data/${lmtask_default:dataset_name}/${lmtask_default:model_name}
+
+lmtask_default:
+  # lmtask_train_inference_resource
+  base_resource: lmtask_tinystory_inference_resource
+
+lmtask_trainer_default:
+  trainer_name: 'lmtask_trainer_hf'
+
+
+## Trainer
+#
+lmtask_trainer_hf_source_resource:
+  class_name: ${lmtask_gemma_base_resource:class_name}
+  # override because gemma doesn't take ``use_cache``
+  model_args:
+    device_map: auto
+
+lmtask_trainer_hf:
+  train_source: 'instance: lmtask_tinystory_train_source'
+  eval_source: 'instance: lmtask_tinystory_eval_source'
+
+
+## Inference
+#
+lmtask_tinystory_model_args:
+  device_map: auto
+  # uncomment to load weights as a 16-bit float
+  #torch_dtype: float16
+  # uncommen to add quantization
+  #quantization_config: 'instance: lmtask_quant_4bit_config'
+
+lmtask_tinystory_inference_resource:
+  class_name: ${lmtask_gemma_base_resource:class_name}
+  model_desc: Base model trained on the tiny story corpus
+  model_args: 'instance: lmtask_tinystory_model_args'
+  model_id: '${lmtask_trainer_default:source_model}'
+  peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
+
+lmtask_tinystory_stash:
+  class_name: zensols.db.sqlite.SqliteDbStash
+  path: 'path: ${default:data_dir}/task/cache.sqlite3'
+
+lmtask_tinystory_caching_generator:
+  class_name: zensols.lmtask.generate.CachingGenerator
+  _delegate: 'alias: lmtask_default:base_generator'
+  _stash: 'instance: lmtask_tinystory_stash'
+
+lmtask_task_tinystory:
+  class_name: zensols.lmtask.generate.GenerateTask
+  description: 'trained on the tiny story corpus'
+  request_class: 'class: zensols.lmtask.task.TaskRequest'
+  response_class: 'class: zensols.lmtask.task.TaskResponse'
+  1.condition:
+    if: ${lmtask_default:cache}
+    then:
+      generator: 'instance: lmtask_tinystory_caching_generator'
+    else:
+      generator: 'alias: lmtask_default:base_generator'
+  # base model
+  resource: 'alias: lmtask_default:base_resource'
+
+
+## Temporary fix for error:
+#
+# ValueError: Target module Gemma4ClippableLinear((linear): ...) is not
+# supported. Currently, only the following modules are supported...
+#
+# See Gemma4HFTrainerResource class doc.
+lmtask_trainer_hf_peft:
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  bias: none
+  task_type: CAUSAL_LM
+
+lmtask_trainer_hf_train_resource:
+  class_name: zensols.lmtask.gemma4.Gemma4HFTrainerResource
