@@ -6,6 +6,7 @@ import logging
 from zensols.config import ConfigFactory
 from .instruct import InstructTaskRequest
 from . import TaskResponse, Task, Application
+from .app import _Format
 logger = logging.getLogger(__name__)
 
 
@@ -134,7 +135,7 @@ class PrototypeApplication(object):
     def _tmp(self):
         self.config_factory.config.write()
 
-    def proto(self, run: int = 0):
+    def proto(self, run: int = 2):
         {
             0: self._tmp,
             1: self.app.show_task,
