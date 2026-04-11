@@ -4,7 +4,8 @@
 from __future__ import annotations
 __author__ = 'Paul Landes'
 from typing import (
-    List, Tuple, Dict, Iterable, Any, Union, Type, Optional, ClassVar
+    List, Tuple, Dict, Iterable, Any, Union, Type, Optional, ClassVar,
+    Pattern, TypeAlias
 )
 from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
@@ -27,13 +28,17 @@ from transformers import (
     AutoModel, AutoTokenizer, PreTrainedTokenizer, PreTrainedModel,
     AutoModelForCausalLM, BatchEncoding, TextIteratorStreamer
 )
-from peft import AutoPeftModelForCausalLM
+from peft import AutoPeftModelForCausalLM, PeftModel
 from zensols.util import time, Hasher, APIError
 from zensols.persist import persisted, Stash, FileTextUtil
 from zensols.config import Dictable, ConfigFactory
 from . import TaskError, Task, TaskRequest, TaskResponse, TaskDatasetFactory
 
 logger = logging.getLogger(__name__)
+
+
+Replacement: TypeAlias = tuple[Union[str, Pattern[str]], str, Optional[str]]
+Replacements: TypeAlias = tuple[Replacement, ...]
 
 
 @dataclass
@@ -124,14 +129,18 @@ class GeneratorResource(Dictable):
     def _resource_cache(self) -> Dict[str, _Resource]:
         return collections.defaultdict(_Resource)
 
-    def configure_tokenizer(self, tokenizer: PreTrainedTokenizer):
+    def _configure_tokenizer(self, tokenizer: PreTrainedTokenizer):
         """Make any necessary updates programatically (i.e. set special
         tokens).
 
         """
         pass
 
-    def configure_model(self, model: PreTrainedModel):
+    def _configure_model(self, model: PreTrainedModel):
+        """Make any necessary updates programatically."""
+        pass
+
+    def _configure_peft(self, model: PeftModel):
         """Make any necessary updates programatically."""
         pass
 
@@ -143,7 +152,7 @@ class GeneratorResource(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'tokenizer params: {params}')
         tokenizer = self.tokenizer_class.from_pretrained(model_id, **params)
-        self.configure_tokenizer(tokenizer)
+        self._configure_tokenizer(tokenizer)
         return tokenizer
 
     def _load_model(self) -> PreTrainedModel:
@@ -152,17 +161,16 @@ class GeneratorResource(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model params: {params}')
         with time(f'loaded model: {model_id}', logging.DEBUG):
-            cls: Type[AutoModel]
-            if self.peft_model_id is None:
-                cls = self.model_class
-            else:
-                cls = self.peft_model_class
-                model_id = self.peft_model_id
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'loading {model_id}, generator: {self.name}')
                 self.write_to_log(logger, logging.DEBUG)
-            model = cls.from_pretrained(model_id, **params)
-            self.configure_model(model)
+            if self.peft_model_id is None:
+                model = self.model_class.from_pretrained(model_id, **params)
+            else:
+                model = self.model_class.from_pretrained(model_id, **params)
+                self._configure_peft(model)
+                model = PeftModel.from_pretrained(model, self.peft_model_id)
+            self._configure_model(model)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model type: {type(model)}')
         return model
@@ -210,12 +218,12 @@ class ConfigGeneratorResource(GeneratorResource):
     will be an instance of :class:`~transformers.PreTrainedModel`.
 
     """
-    def configure_tokenizer(self, tokenizer: PreTrainedTokenizer):
+    def _configure_tokenizer(self, tokenizer: PreTrainedTokenizer):
         if self.code_tokenizer is not None:
             _locs = locals()
             exec(self.code_tokenizer, None, _locs)
 
-    def configure_model(self, model: PreTrainedModel):
+    def _configure_model(self, model: PreTrainedModel):
         if self.code_model is not None:
             _locs = locals()
             exec(self.code_model, None, _locs)
@@ -334,13 +342,15 @@ class ModelTextGenerator(TextGenerator):
         mr: GeneratorResource = self.resource
         tokenizer: PreTrainedTokenizer = mr.tokenizer
         params: Dict[str, Any] = dict(self.generate_params)
-        gen_config: Dict[str, Any] = copy.deepcopy(mr.model.generation_config)
-        gen_config.update(self.generation_config)
         params.update(dict(
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
-            tokenizer=tokenizer,
-            generation_config=gen_config))
+            tokenizer=tokenizer))
+        if len(self.generation_config) > 0:
+            gen_config: Dict[str, Any] = \
+                copy.deepcopy(mr.model.generation_config)
+            gen_config.update(self.generation_config)
+            params['generation_config'] = gen_config
         return params
 
     def _generate(self, prompt: str) -> GeneratorOutput:
@@ -434,8 +444,7 @@ class ReplaceTextGenerator(ModelTextGenerator):
     expressions.  This is helpful for removing special tokens.
 
     """
-    replacements: Tuple[Tuple[Union[str, re.Pattern], str, Optional[str]], ...] = \
-        field(default=())
+    replacements: Replacements = field(default=())
     """The a tuple ``(<regular expression>, <replacement>[, flags])`` to replace
     in the parsed output from the model.  String patters are compiled with
     :func:`re.compile`.
