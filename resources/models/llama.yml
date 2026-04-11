@@ -54,7 +54,7 @@ lmtask_llama_base_generator:
     skip_special_tokens: true
   replacements:
     - ['<\|begin_of_text\|>\s*', '']
-    - ['<\|end_of_text\|>', '']
+    - ['<\|end_of_text\|>\s*', '']
 
 lmtask_llama_instruct_generator:
   class_name: zensols.lmtask.instruct.InstructModelTextGenerator
@@ -62,7 +62,7 @@ lmtask_llama_instruct_generator:
   generate_params: >-
     call({'param': {'method': 'asdict'}}): lmtask_model_generate_args
   replacements:
-    - ['<\|start_header_id\|>.+<\|end_header_id\|>', '']
+    - ['<\|start_header_id\|>.+<\|end_header_id\|>\s*', '']
     - ['<\|eot_id\|>', '']
     - ['<\|begin_of_text\|>', '']
     - ['<\|end_of_text\|>', '']
