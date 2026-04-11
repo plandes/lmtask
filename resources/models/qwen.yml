@@ -2,10 +2,6 @@
 #@meta {desc: "qwen default-like objects", date: "2026-04-09"}
 
 
-# lmtask_model_args:
-#   add_generation_prompt: false
-
-
 ## Resources
 #
 lmtask_qwen_base_resource:

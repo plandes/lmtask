@@ -10,6 +10,6 @@ Each entry in the output JSON has the format:
 {% raw %}[{"index": {{0-index of the sentence}}, "sentence": {{sentence}}, "label": {{sentiment}}}]{% endraw %}
 
 Do not include the introduction or summary.  The sentences to classify are
-below the dashed line.
-----------------------------------------
+given below:
+
 {{request.instruction}}

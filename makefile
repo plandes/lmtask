@@ -14,7 +14,7 @@ ADD_CLEAN_ALL +=	data
 
 ## Project
 #
-CONFIG =		trainconf/tinystory-qwen.yml
+CONFIG =		trainconf/tinystory-gemma.yml
 GEN_PROMPT = 		'Once upon a time, in a galaxy, far far away,'
 
 

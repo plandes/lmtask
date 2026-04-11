@@ -12,6 +12,7 @@ import sys
 import logging
 import re
 import collections
+import copy
 from functools import reduce
 from operator import or_
 from threading import Thread
@@ -79,10 +80,12 @@ class GeneratorResource(Dictable):
     system_role_name: str = field(default='system')
     """The default name of the system's role."""
 
-    model_args: Dict[str, Any] = field(default_factory=dict)
-    """The arguments given to the HF model ``from_pretrained`` method.
+    tokenizer_args: Dict[str, Any] = field(default_factory=dict)
+    """The arguments given to the HF tokenizer ``from_pretrained`` method."""
 
-    """
+    model_args: Dict[str, Any] = field(default_factory=dict)
+    """The arguments given to the HF model ``from_pretrained`` method."""
+
     def __post_init__(self):
         if isinstance(self.model_id, Path):
             self.model_id = str(self.model_id)
@@ -136,7 +139,7 @@ class GeneratorResource(Dictable):
         model_id: str = self.model_id
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating tokenizer: {model_id}')
-        params: Dict[str, Any] = {}
+        params: Dict[str, Any] = dict(self.tokenizer_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'tokenizer params: {params}')
         tokenizer = self.tokenizer_class.from_pretrained(model_id, **params)
@@ -300,6 +303,9 @@ class ModelTextGenerator(TextGenerator):
     generate_params: Dict[str, Any] = field(default_factory=dict)
     """Parameters given to the model's inference method for each prompt."""
 
+    generation_config: Dict[str, Any] = field(default_factory=dict)
+    """The generation parameter for the model defaults ``generation_config``."""
+
     def _process_output(self, input_ids: Tensor, model_output: Tensor) -> \
             Tensor:
         return model_output[0]
@@ -328,9 +334,13 @@ class ModelTextGenerator(TextGenerator):
         mr: GeneratorResource = self.resource
         tokenizer: PreTrainedTokenizer = mr.tokenizer
         params: Dict[str, Any] = dict(self.generate_params)
+        gen_config: Dict[str, Any] = copy.deepcopy(mr.model.generation_config)
+        gen_config.update(self.generation_config)
         params.update(dict(
             pad_token_id=tokenizer.pad_token_id,
-            eos_token_id=tokenizer.eos_token_id))
+            eos_token_id=tokenizer.eos_token_id,
+            tokenizer=tokenizer,
+            generation_config=gen_config))
         return params
 
     def _generate(self, prompt: str) -> GeneratorOutput:

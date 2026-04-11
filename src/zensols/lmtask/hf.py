@@ -36,6 +36,9 @@ class HFTrainerResource(TrainerResource):
         res: GeneratorResource = self.generator_resource
         return res.model, res.tokenizer
 
+    def _configure_model(self, model: PreTrainedModel) -> PreTrainedModel:
+        return model
+
     def _create_peft_model(self) -> PeftModelForCausalLM:
         """Create the Peft model for LoRA training.  The quantization is set
         :obj:`model_args` in the ``quantization_config``, which is called in
@@ -55,6 +58,7 @@ class HFTrainerResource(TrainerResource):
                 logger.debug(f'configuring for quantization: {quant}')
             # preprocess the quantized model for training
             model = peft.prepare_model_for_kbit_training(model)
+        model = self._configure_model(model)
         # create a PeftModel from the (optionally) quantized model
         model: PeftModelForCausalLM = peft.get_peft_model(
             model, self.peft_config)
