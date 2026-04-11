@@ -14,8 +14,9 @@ ADD_CLEAN_ALL +=	data
 
 ## Project
 #
-CONFIG =		trainconf/tinystory-gemma.yml
-GEN_PROMPT = 		'Once upon a time, in a galaxy, far far away,'
+TEST_MODEL ?=		gemma
+CONFIG ?=		trainconf/tinystory-$(TEST_MODEL).yml
+GEN_PROMPT ?= 		'Once upon a time, in a galaxy, far far away,'
 
 
 ## Includes
