@@ -14,7 +14,7 @@ ADD_CLEAN_ALL +=	data
 
 ## Project
 #
-TEST_MODEL ?=		gemma
+TEST_MODEL ?=		llama
 CONFIG ?=		trainconf/tinystory-$(TEST_MODEL).yml
 GEN_PROMPT ?= 		'Once upon a time, in a galaxy, far far away,'
 
@@ -41,7 +41,7 @@ classify:
 
 # train a new model on the tinystory corpus
 .PHONY:			traintinystory
-traintinystory:
+traintinystory:		$(PY_PYPROJECT_FILE)
 			@$(MAKE) $(PY_MAKE_ARGS) invoke ARG="-c $(CONFIG) train"
 
 # accelerate
@@ -49,6 +49,16 @@ traintinystory:
 traintinystoryacc:	$(PY_PYPROJECT_FILE)
 			$(PY_PX_BIN) run accelerate launch \
 				./harness.py -c $(CONFIG) train
+
+# train a new gemma model on the tinystory corpus
+.PHONY:			traintinystorygemma
+traintinystorygemma:
+			@$(MAKE) $(PY_MAKE_ARGS) TEST_MODEL=gemma4 traintinystory
+
+# train a new qwen model on the tinystory corpus
+.PHONY:			traintinystoryqwen
+traintinystoryqwen:
+			@$(MAKE) $(PY_MAKE_ARGS) TEST_MODEL=qwen traintinystory
 
 # train a new model on the databricks instruct corpus
 .PHONY:			trainimdb
