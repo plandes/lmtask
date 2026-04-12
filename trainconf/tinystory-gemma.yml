@@ -12,14 +12,14 @@ project:
       merge: parent
       type: importini
     train_imp:
-      config_file: 'resource(zensols.lmtask): resources/models/gemma-train.yml'
+      config_file: 'resource(zensols.lmtask): resources/models/gemma-dataset.yml'
       merge: child
       type: importyaml
 
 
 ## Defaults
 #
-lmtask_default:
+lmtask_dataset:
   dataset_name: tinystory
   model_name: gemma
 
@@ -27,22 +27,17 @@ lmtask_default:
 ## Train
 #
 lmtask_trainer_default:
-  #source_model: 'google/gemma-4-E4B'
   source_model: 'google/gemma-4-E2B'
 
-lmtask_tinystory_train_source:
-  class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
+lmtask_dataset_train_source:
   source: roneneldan/TinyStories
   load_args:
     split: 'train[:2500]'
-  task: 'instance: lmtask_task_tinystory'
 
-lmtask_tinystory_eval_source:
-  class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
+lmtask_dataset_eval_source:
   source: roneneldan/TinyStories
   load_args:
     split: 'validation[:250]'
-  task: 'instance: lmtask_task_tinystory'
 
 lmtask_trainer_hf_training_arguments:
   learning_rate: 5e-6

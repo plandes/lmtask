@@ -35,7 +35,6 @@ lmtask_gemma_base_generator:
   replacements:
     - ['<bos>', '']
     - ['<eos>', '']
-  remove_generation_config: ['temperature', 'top_k', 'top_p']
 
 lmtask_gemma_instruct_generator:
   class_name: zensols.lmtask.instruct.InstructModelTextGenerator
