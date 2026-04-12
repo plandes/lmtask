@@ -28,11 +28,11 @@ lmtask_trainer_hf:
 
 lmtask_dataset_train_source:
   class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
-  task: 'instance: lmtask_task_tinystory'
+  task: 'instance: lmtask_task_dataset'
 
 lmtask_dataset_eval_source:
   class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
-  task: 'instance: lmtask_task_tinystory'
+  task: 'instance: lmtask_task_dataset'
 
 
 ## Inference
@@ -60,7 +60,7 @@ lmtask_dataset_caching_generator:
   _delegate: 'alias: lmtask_default:base_generator'
   _stash: 'instance: lmtask_dataset_stash'
 
-lmtask_task_tinystory:
+lmtask_task_dataset:
   class_name: zensols.lmtask.generate.GenerateTask
   description: 'trained on the tiny story corpus'
   request_class: 'class: zensols.lmtask.task.TaskRequest'
