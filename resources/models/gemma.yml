@@ -11,12 +11,12 @@ lmtask_model_generate_args:
 ## Resources
 #
 lmtask_gemma_base_resource:
-  class_name: zensols.lmtask.gemma4.Gemma4GeneratorResource
+  class_name: ${lmtask_default:base_resource_class}
   model_id: ${lmtask_default:base_model_id}
   model_args: 'asdict: lmtask_model_args'
 
 lmtask_gemma_instruct_resource:
-  class_name: ${lmtask_gemma_base_resource:class_name}
+  class_name: ${lmtask_default:instruct_resource_class}
   model_id: ${lmtask_default:instruct_model_id}
   tokenizer_args:
     stop_strings: ${lmtask_model_generate_args:stop_strings}
@@ -45,3 +45,31 @@ lmtask_gemma_instruct_generator:
     - ['^```json(.+)```', '\1', DOTALL]
     - ['^```json\n', '']
     - ['<turn\|>', '']
+
+
+## Training
+#
+# temporary fix for error: ValueError: Target module
+# Gemma4ClippableLinear((linear): ...) is not supported. Currently, only the
+# following modules are supported...
+#
+# See Gemma4HFTrainerResource class doc.
+lmtask_trainer_hf_peft:
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+  bias: none
+  task_type: CAUSAL_LM
+
+lmtask_trainer_hf_train_resource:
+  class_name: zensols.lmtask.gemma4.Gemma4HFTrainerResource
+
+lmtask_trainer_hf_source_resource:
+  # override because gemma doesn't take ``use_cache``
+  model_args:
+    device_map: auto
