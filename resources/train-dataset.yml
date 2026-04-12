@@ -1,6 +1,6 @@
 #@meta {author: "Paul Landes"}
 #@meta {desc: "dataset for supervised fine-tuning", date: "2026-04-11"}
-#@meta {doc: "to create a new dataset train task, copy and replace `_dataset`"}
+#@meta {doc: "create new task: copy this, train-dataset-{base/instruct}, replace `_dataset`"}
 
 
 ## Defaults
@@ -8,17 +8,14 @@
 default:
   data_dir: ${default:root_dir}/data/${lmtask_dataset:dataset_name}/${lmtask_dataset:model_name}
 
-lmtask_default:
-  base_resource: lmtask_dataset_inference_resource
-
 lmtask_trainer_default:
   trainer_name: 'lmtask_trainer_hf'
 
 
 ## Trainer
 #
-lmtask_trainer_hf_source_resource:
-  class_name: ${lmtask_default:base_resource_class}
+lmtask_default:
+  base_resource: lmtask_dataset_inference_resource
 
 lmtask_trainer_hf:
   train_source: 'instance: lmtask_dataset_train_source'
@@ -26,6 +23,8 @@ lmtask_trainer_hf:
 
 lmtask_dataset_train_source:
   class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
+  # the task that consumes the data, which will format each datapoint
+  # specifically for that task's model
   task: 'instance: lmtask_task_dataset'
 
 lmtask_dataset_eval_source:
@@ -43,7 +42,7 @@ lmtask_dataset_model_args:
   #quantization_config: 'instance: lmtask_quant_4bit_config'
 
 lmtask_dataset_inference_resource:
-  class_name: ${lmtask_default:instruct_resource_class}
+  #class_name: ${lmtask_default:base_resource_class}
   model_desc: 'Base model trained on the ${lmtask_dataset:dataset_name} dataset'
   model_args: 'instance: lmtask_dataset_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
@@ -59,15 +58,10 @@ lmtask_dataset_caching_generator:
   _stash: 'instance: lmtask_dataset_stash'
 
 lmtask_task_dataset:
-  class_name: zensols.lmtask.generate.GenerateTask
   description: 'trained on the ${lmtask_dataset:dataset_name} dataset'
-  request_class: 'class: zensols.lmtask.task.TaskRequest'
-  response_class: 'class: zensols.lmtask.task.TaskResponse'
   1.condition:
     if: ${lmtask_default:cache}
     then:
       generator: 'instance: lmtask_dataset_caching_generator'
     else:
       generator: 'alias: lmtask_default:base_generator'
-  # base model
-  resource: 'alias: lmtask_default:base_resource'

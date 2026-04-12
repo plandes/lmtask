@@ -15,6 +15,10 @@ project:
       config_file: 'resource(zensols.lmtask): resources/train-dataset.yml'
       merge: child
       type: importyaml
+    train_base_imp:
+      config_file: 'resource(zensols.lmtask): resources/train-dataset-base.yml'
+      merge: parent
+      type: importyaml
 
 
 ## Defaults
@@ -26,9 +30,6 @@ lmtask_dataset:
 
 ## Train
 #
-lmtask_trainer_default:
-  source_model: 'google/gemma-4-E2B'
-
 lmtask_dataset_train_source:
   source: roneneldan/TinyStories
   load_args:
@@ -41,7 +42,7 @@ lmtask_dataset_eval_source:
 
 lmtask_trainer_hf_training_arguments:
   learning_rate: 5e-6
-  num_train_epochs: 1
+  num_train_epochs: 3
   optim: 'paged_adamw_32bit'
   lr_scheduler_type: 'cosine'
   per_device_train_batch_size: 2
@@ -52,3 +53,6 @@ lmtask_trainer_hf_peft:
   r: 128
   lora_alpha: 32
   lora_dropout: 0.05
+
+lmtask_task_dataset:
+  class_name: zensols.lmtask.generate.GenerateTask

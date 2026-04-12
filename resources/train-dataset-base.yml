@@ -1,0 +1,20 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "dataset for supervised fine-tuning base models", date: "2026-04-11"}
+
+
+lmtask_trainer_default:
+  source_model: ${lmtask_default:base_model_id}
+
+lmtask_trainer_hf_source_resource:
+  class_name: ${lmtask_default:base_resource_class}
+
+lmtask_dataset_inference_resource:
+  class_name: ${lmtask_default:base_resource_class}
+
+lmtask_dataset_caching_generator:
+  _delegate: 'alias: lmtask_default:base_generator'
+
+lmtask_task_dataset:
+  request_class: 'class: zensols.lmtask.task.TaskRequest'
+  response_class: 'class: zensols.lmtask.task.TaskResponse'
+  resource: 'alias: lmtask_default:base_resource'
