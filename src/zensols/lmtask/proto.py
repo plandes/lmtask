@@ -135,7 +135,7 @@ class PrototypeApplication(object):
     def _tmp(self):
         self.config_factory.config.write()
 
-    def proto(self, run: int = 2):
+    def proto(self, run: int = 7):
         {
             0: self._tmp,
             1: self.app.show_task,
