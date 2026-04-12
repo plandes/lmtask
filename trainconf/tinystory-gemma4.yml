@@ -14,8 +14,8 @@ project:
     train_imp:
       config_file: 'resource(zensols.lmtask): resources/train-dataset.yml'
       type: importyaml
-    train_base_imp:
-      config_file: 'resource(zensols.lmtask): resources/train-dataset-base.yml'
+    train_shared_imp:
+      config_file: 'resource(zensols.lmtask): trainconf/tinystory-shared.yml'
       type: importyaml
 
 
@@ -23,31 +23,5 @@ project:
 #
 lmtask_dataset:
   dataset_name: tinystory
-  model_name: gemma
-
-
-## Train
-#
-lmtask_dataset_train_source:
-  source: roneneldan/TinyStories
-  load_args:
-    split: 'train[:2500]'
-
-lmtask_dataset_eval_source:
-  source: roneneldan/TinyStories
-  load_args:
-    split: 'validation[:250]'
-
-lmtask_trainer_hf_training_arguments:
-  learning_rate: 5e-6
-  num_train_epochs: 3
-  optim: 'paged_adamw_32bit'
-  lr_scheduler_type: 'cosine'
-  per_device_train_batch_size: 2
-  gradient_accumulation_steps: 8
-  logging_steps: 2
-
-lmtask_trainer_hf_peft:
-  r: 128
-  lora_alpha: 32
-  lora_dropout: 0.05
+  model_name: gemma4
+  is_base: true

@@ -8,14 +8,28 @@
 default:
   data_dir: ${default:root_dir}/data/${lmtask_dataset:dataset_name}/${lmtask_dataset:model_name}
 
+lmtask_default:
+  base_resource: lmtask_dataset_inference_resource
+
 lmtask_trainer_default:
   trainer_name: 'lmtask_trainer_hf'
+  1.condition:
+    if: ${lmtask_dataset:is_base}
+    then:
+      source_model: ${lmtask_default:base_model_id}
+    else:
+      source_model: ${lmtask_default:instruct_model_id}
 
 
 ## Trainer
 #
-lmtask_default:
-  base_resource: lmtask_dataset_inference_resource
+lmtask_trainer_hf_source_resource:
+  1.condition:
+    if: ${lmtask_dataset:is_base}
+    then:
+      class_name: ${lmtask_default:base_resource_class}
+    else:
+      class_name: ${lmtask_default:instruct_resource_class}
 
 lmtask_trainer_hf:
   train_source: 'instance: lmtask_dataset_train_source'
@@ -42,7 +56,13 @@ lmtask_dataset_model_args:
   #quantization_config: 'instance: lmtask_quant_4bit_config'
 
 lmtask_dataset_inference_resource:
-  model_desc: 'Base model trained on the ${lmtask_dataset:dataset_name} dataset'
+  condition:
+    if: ${lmtask_dataset:is_base}
+    then:
+      class_name: ${lmtask_default:base_resource_class}
+    else:
+      class_name: ${lmtask_default:instruct_resource_class}
+  model_desc: 'Model trained on the ${lmtask_dataset:dataset_name} dataset'
   model_args: 'instance: lmtask_dataset_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
   peft_model_id: '${lmtask_trainer_default:peft_output_dir}'
@@ -53,14 +73,33 @@ lmtask_dataset_stash:
 
 lmtask_dataset_caching_generator:
   class_name: zensols.lmtask.generate.CachingGenerator
-  _delegate: 'alias: lmtask_default:base_generator'
+  condition:
+    if: ${lmtask_dataset:is_base}
+    then:
+      _delegate: 'alias: lmtask_default:base_generator'
+    else:
+      _delegate: 'alias: lmtask_default:instruct_generator'
   _stash: 'instance: lmtask_dataset_stash'
 
 lmtask_task_dataset:
-  description: 'trained on the ${lmtask_dataset:dataset_name} dataset'
+  description: 'Trained on the ${lmtask_dataset:dataset_name} dataset'
   1.condition:
+    if: ${lmtask_dataset:is_base}
+    then:
+      class_name: zensols.lmtask.generate.GenerateTask
+    else:
+      class_name: zensols.lmtask.instruct.InstructTask
+  2.condition:
+    if: ${lmtask_dataset:is_base}
+    then:
+      request_class: 'class: zensols.lmtask.task.TaskRequest'
+    else:
+      request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
+  response_class: 'class: zensols.lmtask.task.TaskResponse'
+  resource: 'alias: lmtask_default:base_resource'
+  condition:
     if: ${lmtask_default:cache}
     then:
       generator: 'instance: lmtask_dataset_caching_generator'
     else:
-      generator: 'alias: lmtask_default:base_generator'
+      generator: '${lmtask_dataset_caching_generator:_delegate}'
