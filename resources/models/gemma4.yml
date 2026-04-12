@@ -1,5 +1,6 @@
 #@meta {author: "Paul Landes"}
-#@meta {desc: "gemma default-like objects", date: "2026-04-09"}
+#@meta {desc: "gemma 4 default-like objects", date: "2026-04-09"}
+#@meta {doc: "includes 'monkey patch' necessary in transformers 5.5"}
 
 
 ## Defaults

@@ -8,7 +8,7 @@
 project:
   import:
     model_imp:
-      config_file: 'resource(zensols.lmtask): resources/models/gemma.conf'
+      config_file: 'resource(zensols.lmtask): resources/models/gemma4.conf'
       merge: parent
       type: importini
     train_imp:
