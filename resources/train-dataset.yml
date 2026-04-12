@@ -42,7 +42,6 @@ lmtask_dataset_model_args:
   #quantization_config: 'instance: lmtask_quant_4bit_config'
 
 lmtask_dataset_inference_resource:
-  #class_name: ${lmtask_default:base_resource_class}
   model_desc: 'Base model trained on the ${lmtask_dataset:dataset_name} dataset'
   model_args: 'instance: lmtask_dataset_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
