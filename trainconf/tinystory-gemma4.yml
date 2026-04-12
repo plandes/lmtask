@@ -53,6 +53,3 @@ lmtask_trainer_hf_peft:
   r: 128
   lora_alpha: 32
   lora_dropout: 0.05
-
-lmtask_task_dataset:
-  class_name: zensols.lmtask.generate.GenerateTask
