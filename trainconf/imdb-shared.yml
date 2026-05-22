@@ -1,0 +1,35 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "shared imdb trained model config", date: "2026-04-12"}
+
+
+lmtask_dataset_train_source:
+  # the dataset name (downloaded if not already); this can be a `pathlib.Path`,
+  # Pandas dataframe or Zensols Stash
+  source: stanfordnlp/imdb
+  # use only the training split
+  load_args:
+    split: train
+  # preprocessing Python source code to add labels and subset the data (db.select)
+  pre_process: |-
+    ds = ds.map(lambda x: {'output': 'positive' if x['label'] == 1 else 'negative'})
+    ds = ds.rename_column('text', 'instruction')
+    ds = ds.shuffle(seed=0)
+    # 7K takes 55m
+    #ds = ds.select(range(7_000))
+    ds = ds.select(range(2_000))
+
+lmtask_dataset_eval_source:
+  source: stanfordnlp/imdb
+  load_args:
+    split: test[:250]
+  pre_process: |-
+    ds = ds.map(lambda x: {'output': 'positive' if x['label'] == 1 else 'negative'})
+    ds = ds.rename_column('text', 'instruction')
+    ds = ds.shuffle(seed=0)
+
+lmtask_trainer_hf_training_arguments:
+  num_train_epochs: 1
+  optim: 'paged_adamw_32bit'
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 4
+  logging_steps: 2

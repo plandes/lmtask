@@ -46,6 +46,8 @@ lmtask_gemma_instruct_generator:
     - ['^```json(.+)```', '\1', DOTALL]
     - ['^```json\n', '']
     - ['<turn\|>', '']
+    - ['<bos>', '']
+    - ['<eos>', '']
 
 
 ## Training

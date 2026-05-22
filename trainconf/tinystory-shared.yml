@@ -1,5 +1,7 @@
-## Train
-#
+#@meta {author: "Paul Landes"}
+#@meta {desc: "shared tinystory trained model config", date: "2026-04-12"}
+
+
 lmtask_dataset_train_source:
   source: roneneldan/TinyStories
   load_args:
