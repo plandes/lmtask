@@ -13,7 +13,6 @@ import sys
 import logging
 import re
 import collections
-import copy
 from functools import reduce
 from operator import or_
 from threading import Thread
