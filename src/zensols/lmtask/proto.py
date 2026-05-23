@@ -87,14 +87,16 @@ class PrototypeApplication(object):
                 print(row['text'], file=f)
                 print('_' * 40, file=f)
 
-    def _example_imdb(self, debug: bool = False):
+    def _example_imdb(self, debug: bool = 0, limit: int = 100):
         """Needs ``proto_args='proto -c trainconf/dbinstruct.yml'`` in the
         harness args.
 
         """
+        from pprint import pprint
+        import textwrap
+        import numpy as np
         import datasets
         from datasets import Dataset
-        import numpy as np
 
         def binary_metrics(labels, preds, positive=1) -> dict[str, float]:
             y = np.asarray(labels)
@@ -121,34 +123,32 @@ class PrototypeApplication(object):
 
         task: Task = self.app.task_factory.create('dataset')
         if 0:
-            self.app.show_task()
             task.write()
             return
         ds: Dataset = datasets.load_dataset('stanfordnlp/imdb', split='test')
         labels: list[str] = []
         preds: list[str] = []
         ds = ds.shuffle(seed=0)
-        ds = ds.select(range(50))
-        for review in ds:
-            print('text', review['text'])
+        ds = ds.select(range(limit))
+        for i, review in enumerate(ds):
+            print(('_' * 30), f'<{i}>', ('_' * 30))
             req = InstructTaskRequest(instruction=review['text'])
             if debug:
-                req = task.prepare_request(req)
-                req.write()
+                task.prepare_request(req).write(include_instruction=False)
             res: TaskResponse = task.process(req)
-            res.write()
             if debug:
                 res.write(include_model_output_raw=True)
-            should: str = 'positive' if review['label'] == 1 else 'negative'
+            label: str = 'positive' if review['label'] == 1 else 'negative'
             pred: str = res.model_output.strip().lower()
-            labels.append(should)
+            labels.append(label)
             preds.append(pred)
-            correct: bool = (should == pred)
-            print(f'should: {should}, pred: {pred}, correct: {correct}')
-        print(labels)
-        print(preds)
-        from pprint import pprint
+            correct: bool = (label == pred)
+            pred_str: str = textwrap.shorten(pred, width=20)
+            print(f'correct: {correct} (label={label}, pred=<{pred_str}>)')
         pprint(binary_metrics(labels, preds, positive='positive'))
+
+    def _tmp(self):
+        pass
 
     def proto(self, run: int = 11):
         {

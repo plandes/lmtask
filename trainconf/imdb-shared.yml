@@ -42,10 +42,10 @@ lmtask_trainer_hf_peft:
 lmtask_task_dataset:
   role: 'You are a sentiment classifier.'
   train_template: |-
-    Only output the sentiment as either ```positive``` or ```negative```.
+    Only output the sentiment (and nothing else) as either ```positive``` or ```negative```.
     ### Review:{{ instruction }}
     ### Sentiment:```{{ output }}```
   inference_template: |-
-    Only output the sentiment as either 'positive' or 'negative'.
+    Only output the sentiment (and nothing else) as either 'positive' or 'negative'.
     ### Review:{{ request.instruction }}
     ### Sentiment:

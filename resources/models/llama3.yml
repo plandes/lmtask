@@ -29,7 +29,7 @@ lmtask_llama_base_resource:
   model_args: 'asdict: lmtask_model_args'
   code_tokenizer: |
     tokenizer.pad_token = '<|finetune_right_pad_id|>'
-  code_model: |
+  code_model: |-
     model.config.pad_token_id = self.tokenizer.pad_token_id
     model.config.eos_token_id = self.tokenizer.eos_token_id
     model.config.bos_token_id = self.tokenizer.bos_token_id
@@ -42,7 +42,13 @@ lmtask_llama_instruct_resource:
   model_id: ${lmtask_default:instruct_model_id}
   model_args: ${lmtask_llama_base_resource:model_args}
   code_tokenizer: ${lmtask_llama_base_resource:code_tokenizer}
-  code_model: ${lmtask_llama_base_resource:code_model}
+  code_model: |-
+    ${lmtask_llama_base_resource:code_model}
+    # suppress warning
+    model.generation_config.do_sample = False
+    model.generation_config.temperature = None
+    model.generation_config.top_p = None
+    model.generation_config.top_k = None
 
 
 ## Generators

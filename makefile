@@ -71,10 +71,24 @@ trainimdbllama3:
 				TASK=imdb TEST_MODEL=llama3 train
 
 # train a new llama3 model on the databricks instruct corpus
+.PHONY:			trainimdbqwen3
+trainimdbqwen3:
+			@$(MAKE) $(PY_MAKE_ARGS) \
+				TASK=imdb TEST_MODEL=qwen3 train
+
+# train a new llama3 model on the databricks instruct corpus
 .PHONY:			trainimdbgemma4
 trainimdbgemma4:
 			@$(MAKE) $(PY_MAKE_ARGS) \
 				TASK=imdb TEST_MODEL=gemma4 train
+
+# retrain all imdb task models
+.PHONY:			retrainimdb
+retrainimdb:
+			rm -fr data/imdb
+			for model in llama3 qwen3 gemma4 ; do \
+				make TASK=imdb TEST_MODEL=$$model train ; \
+			done
 
 
 ## Test

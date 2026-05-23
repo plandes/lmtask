@@ -8,7 +8,7 @@ project:
   import:
     # importyaml to avoid eager evaulate as this parent is a condyaml
     model_imp:
-      config_file: 'resource(zensols.lmtask): resources/models/gemma4.conf'
+      config_file: 'resource(zensols.lmtask): resources/models/qwen3.conf'
       type: importini
     train_imp:
       config_file: 'resource(zensols.lmtask): resources/train-dataset.yml'
@@ -22,7 +22,7 @@ project:
 #
 lmtask_dataset:
   dataset_name: imdb
-  model_name: gemma4
+  model_name: qwen3
   is_base: false
 
 
@@ -33,3 +33,5 @@ lmtask_task_dataset:
     # appends the model’s assistant-start marker to the chat template so the
     # model knows it should generate the assistant’s next response
     add_generation_prompt: true
+    # whether to enable reasoning, which adds <think> tags
+    enable_thinking: false

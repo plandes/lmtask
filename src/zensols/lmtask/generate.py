@@ -370,16 +370,23 @@ class ModelTextGenerator(TextGenerator):
                          str(self._get_tokenize_decode_params()))
             logger.debug(f'generate_params: {self._get_generate_params()}')
 
-        be: BatchEncoding = tokenizer(prompt, **self._get_tokenize_params())
-        input_ids: Tensor = be.input_ids.to(model.device)
+        be: BatchEncoding = tokenizer(prompt, **self._get_tokenize_params()).\
+            to(model.device)
+        input_ids: Tensor = be.input_ids
         if logger.isEnabledFor(logging.TRACE):
             input_text: str = tokenizer.decode(
                 input_ids[0], **self._get_tokenize_decode_params())
             logger.trace(f'input text: <<{input_text}>>')
+        generate_params = dict(self._get_generate_params())
+        if generate_params.get('pad_token_id') is None:
+            generate_params['pad_token_id'] = (
+                tokenizer.pad_token_id
+                if tokenizer.pad_token_id is not None
+                else tokenizer.eos_token_id)
         with torch.no_grad():
             model_output: Tensor = model.generate(
-                input_ids,
-                **self._get_generate_params())
+                **be,
+                **generate_params)
         model_output = self._process_output(input_ids, model_output)
         model_output_raw: str = tokenizer.decode(
             model_output, **self._get_tokenize_decode_params())

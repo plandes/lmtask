@@ -110,9 +110,9 @@ class InstructTask(GenerateTask):
 
     """
     train_apply_chat_template: bool = field(default=False)
-    """Like :obj:`apply_chat_template`, but whether to apply during training.
-    If this is ``False``, a conversational ``messages`` with dictionary list is
-    used instead.
+    """Whether to add :obj:`apply_chat_template` parameters to the
+    ``apply_chat_template`` call during training.  If this is ``False``, a
+    conversational ``messages`` with dictionary list is used instead.
 
     """
     def __post_init__(self):

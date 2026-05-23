@@ -16,7 +16,12 @@ lmtask_qwen_instruct_resource:
   model_id: ${lmtask_default:instruct_model_id}
   model_args: ${lmtask_qwen_base_resource:model_args}
   code_tokenizer: ${lmtask_qwen_base_resource:code_tokenizer}
-  code_model: ${lmtask_qwen_base_resource:code_model}
+  code_model: |-
+    # suppress warning
+    model.generation_config.do_sample = False
+    model.generation_config.temperature = None
+    model.generation_config.top_p = None
+    model.generation_config.top_k = None
 
 
 ## Generators
@@ -29,9 +34,11 @@ lmtask_qwen_base_generator:
   tokenize_decode_params:
     skip_special_tokens: true
   replacements:
-    - ['<\|im_start\|>\s*', '']
+    - ['<\|im_start\|>[^\n]*\n?', '']
     - ['<\|im_end\|>', '']
-    - ['^.+</think>', '', DOTALL]
+    - ['^.*?</think>\s*', '', DOTALL]
+    - ['^(assistant|user|system|edReader)\s*', '']
+    - ['<think>.*\Z', '', DOTALL]
 
 lmtask_qwen_instruct_generator:
   class_name: zensols.lmtask.instruct.InstructModelTextGenerator
