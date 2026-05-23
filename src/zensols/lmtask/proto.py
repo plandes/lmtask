@@ -45,6 +45,9 @@ class PrototypeApplication(object):
     def _example_stream_base(self):
         from . import Task
         task: Task = self.app.task_factory.create('base_generate')
+        if 1:
+            task.write()
+            return
         task.generator.generate_params['max_new_tokens'] = 300
         task.generator.stream(self.prompt)
 
@@ -67,7 +70,8 @@ class PrototypeApplication(object):
 
         """
         from . import Task
-        task: Task = self.app.task_factory.create('tinystory')
+        task: Task = self.app.task_factory.create('dataset')
+        task.write()
         task.generator.generate_params['max_new_tokens'] = 300
         task.generator.stream(self.prompt)
 
@@ -83,31 +87,6 @@ class PrototypeApplication(object):
                 print(row['text'], file=f)
                 print('_' * 40, file=f)
 
-    def _example_databricks_instruct(self):
-        """Needs ``proto_args='proto -c trainconf/dbinstruct.yml'`` in the
-        harness args.
-
-        """
-        from . import Task, InstructTaskRequest
-        task: Task = self.app.task_factory.create('instruct_databricks')
-        req = InstructTaskRequest(
-            instruction=(
-                'Provide a detailed explanation of the events and ' +
-                'circumstances that led to the outbreak of World War II.'))
-        req.context = (
-            'The goal is to offer a clear and informative account of the ' +
-            'factors, political decisions, and international tensions ' +
-            'that played a crucial role in triggering World War II. ' +
-            'Ensure that the explanation covers the period leading up ' +
-            'to the war, key events, and the involvement of major nations')
-        if 0:
-            self.config_factory.config['lmtask_task_instruct_databricks'].write()
-            task.write()
-        else:
-            task.generator.generate_params['max_length'] = 500
-            res = task.process(req)
-            res.write()
-
     def _example_imdb(self, debug: bool = False):
         """Needs ``proto_args='proto -c trainconf/dbinstruct.yml'`` in the
         harness args.
@@ -115,27 +94,63 @@ class PrototypeApplication(object):
         """
         import datasets
         from datasets import Dataset
-        task: Task = self.app.task_factory.create('imdb')
+        import numpy as np
+
+        def binary_metrics(labels, preds, positive=1) -> dict[str, float]:
+            y = np.asarray(labels)
+            p = np.asarray(preds)
+            if y.shape != p.shape:
+                raise ValueError(f"labels and preds must have same shape: {y.shape} != {p.shape}")
+            tp = np.sum((y == positive) & (p == positive))
+            tn = np.sum((y != positive) & (p != positive))
+            fp = np.sum((y != positive) & (p == positive))
+            fn = np.sum((y == positive) & (p != positive))
+            accuracy = (tp + tn) / len(y) if len(y) else 0.0
+            precision = tp / (tp + fp) if (tp + fp) else 0.0
+            recall = tp / (tp + fn) if (tp + fn) else 0.0
+            f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
+            return {
+                "accuracy": float(accuracy),
+                "precision": float(precision),
+                "recall": float(recall),
+                "f1": float(f1),
+                "tp": int(tp),
+                "tn": int(tn),
+                "fp": int(fp),
+                "fn": int(fn)}
+
+        task: Task = self.app.task_factory.create('dataset')
+        if 0:
+            self.app.show_task()
+            task.write()
+            return
         ds: Dataset = datasets.load_dataset('stanfordnlp/imdb', split='test')
+        labels: list[str] = []
+        preds: list[str] = []
         ds = ds.shuffle(seed=0)
         ds = ds.select(range(50))
         for review in ds:
+            print('text', review['text'])
             req = InstructTaskRequest(instruction=review['text'])
             if debug:
                 req = task.prepare_request(req)
                 req.write()
             res: TaskResponse = task.process(req)
+            res.write()
             if debug:
                 res.write(include_model_output_raw=True)
             should: str = 'positive' if review['label'] == 1 else 'negative'
-            pred: str = res.model_output.strip()
+            pred: str = res.model_output.strip().lower()
+            labels.append(should)
+            preds.append(pred)
             correct: bool = (should == pred)
             print(f'should: {should}, pred: {pred}, correct: {correct}')
+        print(labels)
+        print(preds)
+        from pprint import pprint
+        pprint(binary_metrics(labels, preds, positive='positive'))
 
-    def _tmp(self):
-        self.config_factory.config.write()
-
-    def proto(self, run: int = 7):
+    def proto(self, run: int = 11):
         {
             0: self._tmp,
             1: self.app.show_task,
@@ -157,7 +172,6 @@ class PrototypeApplication(object):
             8: self._example_stream_instruct,
             9: self._example_prompt_population,
             10: self._example_tiny_story,
-            11: self._example_databricks_instruct,
-            12: self._example_imdb,
-            13: self.app.dataset_sample,
+            11: self._example_imdb,
+            12: self.app.dataset_sample,
         }[run]()

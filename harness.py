@@ -15,7 +15,7 @@ def run():
     ConfigurationImporterCliHarness.add_sys_path('src')
     from zensols.lmtask.torchconfig import TorchConfig
     TorchConfig.set_random_seed()
-    harness: ConfigurationImporterCliHarness = create_harness('-c trainconf/tinystory.yml')
+    harness: ConfigurationImporterCliHarness = create_harness('-c trainconf/imdb-gemma4.yml')
     harness.run()
 
 
