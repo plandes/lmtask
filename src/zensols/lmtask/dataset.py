@@ -3,10 +3,9 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Dict, Tuple, List, Union, Callable
+from typing import Any, Dict, Tuple, List, Union, Callable, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-import shutil
 import pandas as pd
 import datasets
 from datasets import Dataset
@@ -44,15 +43,16 @@ class LoadedTaskDatasetFactory(TaskDatasetFactory):
     """
     @staticmethod
     def clear_generator_cache():
-        path = Path('~/.cache/huggingface/datasets/generator')
-        path = path.expanduser().absolute()
-        if path.is_dir():
-            shutil.rmtree(path)
+        path = Path('~/.cache/huggingface/datasets/').expanduser().absolute()
+        files: Iterable[Path] = filter(
+            lambda p: p.is_file(), path.glob('**/cache-*.arrow'))
+        for path in files:
+            path.unlink()
 
     def _pre_process(self, ds: Dataset) -> Dataset:
         if isinstance(self.pre_process, str):
             _locs = locals()
-            exec(self.pre_process)
+            exec(self.pre_process, None, _locs)
             ds = _locs['ds']
         else:
             ds = self.pre_process(ds)
@@ -61,7 +61,7 @@ class LoadedTaskDatasetFactory(TaskDatasetFactory):
     def _post_process(self, ds: Dataset) -> Dataset:
         if isinstance(self.post_process, str):
             _locs = locals()
-            exec(self.post_process)
+            exec(self.post_process, None, _locs)
             ds = _locs['ds']
         else:
             ds = self.post_process(ds)
