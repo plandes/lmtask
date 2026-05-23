@@ -81,6 +81,8 @@ lmtask_dataset_caching_generator:
       _delegate: 'alias: lmtask_default:instruct_generator'
   _stash: 'instance: lmtask_dataset_stash'
 
+# task used to train and inference on a dataset, which is why the task used on
+# the train/inference examples (tinystory and imdb) have `dataset` as the name
 lmtask_task_dataset:
   description: 'Trained on the ${lmtask_dataset:dataset_name} dataset'
   1.condition:

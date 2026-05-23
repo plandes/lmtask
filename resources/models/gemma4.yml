@@ -22,7 +22,7 @@ lmtask_gemma_instruct_resource:
   tokenizer_args:
     stop_strings: ${lmtask_model_generate_args:stop_strings}
   model_args: ${lmtask_gemma_base_resource:model_args}
-
+    
 
 ## Generators
 #

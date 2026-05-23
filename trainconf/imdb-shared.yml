@@ -14,14 +14,13 @@ lmtask_dataset_train_source:
     ds = ds.map(lambda x: {'output': 'positive' if x['label'] == 1 else 'negative'})
     ds = ds.rename_column('text', 'instruction')
     ds = ds.shuffle(seed=0)
-    # 7K takes 55m
-    #ds = ds.select(range(7_000))
-    ds = ds.select(range(2_000))
+    # 7K takes 55m, 2K takes 15m, 1K takes 7m on llama3
+    ds = ds.select(range(1_000))
 
 lmtask_dataset_eval_source:
   source: stanfordnlp/imdb
   load_args:
-    split: test[:250]
+    split: test[:100]
   pre_process: |-
     ds = ds.map(lambda x: {'output': 'positive' if x['label'] == 1 else 'negative'})
     ds = ds.rename_column('text', 'instruction')
@@ -38,3 +37,15 @@ lmtask_trainer_hf_peft:
   r: 128
   lora_alpha: 32
   lora_dropout: 0.05
+
+# for instruct configurations the train and inference templates must given
+lmtask_task_dataset:
+  role: 'You are a sentiment classifier.'
+  train_template: |-
+    Only output the sentiment as either ```positive``` or ```negative```.
+    ### Review:{{ instruction }}
+    ### Sentiment:```{{ output }}```
+  inference_template: |-
+    Only output the sentiment as either 'positive' or 'negative'.
+    ### Review:{{ request.instruction }}
+    ### Sentiment:

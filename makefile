@@ -15,7 +15,7 @@ ADD_CLEAN_ALL +=	data
 ## Project
 #
 TEST_MODEL ?=		llama
-CONFIG ?=		trainconf/tinystory-$(TEST_MODEL).yml
+CONFIG ?=		trainconf/$(TASK)-$(TEST_MODEL).yml
 GEN_PROMPT ?= 		'Once upon a time, in a galaxy, far far away,'
 
 
@@ -24,7 +24,7 @@ GEN_PROMPT ?= 		'Once upon a time, in a galaxy, far far away,'
 include ./zenbuild/main.mk
 
 
-## Targets
+## Inference targets
 #
 # stream text with the default base generation task
 .PHONY:			stream
@@ -39,33 +39,46 @@ classify:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn ARG="instruct sentiment \
 				'HuggingFace is a great API!\nBut the docs could improve.'"
 
-# train a new model on the tinystory corpus
-.PHONY:			traintinystory
-traintinystory:		$(PY_PYPROJECT_FILE)
+## Train
+#
+# train a new model
+.PHONY:			train
+train:			$(PY_PYPROJECT_FILE)
 			@$(MAKE) $(PY_MAKE_ARGS) invoke ARG="-c $(CONFIG) train"
 
 # accelerate
-.PHONY:			traintinystoryacc
-traintinystoryacc:	$(PY_PYPROJECT_FILE)
+.PHONY:			trainacc
+trainacc:		$(PY_PYPROJECT_FILE)
 			$(PY_PX_BIN) run accelerate launch \
 				./harness.py -c $(CONFIG) train
-
-# train a new gemma model on the tinystory corpus
-.PHONY:			traintinystorygemma
-traintinystorygemma:
-			@$(MAKE) $(PY_MAKE_ARGS) TEST_MODEL=gemma4 traintinystory
 
 # train a new qwen model on the tinystory corpus
 .PHONY:			traintinystoryqwen
 traintinystoryqwen:
-			@$(MAKE) $(PY_MAKE_ARGS) TEST_MODEL=qwen traintinystory
+			@$(MAKE) $(PY_MAKE_ARGS) \
+				TASK=tinystory TEST_MODEL=qwen3 train
 
-# train a new model on the databricks instruct corpus
-.PHONY:			trainimdb
-trainimdb:
-			@$(MAKE) $(PY_MAKE_ARGS) invoke \
-				ARG="-c trainconf/imdb.yml train"
+# train a new gemma model on the tinystory corpus
+.PHONY:			traintinystorygemma
+traintinystorygemma:
+			@$(MAKE) $(PY_MAKE_ARGS) \
+				TASK=tinystory TEST_MODEL=gemma4 train
 
+# train a new llama3 model on the databricks instruct corpus
+.PHONY:			trainimdbllama3
+trainimdbllama3:
+			@$(MAKE) $(PY_MAKE_ARGS) \
+				TASK=imdb TEST_MODEL=llama3 train
+
+# train a new llama3 model on the databricks instruct corpus
+.PHONY:			trainimdbgemma4
+trainimdbgemma4:
+			@$(MAKE) $(PY_MAKE_ARGS) \
+				TASK=imdb TEST_MODEL=gemma4 train
+
+
+## Test
+#
 # test the trained tiny story generation model
 .PHONY:			testtinystory
 testtinystory:

@@ -3,7 +3,7 @@
 """
 from dataclasses import dataclass
 from torch import nn
-from transformers import PreTrainedModel
+from transformers import PreTrainedModel, PreTrainedTokenizer
 from peft import PeftModel
 from .generate import GeneratorResource
 from .hf import HFTrainerResource
@@ -39,6 +39,21 @@ class Gemma4GeneratorResource(GeneratorResource):
     def _configure_model(self, model: PreTrainedModel):
         for attr in 'temperature top_p top_k'.split():
             setattr(model.generation_config, attr, None)
+        self._config_model_tokens(model)
+
+    def _config_model_tokens(self, model: PreTrainedModel):
+        tokenizer: PreTrainedTokenizer = self.tokenizer
+        # for Gemma4Config / wrapper configs
+        if hasattr(model.config, 'text_config'):
+            model.config.text_config.bos_token_id = tokenizer.bos_token_id
+            model.config.text_config.eos_token_id = tokenizer.eos_token_id
+            model.config.text_config.pad_token_id = tokenizer.pad_token_id
+        model.config.pad_token_id = tokenizer.pad_token_id
+        model.config.bos_token_id = tokenizer.bos_token_id
+        model.config.eos_token_id = tokenizer.eos_token_id
+        model.generation_config.pad_token_id = tokenizer.pad_token_id
+        model.generation_config.eos_token_id = tokenizer.eos_token_id
+        model.generation_config.bos_token_id = tokenizer.bos_token_id
 
 
 @dataclass
