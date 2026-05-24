@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
+import os
 from zensols.cli import ConfigurationImporterCliHarness
 
 
 def create_harness(task: str, model: str) -> ConfigurationImporterCliHarness:
     return ConfigurationImporterCliHarness(
         app_factory_class='zensols.lmtask.ApplicationFactory',
-        proto_args=f'-c trainconf/{task}-{model}.yml',
+        proto_args=f'proto -c trainconf/{task}-{model}.yml',
         proto_factory_kwargs={'reload_pattern': r'^zensols.lmtask.(?!task)'})
 
 
 def run():
-    ConfigurationImporterCliHarness.add_sys_path('src')
     from zensols.lmtask.torchconfig import TorchConfig
     TorchConfig.set_random_seed()
     task: str = {
@@ -33,11 +33,13 @@ def run_test():
     from zensols.introspect.tester import UnitTester
     logging.basicConfig()
     logging.getLogger('tester').setLevel(logging.INFO)
-    ConfigurationImporterCliHarness.add_sys_path('src')
     testrun = UnitTester('test_trained', Path('tests'))
     testrun()
 
 
 if (__name__ == '__main__'):
-    #run()
-    run_test()
+    ConfigurationImporterCliHarness.add_sys_path('src')
+    if os.environ.get('HARNESS_TEST', '0') == '1':
+        run_test()
+    else:
+        run()

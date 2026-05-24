@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 import logging
 from zensols.config import ConfigFactory
 from .instruct import InstructTaskRequest
-from . import TaskResponse, Task, Application
+from . import Task, Application
 from .app import _Format
 logger = logging.getLogger(__name__)
 
@@ -87,91 +87,30 @@ class PrototypeApplication(object):
                 print(row['text'], file=f)
                 print('_' * 40, file=f)
 
-    def _example_imdb(self, debug: bool = 0, limit: int = 100):
-        """Needs ``proto_args='proto -c trainconf/dbinstruct.yml'`` in the
-        harness args.
-
-        """
-        from pprint import pprint
-        import textwrap
-        import numpy as np
-        import datasets
-        from datasets import Dataset
-
-        def binary_metrics(labels, preds, positive=1) -> dict[str, float]:
-            y = np.asarray(labels)
-            p = np.asarray(preds)
-            if y.shape != p.shape:
-                raise ValueError(f"labels and preds must have same shape: {y.shape} != {p.shape}")
-            tp = np.sum((y == positive) & (p == positive))
-            tn = np.sum((y != positive) & (p != positive))
-            fp = np.sum((y != positive) & (p == positive))
-            fn = np.sum((y == positive) & (p != positive))
-            accuracy = (tp + tn) / len(y) if len(y) else 0.0
-            precision = tp / (tp + fp) if (tp + fp) else 0.0
-            recall = tp / (tp + fn) if (tp + fn) else 0.0
-            f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
-            return {
-                "accuracy": float(accuracy),
-                "precision": float(precision),
-                "recall": float(recall),
-                "f1": float(f1),
-                "tp": int(tp),
-                "tn": int(tn),
-                "fp": int(fp),
-                "fn": int(fn)}
-
-        task: Task = self.app.task_factory.create('dataset')
-        if 0:
-            task.write()
-            return
-        ds: Dataset = datasets.load_dataset('stanfordnlp/imdb', split='test')
-        labels: list[str] = []
-        preds: list[str] = []
-        ds = ds.shuffle(seed=0)
-        ds = ds.select(range(limit))
-        for i, review in enumerate(ds):
-            print(('_' * 30), f'<{i}>', ('_' * 30))
-            req = InstructTaskRequest(instruction=review['text'])
-            if debug:
-                task.prepare_request(req).write(include_instruction=False)
-            res: TaskResponse = task.process(req)
-            if debug:
-                res.write(include_model_output_raw=True)
-            label: str = 'positive' if review['label'] == 1 else 'negative'
-            pred: str = res.model_output.strip().lower()
-            labels.append(label)
-            preds.append(pred)
-            correct: bool = (label == pred)
-            pred_str: str = textwrap.shorten(pred, width=20)
-            print(f'correct: {correct} (label={label}, pred=<{pred_str}>)')
-        pprint(binary_metrics(labels, preds, positive='positive'))
-
     def _tmp(self):
         pass
 
-    def proto(self, run: int = 11):
+    def proto(self, run: int = 1):
         {
             0: self._tmp,
-            1: self.app.show_task,
-            2: lambda: self.app.instruct(
+            1: self.app.dataset_sample,
+            2: self.app.show_task,
+            3: lambda: self.app.instruct(
                 task_name='instruct_generate',
                 instruction='Write a poem about a cat in 50 words or less.',
                 output_format=_Format.full),
-            3: lambda: self.app.instruct(
+            4: lambda: self.app.instruct(
                 task_name='sentiment',
                 instruction='I love football.\nI hate olives.\nEarth is big.',
                 output_format=_Format.full),
-            4: lambda: self.app.instruct(
+            5: lambda: self.app.instruct(
                 task_name='ner',
                 instruction='Obama was the 44th president of the United States.',
                 output_format=_Format.full),
-            5: self._example_direct_model,
-            6: self._example_base_generate,
-            7: self._example_stream_base,
-            8: self._example_stream_instruct,
-            9: self._example_prompt_population,
-            10: self._example_tiny_story,
-            11: self._example_imdb,
-            12: self.app.dataset_sample,
+            6: self._example_direct_model,
+            7: self._example_base_generate,
+            8: self._example_stream_base,
+            9: self._example_stream_instruct,
+            10: self._example_prompt_population,
+            11: self._example_tiny_story,
         }[run]()
