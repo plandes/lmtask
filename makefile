@@ -14,7 +14,9 @@ ADD_CLEAN_ALL +=	data
 
 ## Project
 #
-CONFIG ?=		trainconf/$(TASK)-$(TEST_MODEL).yml
+MODELS ?=		llama3 qwen3 gemma4
+TRAIN_CONF_DIR ?=	trainconf
+CONFIG ?=		$(TRAIN_CONF_DIR)/$(TASK)-$(TEST_MODEL).yml
 GEN_PROMPT ?= 		'Once upon a time, in a galaxy, far far away,'
 
 
@@ -23,7 +25,7 @@ GEN_PROMPT ?= 		'Once upon a time, in a galaxy, far far away,'
 include ./zenbuild/main.mk
 
 
-## Inference targets
+## Train and inference function-like
 #
 # stream text with the default base generation task
 .PHONY:			stream
@@ -38,8 +40,6 @@ classify:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn ARG="instruct sentiment \
 				'HuggingFace is a great API!\nBut the docs could improve.'"
 
-## Train
-#
 # train a new model
 .PHONY:			train
 train:			$(PY_PYPROJECT_FILE)
@@ -51,46 +51,30 @@ train:			$(PY_PYPROJECT_FILE)
 					ARG="-c $(CONFIG) train" ; \
 			fi
 
-# accelerate
-.PHONY:			trainacc
-trainacc:		$(PY_PYPROJECT_FILE)
-			$(PY_PX_BIN) run accelerate launch \
-				./harness.py -c $(CONFIG) train
 
-# train a new qwen model on the tinystory corpus
-.PHONY:			traintinystoryqwen
-traintinystoryqwen:
-			@$(MAKE) $(PY_MAKE_ARGS) \
-				TASK=tinystory TEST_MODEL=qwen3 train
+## Tinystory train
+#
+# train all tinystory task models
+.PHONY:			traintinystory
+traintinystory:
+			@for model in $(MODELS) ; do \
+				$(MAKE) $(PY_MAKE_ARGS) \
+					TASK=tinystory TEST_MODEL=$$model train ; \
+			done
 
-# train a new gemma model on the tinystory corpus
-.PHONY:			traintinystorygemma
-traintinystorygemma:
-			@$(MAKE) $(PY_MAKE_ARGS) \
-				TASK=tinystory TEST_MODEL=gemma4 train
+# retrain all tinystory task models
+.PHONY:			retraintinystory
+retraintinystory:
+			rm -fr data/tinystory
+			@$(MAKE) $(PY_MAKE_ARGS) traintinystory
 
-# train a new llama3 model on the imdb instruct corpus
-.PHONY:			trainimdbllama3
-trainimdbllama3:
-			@$(MAKE) $(PY_MAKE_ARGS) \
-				TASK=imdb TEST_MODEL=llama3 train
 
-# train a new llama3 model on the imdb instruct corpus
-.PHONY:			trainimdbqwen3
-trainimdbqwen3:
-			@$(MAKE) $(PY_MAKE_ARGS) \
-				TASK=imdb TEST_MODEL=qwen3 train
-
-# train a new llama3 model on the imdb instruct corpus
-.PHONY:			trainimdbgemma4
-trainimdbgemma4:
-			@$(MAKE) $(PY_MAKE_ARGS) \
-				TASK=imdb TEST_MODEL=gemma4 train
-
+## IMDB train
+#
 # train all imdb task models
 .PHONY:			trainimdb
 trainimdb:
-			@for model in llama3 qwen3 gemma4 ; do \
+			@for model in $(MODELS) ; do \
 				$(MAKE) $(PY_MAKE_ARGS) \
 					TASK=imdb TEST_MODEL=$$model train ; \
 			done
@@ -100,6 +84,7 @@ trainimdb:
 retrainimdb:
 			rm -fr data/imdb
 			@$(MAKE) $(PY_MAKE_ARGS) trainimdb
+
 
 ## Test
 #
@@ -113,5 +98,5 @@ testtinystory:
 .PHONY:			testimdb
 testimdb:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
-				ARG="-c trainconf/imdb.yml \
-					instruct imdb 'I loved the movie'"
+				ARG="-c $(TRAIN_CONF_DIR)/imdb-llama3.yml \
+					instruct dataset 'I loved the movie'"
