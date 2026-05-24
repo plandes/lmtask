@@ -12,6 +12,9 @@ ADD_CLEAN +=		tmp_trainer train.log
 ADD_CLEAN_ALL +=	data
 
 
+PY_TEST_GLOB = test_trained.py
+
+
 ## Project
 #
 TEST_MODEL ?=		llama
@@ -44,7 +47,13 @@ classify:
 # train a new model
 .PHONY:			train
 train:			$(PY_PYPROJECT_FILE)
-			@$(MAKE) $(PY_MAKE_ARGS) invoke ARG="-c $(CONFIG) train"
+			@if [ -d data/$(TASK)/$(TEST_MODEL) ] ; then \
+				echo "$(TASK) $(TEST_MODEL) already exists" ; \
+			else \
+				echo "training $(TASK) $(TEST_MODEL)" ; \
+				$(MAKE) $(PY_MAKE_ARGS) invoke \
+					ARG="-c $(CONFIG) train" ; \
+			fi
 
 # accelerate
 .PHONY:			trainacc
@@ -82,14 +91,19 @@ trainimdbgemma4:
 			@$(MAKE) $(PY_MAKE_ARGS) \
 				TASK=imdb TEST_MODEL=gemma4 train
 
+# train all imdb task models
+.PHONY:			trainimdb
+trainimdb:
+			@for model in llama3 qwen3 gemma4 ; do \
+				$(MAKE) $(PY_MAKE_ARGS) \
+					TASK=imdb TEST_MODEL=$$model train ; \
+			done
+
 # retrain all imdb task models
 .PHONY:			retrainimdb
 retrainimdb:
 			rm -fr data/imdb
-			for model in llama3 qwen3 gemma4 ; do \
-				make TASK=imdb TEST_MODEL=$$model train ; \
-			done
-
+			@$(MAKE) $(PY_MAKE_ARGS) trainimdb
 
 ## Test
 #
