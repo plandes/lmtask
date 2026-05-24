@@ -7,17 +7,13 @@
 # type of project
 PROJ_TYPE =		python
 PROJ_MODULES =		python/doc python/package python/deploy
-PY_TEST_ALL_TARGETS +=	stream classify
+PY_TEST_ALL_TARGETS +=	trainimdb stream classify
 ADD_CLEAN +=		tmp_trainer train.log
 ADD_CLEAN_ALL +=	data
 
 
-PY_TEST_GLOB = test_trained.py
-
-
 ## Project
 #
-TEST_MODEL ?=		llama
 CONFIG ?=		trainconf/$(TASK)-$(TEST_MODEL).yml
 GEN_PROMPT ?= 		'Once upon a time, in a galaxy, far far away,'
 
@@ -73,19 +69,19 @@ traintinystorygemma:
 			@$(MAKE) $(PY_MAKE_ARGS) \
 				TASK=tinystory TEST_MODEL=gemma4 train
 
-# train a new llama3 model on the databricks instruct corpus
+# train a new llama3 model on the imdb instruct corpus
 .PHONY:			trainimdbllama3
 trainimdbllama3:
 			@$(MAKE) $(PY_MAKE_ARGS) \
 				TASK=imdb TEST_MODEL=llama3 train
 
-# train a new llama3 model on the databricks instruct corpus
+# train a new llama3 model on the imdb instruct corpus
 .PHONY:			trainimdbqwen3
 trainimdbqwen3:
 			@$(MAKE) $(PY_MAKE_ARGS) \
 				TASK=imdb TEST_MODEL=qwen3 train
 
-# train a new llama3 model on the databricks instruct corpus
+# train a new llama3 model on the imdb instruct corpus
 .PHONY:			trainimdbgemma4
 trainimdbgemma4:
 			@$(MAKE) $(PY_MAKE_ARGS) \
