@@ -38,6 +38,8 @@ class TestBase(unittest.TestCase):
         if task is not None:
             assert self._trained_model_exists(task, model)
             args = f'-c trainconf/{task}-{model}.yml'
+        elif model is not None:
+            args = f'-c resources/models/{model}.conf'
         args += ' --level=err'
         return harn.get_config_factory(args)
 
@@ -49,8 +51,9 @@ class TestBase(unittest.TestCase):
             app.rethrow()
         return app
 
-    def _get_trained_task(self, task_name: str, model: str) -> Task:
-        if not self._trained_model_exists(task_name, model):
+    def _get_trained_task(self, task_name: str, model: str, task: str) -> Task:
+        if task_name is not None and \
+           not self._trained_model_exists(task_name, model):
             warnings.warn(
                 f"Trained model '{task_name}-{model}' does not exist--skipping",
                 UserWarning)
@@ -58,4 +61,4 @@ class TestBase(unittest.TestCase):
         fac: ConfigFactory = self._get_config_factory(task_name, model)
         task_factory: TaskFactory = fac('lmtask_task_factory')
         #task_factory.write(short=True)
-        return task_factory.create('dataset')
+        return task_factory.create(task)

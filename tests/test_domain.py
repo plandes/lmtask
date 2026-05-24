@@ -73,20 +73,20 @@ class TestGeneratorResource(TestBase):
 
     def test_model_desc_set(self):
         fac: ConfigFactory = self._get_config_factory()
-        res: GeneratorResource = fac('lmtask_llama_test_desc_set_resource')
+        res: GeneratorResource = fac('lmtask_llama3_test_desc_set_resource')
         self.assertEqual('Llama-3.1-8B-Instruct', res.model_desc)
         self.assertEqual('llama-3-1-8b-instruct', res.model_file_name)
 
     def test_model_desc_not_set_model_id(self):
         fac: ConfigFactory = self._get_config_factory()
         res: GeneratorResource = fac(
-            'lmtask_llama_test_desc_not_set_model_id_resource')
+            'lmtask_llama3_test_desc_not_set_model_id_resource')
         self.assertEqual('not_set_with_user', res.model_desc)
         self.assertEqual('not-set-with-user', res.model_file_name)
 
     def test_model_desc_not_set_checkpoint(self):
         fac: ConfigFactory = self._get_config_factory()
         res: GeneratorResource = fac(
-            'lmtask_llama_test_desc_not_set_checkpoint_resource')
+            'lmtask_llama3_test_desc_not_set_checkpoint_resource')
         self.assertEqual('checkpoint-123', res.model_desc)
         self.assertEqual('checkpoint-123', res.model_file_name)

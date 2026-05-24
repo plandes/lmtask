@@ -3,7 +3,7 @@ from zensols.lmtask.torchconfig import TorchConfig
 from util import TestBase
 
 
-class TestTrainedGenerate(TestBase):
+class TestGenerate(TestBase):
     DEBUG: bool = 0
     PROMPT: str = 'Once upon a time, in a galaxy, far far away,'
     STREAM: bool = 0
@@ -14,9 +14,13 @@ class TestTrainedGenerate(TestBase):
         super().setUp()
         TorchConfig.set_random_seed()
 
-    def _test_gen(self, model: str):
-        task_name: str = 'tinystory'
-        task: Task = self._get_trained_task(task_name, model)
+    def _test_generate(self, task_name: str, model: str, task: str = 'dataset',
+                       clear: bool = False, assert_period: bool = True):
+        task: Task = self._get_trained_task(task_name, model, task)
+        if clear:
+            task.generator.resource.clear()
+        if task is None:
+            return
         req = TaskRequest(self.PROMPT)
         if self.DEBUG:
             print(f'testing: {task_name}-{model}')
@@ -39,11 +43,19 @@ class TestTrainedGenerate(TestBase):
         self.assertTrue(
             word_len > self.MIN_WORDS,
             f'expected at least {self.MIN_WORDS} but got {word_len}')
-        self.assertTrue(
-            out.endswith('.'),
-            f'expected output to end with a period: <<{out}>>')
+        if assert_period:
+            self.assertTrue(
+                out.endswith('.'),
+                f'expected output to end with a period: <<{out}>>')
 
-    def test_generate(self):
-        model: str
-        for model in self.MODELS:
-            self._test_gen(model)
+    def test_default_llama3(self):
+        self._test_generate(None, 'llama3', 'base_generate', True, False)
+
+    def test_tinystory_llama3(self):
+        self._test_generate('tinystory', 'llama3', 'dataset', True)
+
+    def test_tinystory_qwen3(self):
+        self._test_generate('tinystory', 'qwen3')
+
+    def test_tinystory_gemma4(self):
+        self._test_generate('tinystory', 'gemma4')

@@ -3,13 +3,27 @@
 #@meta {doc: "create new task: copy this, train-dataset-{base/instruct}, replace `_dataset`"}
 
 
+train_dataset_imp:
+  import:
+    eval_imp:
+      type: dictionary
+      source: |
+        config = self.parent.parent
+        name = config['lmtask_dataset'].get('model_name')
+        src = 'lmtask_NAME_MODELTYPE_resource'
+        sec = self.parent[src]
+        secs = {}
+        for model_type in 'base instruct'.split():
+          targ = f'lmtask_{name}_{model_type}_resource'
+          secs[targ] = sec
+        self._set_config(secs)
+        self.parent.remove_section(src)
+
+
 ## Defaults
 #
 default:
   data_dir: ${default:root_dir}/data/${lmtask_dataset:dataset_name}/${lmtask_dataset:model_name}
-
-lmtask_default:
-  base_resource: lmtask_dataset_inference_resource
 
 lmtask_trainer_default:
   trainer_name: 'lmtask_trainer_hf'
@@ -55,13 +69,9 @@ lmtask_dataset_model_args:
   # uncommen to add quantization
   #quantization_config: 'instance: lmtask_quant_4bit_config'
 
-lmtask_dataset_inference_resource:
-  condition:
-    if: ${lmtask_dataset:is_base}
-    then:
-      class_name: ${lmtask_default:base_resource_class}
-    else:
-      class_name: ${lmtask_default:instruct_resource_class}
+# each model is in its own config section namespace; this is copied as
+# lmtask_${lmtask_dataset:name}_<base,instruct>_resource
+lmtask_NAME_MODELTYPE_resource:
   model_desc: 'Model trained on the ${lmtask_dataset:dataset_name} dataset'
   model_args: 'instance: lmtask_dataset_model_args'
   model_id: '${lmtask_trainer_default:source_model}'
@@ -98,10 +108,16 @@ lmtask_task_dataset:
     else:
       request_class: 'class: zensols.lmtask.instruct.InstructTaskRequest'
   response_class: 'class: zensols.lmtask.task.TaskResponse'
-  resource: 'alias: lmtask_default:base_resource'
+  3.condition:
+    if: ${lmtask_dataset:is_base}
+    then:
+      resource: 'alias: lmtask_default:base_resource'
+    else:
+      resource: 'alias: lmtask_default:instruct_resource'
   condition:
     if: ${lmtask_default:cache}
     then:
       generator: 'instance: lmtask_dataset_caching_generator'
     else:
       generator: '${lmtask_dataset_caching_generator:_delegate}'
+

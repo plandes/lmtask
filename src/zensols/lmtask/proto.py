@@ -90,7 +90,7 @@ class PrototypeApplication(object):
     def _tmp(self):
         pass
 
-    def proto(self, run: int = 1):
+    def proto(self, run: int = 0):
         {
             0: self._tmp,
             1: self.app.dataset_sample,

@@ -160,13 +160,16 @@ class GeneratorResource(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model params: {params}')
         with time(f'loaded model: {model_id}', logging.DEBUG):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'loading {model_id}, generator: {self.name}')
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'loading {model_id}, generator: {self.name}')
                 self.write_to_log(logger, logging.DEBUG)
+            model = self.model_class.from_pretrained(model_id, **params)
             if self.peft_model_id is None:
-                model = self.model_class.from_pretrained(model_id, **params)
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info('loaded non-peft model')
             else:
-                model = self.model_class.from_pretrained(model_id, **params)
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'loading peft model from {self.peft_model_id}')
                 self._configure_peft(model)
                 model = PeftModel.from_pretrained(model, self.peft_model_id)
             self._configure_model(model)

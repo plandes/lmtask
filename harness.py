@@ -22,7 +22,7 @@ def run():
         0: 'llama3',
         1: 'qwen3',
         2: 'gemma4',
-    }[0]
+    }[2]
     harness: ConfigurationImporterCliHarness = create_harness(task, model)
     harness.run()
 
@@ -33,7 +33,7 @@ def run_test():
     from zensols.introspect.tester import UnitTester
     logging.basicConfig()
     logging.getLogger('tester').setLevel(logging.INFO)
-    testrun = UnitTester('test_trained_instruct', Path('tests'))
+    testrun = UnitTester('test_instruct', Path('tests'))
     testrun()
 
 
