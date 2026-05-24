@@ -316,6 +316,11 @@ class ModelTextGenerator(TextGenerator):
     remove_generation_config: Tuple[str, ...] = field(default=())
     """Attributes to set to ``None`` on the generation config."""
 
+    stream_args: Dict[str, Any] = field(
+        default_factory=lambda: dict(
+            skip_prompt=False, skip_special_tokens=True))
+    """The arguments given to the streamer in :meth:`stream`."""
+
     def _process_output(self, input_ids: Tensor, model_output: Tensor) -> \
             Tensor:
         return model_output[0]
@@ -412,15 +417,22 @@ class ModelTextGenerator(TextGenerator):
         mr: GeneratorResource = self.resource
         tokenizer: PreTrainedTokenizer = mr.tokenizer
         model: PreTrainedModel = mr.model
-        inputs: Tensor = tokenizer(prompt, **self._get_tokenize_params())
+        inputs: BatchEncoding = tokenizer(prompt, **self._get_tokenize_params())
         inputs = inputs.to(model.device)
-        text_streamer = TextIteratorStreamer(tokenizer)
+        generate_params = dict(self._get_generate_params())
+        if generate_params.get('pad_token_id') is None:
+            generate_params['pad_token_id'] = (
+                tokenizer.pad_token_id
+                if tokenizer.pad_token_id is not None
+                else tokenizer.eos_token_id)
+        text_streamer = TextIteratorStreamer(
+            tokenizer, **self.stream_args)
         thread = Thread(
             target=model.generate,
             kwargs=dict(
-                inputs=inputs.input_ids,
+                **inputs,
                 streamer=text_streamer,
-                **self._get_generate_params()))
+                **generate_params))
         thread.start()
         cur_width: int = 0
         text: str
