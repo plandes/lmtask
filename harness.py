@@ -33,7 +33,7 @@ def run_test():
     from zensols.introspect.tester import UnitTester
     logging.basicConfig()
     logging.getLogger('tester').setLevel(logging.INFO)
-    testrun = UnitTester('test_trained', Path('tests'))
+    testrun = UnitTester('test_trained_instruct', Path('tests'))
     testrun()
 
 

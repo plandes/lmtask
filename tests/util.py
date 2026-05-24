@@ -1,4 +1,5 @@
 import logging
+import warnings
 import unittest
 from pathlib import Path
 import shutil
@@ -6,7 +7,7 @@ import os
 from zensols.util import Failure
 from zensols.config import ConfigFactory
 from zensols.cli import CliHarness
-from zensols.lmtask import Application, ApplicationFactory
+from zensols.lmtask import Task, TaskFactory, Application, ApplicationFactory
 
 
 if 0:
@@ -47,3 +48,14 @@ class TestBase(unittest.TestCase):
         if isinstance(app, Failure):
             app.rethrow()
         return app
+
+    def _get_trained_task(self, task_name: str, model: str) -> Task:
+        if not self._trained_model_exists(task_name, model):
+            warnings.warn(
+                f"Trained model '{task_name}-{model}' does not exist--skipping",
+                UserWarning)
+            return
+        fac: ConfigFactory = self._get_config_factory(task_name, model)
+        task_factory: TaskFactory = fac('lmtask_task_factory')
+        #task_factory.write(short=True)
+        return task_factory.create('dataset')

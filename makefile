@@ -7,7 +7,7 @@
 # type of project
 PROJ_TYPE =		python
 PROJ_MODULES =		python/doc python/package python/deploy
-PY_TEST_ALL_TARGETS +=	trainimdb stream classify
+PY_TEST_ALL_TARGETS +=	stream classify
 ADD_CLEAN +=		tmp_trainer train.log
 ADD_CLEAN_ALL +=	data
 
@@ -41,8 +41,8 @@ classify:
 				'HuggingFace is a great API!\nBut the docs could improve.'"
 
 # train a new model
-.PHONY:			train
-train:			$(PY_PYPROJECT_FILE)
+.PHONY:			trainmodel
+trainmodel:			$(PY_PYPROJECT_FILE)
 			@if [ -d data/$(TASK)/$(TEST_MODEL) ] ; then \
 				echo "$(TASK) $(TEST_MODEL) already exists" ; \
 			else \
@@ -59,7 +59,7 @@ train:			$(PY_PYPROJECT_FILE)
 traintinystory:
 			@for model in $(MODELS) ; do \
 				$(MAKE) $(PY_MAKE_ARGS) \
-					TASK=tinystory TEST_MODEL=$$model train ; \
+					TASK=tinystory TEST_MODEL=$$model trainmodel ; \
 			done
 
 # retrain all tinystory task models
@@ -76,7 +76,7 @@ retraintinystory:
 trainimdb:
 			@for model in $(MODELS) ; do \
 				$(MAKE) $(PY_MAKE_ARGS) \
-					TASK=imdb TEST_MODEL=$$model train ; \
+					TASK=imdb TEST_MODEL=$$model trainmodel ; \
 			done
 
 # retrain all imdb task models
@@ -84,6 +84,12 @@ trainimdb:
 retrainimdb:
 			rm -fr data/imdb
 			@$(MAKE) $(PY_MAKE_ARGS) trainimdb
+
+
+## Train
+#
+.PHONY:			train
+train:			traintinystory trainimdb
 
 
 ## Test

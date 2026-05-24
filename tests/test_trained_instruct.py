@@ -1,20 +1,17 @@
 from pprint import pprint
-import warnings
 import textwrap
 import numpy as np
 import datasets
 from datasets import Dataset
 from tqdm import tqdm
-from zensols.lmtask import TaskFactory
-from zensols.config import ConfigFactory
 from zensols.lmtask.instruct import InstructTaskRequest
 from zensols.lmtask import Task, TaskRequest, TaskResponse
 from zensols.lmtask.torchconfig import TorchConfig
 from util import TestBase
 
 
-class TestImdbTrained(TestBase):
-    DEBUG: bool = False
+class TestTrainedInstruct(TestBase):
+    DEBUG: bool = 0
     LIMIT: int = 50
     EXPECT_F1: int = 0.9
 
@@ -48,16 +45,11 @@ class TestImdbTrained(TestBase):
 
     def _test_imdb(self, model: str) -> dict[str, float]:
         task_name: str = 'imdb'
-        if not self._trained_model_exists(task_name, model):
-            warnings.warn(
-                f"Trained model '{task_name}-{model}' does not exist--skipping",
-                UserWarning)
-            return
-        fac: ConfigFactory = self._get_config_factory(task_name, model)
         name: str = f'{task_name}-{model}'
-        task_factory: TaskFactory = fac('lmtask_task_factory')
-        task: Task = task_factory.create('dataset')
+        task: Task = self._get_trained_task(task_name, model)
         ds: Dataset = datasets.load_dataset('stanfordnlp/imdb', split='test')
+        if self.DEBUG:
+            print(f'testing: {task_name}-{model}')
         labels: list[str] = []
         preds: list[str] = []
         ds = ds.shuffle(seed=0)
@@ -88,7 +80,11 @@ class TestImdbTrained(TestBase):
             f'poor performance (expect at lest{self.EXPECT_F1}): {mets}')
         return mets
 
-    def test_imdb_llama(self):
-        model: str
-        for model in 'llama3 qwen3 gemma4'.split():
-            self._test_imdb(model)
+    def test_imdb_llama3(self):
+        self._test_imdb('llama3')
+
+    def test_imdb_qwen3(self):
+        self._test_imdb('qwen3')
+
+    def test_imdb_gemma4(self):
+        self._test_imdb('gemma4')
