@@ -4,7 +4,7 @@
 project:
   import:
     ts_imp:
-      config_file: 'resource(zensols.lmtask): resources/models/llama.conf'
+      config_file: 'resource(zensols.lmtask): resources/models/llama3.conf'
       merge: parent
       type: importini
 

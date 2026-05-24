@@ -23,13 +23,22 @@ class TestBase(unittest.TestCase):
     def _should_protect_hf(self) -> bool:
         return os.environ.get('PROTECT_HF_ACCESS', 'no') == '1'
 
+    def _trained_model_exists(self, task: str, model: str) -> bool:
+        train_dir: Path = Path(f'data/{task}/{model}/model/peft')
+        return train_dir.is_dir()
+
     def _get_harness(self) -> CliHarness:
         return ApplicationFactory.create_harness()
 
-    def _get_config_factory(self) -> ConfigFactory:
+    def _get_config_factory(self, task: str = None, model: str = None) -> \
+            ConfigFactory:
         harn: CliHarness = self._get_harness()
-        return harn.get_config_factory(
-            '-c test-resources/test.yml --level=err')
+        args: str = '-c test-resources/test.yml'
+        if task is not None:
+            assert self._trained_model_exists(task, model)
+            args = f'-c trainconf/{task}-{model}.yml'
+        args += ' --level=err'
+        return harn.get_config_factory(args)
 
     def _get_application(self) -> Application:
         harn: CliHarness = self._get_harness()
