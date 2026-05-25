@@ -22,6 +22,7 @@ class TestGenerate(TestBase):
         if task is None:
             return
         req = TaskRequest(self.PROMPT)
+        task.generator.generate_params['max_new_tokens'] = 300
         if self.DEBUG:
             print(f'testing: {task_name}-{model}')
         if self.DETERMINISTIC:
