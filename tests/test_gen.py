@@ -17,6 +17,8 @@ class TestGenerate(TestBase):
     def _test_generate(self, task_name: str, model: str, task: str = 'dataset',
                        clear: bool = False, assert_period: bool = True):
         task: Task = self._get_trained_task(task_name, model, task)
+        if task is None:
+            return
         if clear:
             task.generator.resource.clear()
         if task is None:

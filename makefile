@@ -37,7 +37,9 @@ stream:
 # classify two sentences as sentiment
 .PHONY:			classify
 classify:
-			@$(MAKE) $(PY_MAKE_ARGS) pyharn ARG="instruct sentiment \
+			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
+				ARG="instruct sentiment \
+				-c 'resource(zensols.lmtask): resources/models/qwen3.conf' \
 				'HuggingFace is a great API!\nBut the docs could improve.'"
 
 # train a new model

@@ -42,6 +42,15 @@ pip3 install zensols.lmtask
 ```
 
 
+## Models
+
+The following models supported and tested:
+
+* Llama 3
+* Qwen 3
+* Gemma 4
+
+
 ## Usage
 
 The package can be used from the command line to both inference and train a new

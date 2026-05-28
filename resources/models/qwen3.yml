@@ -17,7 +17,7 @@ lmtask_qwen3_instruct_resource:
   model_args: ${lmtask_qwen3_base_resource:model_args}
   code_tokenizer: ${lmtask_qwen3_base_resource:code_tokenizer}
   code_model: ${lmtask_qwen3_base_resource:code_model}
-
+    
 
 ## Generators
 #
@@ -40,7 +40,14 @@ lmtask_qwen3_instruct_generator:
   resource: 'alias: lmtask_default:instruct_resource'
   generate_params: >-
     call({'param': {'method': 'asdict'}}): lmtask_model_generate_instruct_args
-  replacements: ${lmtask_qwen3_base_generator:replacements}
+  replacements:
+    - ['<\|im_start\|>[^\n]*\n?', '']
+    - ['<\|im_end\|>', '']
+    - ['^(assistant|user|system|edReader)\s*', '']
+  # appends the model's assistant-start marker to the chat template so the
+  # model knows it should generate the assistant's next response
+  chat_template_args:
+    add_generation_prompt: true
 
 
 ## Training
@@ -60,4 +67,3 @@ lmtask_trainer_hf_peft:
     - up_proj
     - down_proj
     - lm_head
-#    - embed_tokens

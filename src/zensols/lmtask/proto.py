@@ -57,12 +57,16 @@ class PrototypeApplication(object):
         prompt: str = f'Write 20 word short story starting witih "{self.prompt}".'
         task.generator.stream(prompt)
 
-    def _example_prompt_population(self):
+    def _example_prompt_population(self, run: bool = 1):
+        from .task import TaskResponse
         task: Task = self.app.task_factory.create('sentiment')
-        req = InstructTaskRequest(
-            instruction='I love football.\nI hate olives.\nEarth is big.')
+        instr: str = 'I love football.\nI hate olives.\nEarth is big.'
+        req = InstructTaskRequest(instruction=instr)
         req = task.prepare_request(req)
         req.write()
+        if run:
+            res: TaskResponse = task.process(req)
+            res.write(include_model_output=True)
 
     def _example_tiny_story(self):
         """Needs ``proto_args='proto -c trainconf/tinystory.yml'`` in the
@@ -90,7 +94,7 @@ class PrototypeApplication(object):
     def _tmp(self):
         pass
 
-    def proto(self, run: int = 0):
+    def proto(self, run: int = 5):
         {
             0: self._tmp,
             1: self.app.dataset_sample,

@@ -68,6 +68,10 @@ lmtask_llama3_instruct_generator:
     - ['<\|eot_id\|>', '']
     - ['<\|begin_of_text\|>', '']
     - ['<\|end_of_text\|>', '']
+  # appends the model's assistant-start marker to the chat template so the
+  # model knows it should generate the assistant's next response
+  chat_template_args:
+    add_generation_prompt: true
 
 
 ## Training

@@ -30,8 +30,6 @@ lmtask_dataset:
 #
 lmtask_task_dataset:
   chat_template_args:
-    # appends the model’s assistant-start marker to the chat template so the
-    # model knows it should generate the assistant’s next response
-    add_generation_prompt: true
-    # whether to enable reasoning, which adds <think> tags
+    # whether to enable reasoning, which adds <think> tags (only needed by base
+    # Qwen, which is also an instruct model)
     enable_thinking: false

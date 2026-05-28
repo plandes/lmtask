@@ -5,9 +5,14 @@ from zensols.cli import ConfigurationImporterCliHarness
 
 
 def create_harness(task: str, model: str) -> ConfigurationImporterCliHarness:
+    if task is None:
+        args = f'resource(zensols.lmtask): resources/models/{model}.conf'
+    else:
+        f'trainconf/{task}-{model}.yml'
+    args = f"proto -c '{args}'"
     return ConfigurationImporterCliHarness(
         app_factory_class='zensols.lmtask.ApplicationFactory',
-        proto_args=f'proto -c trainconf/{task}-{model}.yml',
+        proto_args=args,
         proto_factory_kwargs={'reload_pattern': r'^zensols.lmtask.(?!task)'})
 
 
@@ -15,9 +20,10 @@ def run():
     from zensols.lmtask.torchconfig import TorchConfig
     TorchConfig.set_random_seed()
     task: str = {
-        0: 'tinystory',
-        1: 'imdb',
-    }[1]
+        0: None,
+        1: 'tinystory',
+        2: 'imdb',
+    }[0]
     model: str = {
         0: 'llama3',
         1: 'qwen3',

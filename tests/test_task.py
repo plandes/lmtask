@@ -32,7 +32,7 @@ class TestTask(TestBase):
         mi: str = response.request.model_input
         should: str = '<|begin_of_text|><|start_header_id|>system<|end_header_id|>'
         self.assertTrue(mi.startswith(should), f'prompt: <<{mi}>>')
-        should = 'instruct: inst<|eot_id|>'
+        should = 'instruct: inst<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n'
         self.assertTrue(mi.endswith(should), f'prompt: <<{mi}>>')
         should = "it's 12 noon"
         self.assertEqual(should, response.model_output_raw)

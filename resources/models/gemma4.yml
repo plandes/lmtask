@@ -46,14 +46,14 @@ lmtask_gemma4_instruct_generator:
   generate_params: >-
     call({'param': {'method': 'asdict'}}): lmtask_model_generate_instruct_args
   replacements:
-    - ['^```json\s*(.*?)\s*```\s*\Z', '\1', DOTALL]
-    - ['^```json\s*', '']
-    - ['```\s*\Z', '']
     - ['<turn\|>', '']
     - ['<eos>', '']
     - ['<bos>', '']
     - ['<\|end_of_turn\|>', '']
     - ['<\|end_of_sentence\|>', '']
+    - ['^```json\s*(.*?)\s*```\s*\Z', '\1', DOTALL]
+    - ['^```json\s*', '']
+    - ['```\s*\Z', '']
 
 
 ## Training

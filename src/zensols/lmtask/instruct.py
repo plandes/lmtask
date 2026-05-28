@@ -18,7 +18,7 @@ from transformers import PreTrainedTokenizer
 from datasets import Dataset
 from .task import TaskError, TaskRequest, TaskDatasetFactory
 from .generate import (
-    GeneratorResource, ReplaceTextGenerator, GenerateTask
+    GeneratorResource, ReplaceTextGenerator, GenerateTask, ModelTextGenerator
 )
 
 logger = logging.getLogger(__name__)
@@ -101,7 +101,8 @@ class InstructTask(GenerateTask):
         default='{{request.instruction}}')
     """The instructions given to :obj:`generator`."""
 
-    chat_template_args: Dict[str, Any] = field(default_factory=dict)
+    chat_template_args: Dict[str, Any] = field(
+        default_factory=lambda: dict(add_generation_prompt=True))
     """Arguments given to ``apply_chat_template``."""
 
     apply_chat_template: bool = field(default=True)
@@ -131,7 +132,9 @@ class InstructTask(GenerateTask):
     def _apply_instruct_chat_template(self, prompt: str) -> str:
         """Format ``prompt`` into one that conforms to the instruct syntax."""
         tokenizer: PreTrainedTokenizer = self.resource.tokenizer
-        args: Dict[str, Any] = dict(self.generator.chat_template_args)
+        args: Dict[str, Any] = {}
+        if isinstance(self.generator, ModelTextGenerator):
+            args.update(self.generator.chat_template_args)
         args.update(self.chat_template_args)
         return tokenizer.apply_chat_template(
             conversation=self._apply_messages(prompt),
