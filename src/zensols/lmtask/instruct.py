@@ -126,17 +126,18 @@ class InstructTask(GenerateTask):
         role_namme: str = self.resource.system_role_name
         return [
             {'role': role_namme, 'content': self.role},
-            {'role': 'user', 'content': prompt}
-        ]
+            {'role': 'user', 'content': prompt}]
 
     def _apply_instruct_chat_template(self, prompt: str) -> str:
         """Format ``prompt`` into one that conforms to the instruct syntax."""
         tokenizer: PreTrainedTokenizer = self.resource.tokenizer
+        args: Dict[str, Any] = dict(self.generator.chat_template_args)
+        args.update(self.chat_template_args)
         return tokenizer.apply_chat_template(
             conversation=self._apply_messages(prompt),
             tokenize=False,
             return_dict=False,
-            **self.chat_template_args)
+            **args)
 
     def _create_template(self, template: Union[str, Path]) -> Template:
         with openread(template, interpret_str=True) as f:

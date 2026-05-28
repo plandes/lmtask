@@ -324,6 +324,15 @@ class ModelTextGenerator(TextGenerator):
             skip_prompt=False, skip_special_tokens=True))
     """The arguments given to the streamer in :meth:`stream`."""
 
+    chat_template_args: Dict[str, Any] = field(default_factory=dict)
+    """Arguments given to ``apply_chat_template``.  Some models require chat
+    templates that all :class:`.instruct.InstructTask` should add.  For example,
+    Qwen 3 always needs ``add_generation_prompt=True``.
+
+    This only is used (and should only be set) in generators used by instruct
+    tasks.
+
+    """
     def _process_output(self, input_ids: Tensor, model_output: Tensor) -> \
             Tensor:
         return model_output[0]
