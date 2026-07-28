@@ -109,7 +109,7 @@ train:			traintinystory trainimdb
 .PHONY:			testtinystory
 testtinystory:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
-				ARG="-c -c $(TRAIN_CONF_DIR)/tinystory-$(TEST_MODEL).yml \
+				ARG="-c $(TRAIN_CONF_DIR)/tinystory-$(TEST_MODEL).yml \
 					stream tinystory $(GEN_PROMPT)"
 
 # test the trained imdb instrudct model
