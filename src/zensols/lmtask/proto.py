@@ -45,9 +45,6 @@ class PrototypeApplication(object):
     def _example_stream_base(self):
         from . import Task
         task: Task = self.app.task_factory.create('base_generate')
-        if 1:
-            task.write()
-            return
         task.generator.generate_params['max_new_tokens'] = 300
         task.generator.stream(self.prompt)
 
@@ -75,9 +72,26 @@ class PrototypeApplication(object):
         """
         from . import Task
         task: Task = self.app.task_factory.create('dataset')
-        task.write()
         task.generator.generate_params['max_new_tokens'] = 300
         task.generator.stream(self.prompt)
+
+    def _example_imdb_review(self):
+        """Read reviews (newline separated) and judge sentiment using trained
+        IMDB model.
+
+        """
+        from .task import TaskResponse
+        from pathlib import Path
+        task: Task = self.app.task_factory.create('dataset')
+        reviews: list[str] = Path('~/review.txt').expanduser().\
+            read_text().strip().split('\n')
+        for instr in reviews:
+            print(instr)
+            req = InstructTaskRequest(instruction=instr)
+            req = task.prepare_request(req)
+            res: TaskResponse = task.process(req)
+            res.write(include_model_output=True)
+            print('_' * 80)
 
     def _dump_tiny(self):
         from datasets import Dataset
@@ -94,7 +108,7 @@ class PrototypeApplication(object):
     def _tmp(self):
         pass
 
-    def proto(self, run: int = 5):
+    def proto(self, run: int = 0):
         {
             0: self._tmp,
             1: self.app.dataset_sample,
@@ -117,4 +131,5 @@ class PrototypeApplication(object):
             9: self._example_stream_instruct,
             10: self._example_prompt_population,
             11: self._example_tiny_story,
+            12: self._example_imdb_review,
         }[run]()

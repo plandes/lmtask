@@ -14,7 +14,7 @@ ADD_CLEAN_ALL +=	data
 
 ## Project
 #
-MODELS ?=		llama3 qwen3 gemma4
+MODELS ?=		llama3 qwen3 gemma4 dsr1qwen3
 TRAIN_CONF_DIR ?=	trainconf
 CONFIG ?=		$(TRAIN_CONF_DIR)/$(TASK)-$(TEST_MODEL).yml
 GEN_PROMPT ?= 		'Once upon a time, in a galaxy, far far away,'
@@ -30,21 +30,30 @@ include ./zenbuild/main.mk
 # stream text with the default base generation task
 .PHONY:			stream
 stream:
-			@$(MAKE) $(PY_MAKE_ARGS) invoke \
-				ARG="stream base_generate 'He' \
-				--override=lmtask_model_generate_args.temperature=0.5"
+			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
+				ARG="stream base_generate $(GEN_PROMPT) \
+				-c 'resource(zensols.lmtask): resources/models/$(TEST_MODEL).conf' \
+				--override=lmtask_model_generate_args.temperature=0.2"
 
 # classify two sentences as sentiment
 .PHONY:			classify
 classify:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
 				ARG="instruct sentiment \
-				-c 'resource(zensols.lmtask): resources/models/qwen3.conf' \
+				-c 'resource(zensols.lmtask): resources/models/$(TEST_MODEL).conf' \
+				'HuggingFace is a great API!\nBut the docs could improve.'"
+
+# classify two sentences as sentiment
+.PHONY:			classifytrained
+classifytrained:
+			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
+				ARG="instruct sentiment \
+				-c $(TRAIN_CONF_DIR)/imdb-$(TEST_MODEL).yml \
 				'HuggingFace is a great API!\nBut the docs could improve.'"
 
 # train a new model
 .PHONY:			trainmodel
-trainmodel:			$(PY_PYPROJECT_FILE)
+trainmodel:		$(PY_PYPROJECT_FILE)
 			@if [ -d data/$(TASK)/$(TEST_MODEL) ] ; then \
 				echo "$(TASK) $(TEST_MODEL) already exists" ; \
 			else \
@@ -100,11 +109,12 @@ train:			traintinystory trainimdb
 .PHONY:			testtinystory
 testtinystory:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
-				ARG="-c $(CONFIG) stream tinystory $(GEN_PROMPT)"
+				ARG="-c -c $(TRAIN_CONF_DIR)/tinystory-$(TEST_MODEL).yml \
+					stream tinystory $(GEN_PROMPT)"
 
 # test the trained imdb instrudct model
 .PHONY:			testimdb
 testimdb:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
-				ARG="-c $(TRAIN_CONF_DIR)/imdb-llama3.yml \
+				ARG="-c $(TRAIN_CONF_DIR)/imdb-$(TEST_MODEL).yml \
 					instruct dataset 'I loved the movie'"

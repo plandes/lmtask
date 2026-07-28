@@ -108,3 +108,6 @@ class TestInstruct(TestBase):
     def test_imdb_gemma4(self):
         #self._test_instruct(None, 'gemma4', 'sentiment', False)
         self._test_instruct('imdb', 'gemma4')
+
+    def test_imdb_dsr1qwen(self):
+        self._test_instruct('imdb', 'dsr1qwen3')

@@ -8,7 +8,7 @@ def create_harness(task: str, model: str) -> ConfigurationImporterCliHarness:
     if task is None:
         args = f'resource(zensols.lmtask): resources/models/{model}.conf'
     else:
-        f'trainconf/{task}-{model}.yml'
+        args = f'trainconf/{task}-{model}.yml'
     args = f"proto -c '{args}'"
     return ConfigurationImporterCliHarness(
         app_factory_class='zensols.lmtask.ApplicationFactory',
@@ -23,12 +23,13 @@ def run():
         0: None,
         1: 'tinystory',
         2: 'imdb',
-    }[0]
+    }[2]
     model: str = {
         0: 'llama3',
         1: 'qwen3',
         2: 'gemma4',
-    }[2]
+        3: 'dsr1qwen3',
+    }[3]
     harness: ConfigurationImporterCliHarness = create_harness(task, model)
     harness.run()
 

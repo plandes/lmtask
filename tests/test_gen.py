@@ -62,3 +62,6 @@ class TestGenerate(TestBase):
 
     def test_tinystory_gemma4(self):
         self._test_generate('tinystory', 'gemma4')
+
+    def test_tinystory_dsr1qwen(self):
+        self._test_generate('tinystory', 'dsr1qwen3')
