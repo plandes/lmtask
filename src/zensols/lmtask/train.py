@@ -139,14 +139,14 @@ class ModelResult(Dictable):
 
 @dataclass
 class Trainer(Dictable, metaclass=ABCMeta):
-    """An :class:`~unsloth.UnslothTrainer` wrapper.
+    """A configurable supervised fine-tuning trainer wrapper.
 
     """
     config: Configurable = field()
     """Used to save to the model result."""
 
     resource: TrainerResource = field()
-    """Used to create the model and tokenzier."""
+    """Used to create the model and tokenizer."""
 
     train_params: Dict[str, Any] = field()
     """The training parameters used to configure the trainer."""
@@ -161,11 +161,13 @@ class Trainer(Dictable, metaclass=ABCMeta):
     """A factory that creates new datasets used to evaluation."""
 
     peft_output_dir: Union[str, Path] = field()
-    """The directory to save the Peft model."""
+    """The directory in which to save the PEFT adapter."""
 
     merged_output_dir: Union[str, Path] = field()
-    """The directory to save the base + perf in one model."""
+    """The directory in which to save the base model with the PEFT adapter
+    merged.
 
+    """
     def __post_init__(self):
         for attr in 'peft_output_dir merged_output_dir'.split():
             val = getattr(self, attr)
@@ -200,11 +202,11 @@ class Trainer(Dictable, metaclass=ABCMeta):
             self.merged_output_dir.mkdir(parents=True, exist_ok=True)
         with time('model trained'):
             output: TrainOutput = self._train(params, train_dataset)
-        result: ModelResult = ModelResult(output)
-        result.output_dir = self.peft_output_dir
-        result.train_params = params
-        result.config = self.config
-        logger.info(f'training complete: {result}')
+            result: ModelResult = ModelResult(output)
+            result.output_dir = self.peft_output_dir
+            result.train_params = params
+            result.config = self.config
+            logger.info(f'training complete: {result}')
         return result
 
     def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
@@ -221,8 +223,8 @@ class Trainer(Dictable, metaclass=ABCMeta):
             sio = StringIO()
             self._write_block(str(args), depth=2, writer=sio)
             dct['train_params']['args'] = sio.getvalue().strip()
-        dct.pop('config')
-        self._write_object(dct, depth, writer)
+            dct.pop('config')
+            self._write_object(dct, depth, writer)
         if self.train_source is not None:
             self._write_line('train_source:', depth, writer)
             self._write_object(self.train_source, depth + 1, writer)

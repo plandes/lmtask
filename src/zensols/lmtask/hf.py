@@ -29,7 +29,7 @@ class HFTrainerResource(TrainerResource):
     """The resource used to the source checkpoint."""
 
     peft_config: LoraConfig = field(default=None)
-    """The Peft low rank adapters configuration."""
+    """The PEFT low-rank adapter configuration."""
 
     def _create_model_tokenizer(self) -> \
             Tuple[PreTrainedTokenizer, PreTrainedModel]:
@@ -42,7 +42,7 @@ class HFTrainerResource(TrainerResource):
     def _create_peft_model(self) -> PeftModelForCausalLM:
         """Create the Peft model for LoRA training.  The quantization is set
         :obj:`model_args` in the ``quantization_config``, which is called in
-        :meth:`load_model`.  The LoRA coniguration is set in :obj:`peft_config`.
+        :meth:`load_model`.  The LoRA configuration is set in :obj:`peft_config`.
 
         :link: `HF: <https://huggingface.co/docs/peft/en/developer_guides/quantization>`_
 

@@ -1,4 +1,4 @@
-"""Large langauage model experimentation.
+"""Task-specialized language model training and inference.
 
 """
 __author__ = 'Paul Landes'
@@ -26,14 +26,14 @@ class _Format(Enum):
 
 @dataclass
 class Application(object):
-    """Large langauage model experimentation.
+    """Task-specialized language model training and inference.
 
     """
     config_factory: ConfigFactory = field()
-    """Used to create training resources."""
+    """Used to create configured application and training resources."""
 
     task_factory: TaskFactory = field()
-    """Create tasks used to fullfill CLI requests."""
+    """Create tasks used to fulfill CLI requests."""
 
     def _get_task(self, task_name: str) -> Task:
         if task_name not in self.task_factory:
