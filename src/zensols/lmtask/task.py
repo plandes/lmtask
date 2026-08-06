@@ -3,10 +3,8 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import (
-    Tuple, List, Dict, Set, Iterable,
-    Optional, Type, Union, ClassVar
-)
+from typing import ClassVar
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from abc import abstractmethod, ABCMeta
 import sys
@@ -60,7 +58,7 @@ class TaskRequest(TaskObject):
             self._write_block(self.model_input, depth + 1, writer)
 
     def _shorten_value(self, attr: str):
-        val: Optional[str] = getattr(self, attr)
+        val: str | None = getattr(self, attr)
         if val is None:
             return f'{attr}: <none>'
         else:
@@ -108,7 +106,7 @@ class JSONTaskResponse(TaskResponse):
     possible and does not raise errors when the json is incomplete.
 
     """
-    _DICTABLE_ATTRIBUTES: ClassVar[Set[str]] = {'model_output_json'}
+    _DICTABLE_ATTRIBUTES: ClassVar[set[str]] = {'model_output_json'}
 
     robust_json: bool = field(default=True)
     """Whether to return :class:`~zensols.util.fail.Failure` from
@@ -117,7 +115,7 @@ class JSONTaskResponse(TaskResponse):
     """
     @property
     @persisted('_model_output_json', transient=True)
-    def model_output_json(self) -> Union[Failure, str]:
+    def model_output_json(self) -> Failure | str:
         """The :obj:`response` attribute parsed as JSON.
 
         :raises json.decoder.JSONDecodeError: if the JSON failed to parse
@@ -152,7 +150,7 @@ class JSONTaskResponse(TaskResponse):
         super().write(depth, writer, include_request=include_request,
                       include_model_output=include_model_output)
         if include_json:
-            jout: Union[str, Failure] = self.model_output_json
+            jout: str | Failure = self.model_output_json
             self._write_line('model_output_json:', depth, writer)
             if isinstance(jout, str):
                 self._write_block(jout, depth + 1, writer)
@@ -235,10 +233,10 @@ class Task(Dictable, metaclass=ABCMeta):
     description: str = field()
     """A description of the task."""
 
-    request_class: Type[TaskRequest] = field()
+    request_class: type[TaskRequest] = field()
     """The response data."""
 
-    response_class: Type[TaskResponse] = field()
+    response_class: type[TaskResponse] = field()
     """The response data."""
 
     @abstractmethod
@@ -311,20 +309,20 @@ class TaskFactory(Dictable):
 
     @property
     @persisted('__name2sec')
-    def _name2sec(self) -> Dict[str, str]:
+    def _name2sec(self) -> dict[str, str]:
         def map_sec(s: str) -> str:
             m: re.Match = self._task_pattern.match(s)
             if m is not None:
                 return m[1], m[0]
 
-        sec_names: Iterable[Tuple[str, str]] = filter(
+        sec_names: Iterable[tuple[str, str]] = filter(
             lambda n: n is not None,
             map(map_sec, self.config_factory.config.sections))
         return dict(sec_names)
 
     @property
     @persisted('_task_names')
-    def task_names(self) -> Set[str]:
+    def task_names(self) -> set[str]:
         """The names of the tasks available to create with :meth:`create`."""
         return frozenset(self._name2sec.keys())
 
@@ -336,7 +334,7 @@ class TaskFactory(Dictable):
         """
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating task: {name}')
-        name2sec: Dict[str, str] = self._name2sec
+        name2sec: dict[str, str] = self._name2sec
         sec: str = name2sec.get(name)
         if sec is None:
             raise TaskError(f"No such task: '{name}'")
@@ -346,14 +344,14 @@ class TaskFactory(Dictable):
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               short: bool = False):
-        names: List[str] = sorted(self.task_names)
+        names: list[str] = sorted(self.task_names)
         if short:
             for task_name in names:
                 task: Task = self.create(task_name)
                 self._write_line(repr(task), depth, writer)
         else:
             max_line_len: int = 0
-            wvals: List[str] = []
+            wvals: list[str] = []
             task_name: str
             for i, task_name in enumerate(names):
                 task: Task = self.create(task_name)

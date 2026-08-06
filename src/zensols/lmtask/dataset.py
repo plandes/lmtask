@@ -3,7 +3,8 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Dict, Tuple, List, Union, Callable, Iterable
+from typing import Any
+from collections.abc import Iterable, Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 import pandas as pd
@@ -21,20 +22,20 @@ class LoadedTaskDatasetFactory(TaskDatasetFactory):
     post processing (i.e. filtering and mapping).
 
     """
-    source: Union[str, Path, Stash, pd.DataFrame, Dataset] = field(default=None)
+    source: str | Path | Stash | pd.DataFrame | Dataset = field(default=None)
     """Used as the source data in the created dataset."""
 
-    load_args: Dict[str, Any] = field(default_factory=dict)
+    load_args: dict[str, Any] = field(default_factory=dict)
     """Additional arguments given to :func:`datasets.load_dataset`."""
 
-    pre_process: Union[str, Callable] = field(default=None)
+    pre_process: str | Callable = field(default=None)
     """Code to call after the dataset is created but before the task applies any
     template.  If this is a string :func:`exec` is used to evaluate it.
     Otherwise it is treated as a callable where the old dataset is the input and
     the returned value is the replaced dataset.
 
     """
-    post_process: Union[str, Callable] = field(default=None)
+    post_process: str | Callable = field(default=None)
     """Code to call after the dataset is created and the task has applied any
     template.
 
@@ -77,13 +78,13 @@ class LoadedTaskDatasetFactory(TaskDatasetFactory):
         if isinstance(source, Dataset):
             ds = source
         elif source is None or isinstance(source, str):
-            params: Dict[str, Any] = {}
+            params: dict[str, Any] = {}
             if source is not None:
                 params['path'] = source
             params.update(self.load_args)
             ds = datasets.load_dataset(**params)
         elif isinstance(source, Path):
-            files: Union[str, Tuple[str, ...]]
+            files: str | tuple[str, ...]
             if source.is_dir():
                 files = tuple(map(str, source.iterdir()))
             else:
@@ -93,7 +94,7 @@ class LoadedTaskDatasetFactory(TaskDatasetFactory):
                files[0].suffix == '.arrow':
                 ds = Dataset.from_file(files[0], **self.load_args)
             else:
-                args: Dict[str, Any] = dict(
+                args: dict[str, Any] = dict(
                     # path tells load_dataset to load the files as text
                     path='text',
                     data_files=files,
@@ -101,7 +102,7 @@ class LoadedTaskDatasetFactory(TaskDatasetFactory):
                 args.update(self.load_args)
                 ds = datasets.load_dataset(**args)
         elif isinstance(source, Stash):
-            rows: List[Tuple[Any, ...]] = []
+            rows: list[tuple[Any, ...]] = []
             stash: Stash = self.source
             key: str
             item: Any
@@ -116,7 +117,7 @@ class LoadedTaskDatasetFactory(TaskDatasetFactory):
                 f'Unknown source type: {type(source)}')
         return ds
 
-    def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
+    def _from_dictable(self, *args, **kwargs) -> dict[str, Any]:
         # avoid pickling large stashes
         use_obj: bool = isinstance(self.source, (str, Path))
         return {'source': self.source if use_obj else type(self.source),

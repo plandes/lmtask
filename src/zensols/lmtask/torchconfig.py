@@ -6,7 +6,8 @@ Remove this module if that dependency is ever added.
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Dict, Iterable, Any, Tuple, Union, Type, List
+from typing import Any
+from collections.abc import Iterable
 import sys
 import logging
 import gc
@@ -44,7 +45,7 @@ class CudaInfo(Writable):
         """
         return cuda.device_count()
 
-    def get_devices(self, format: bool = False) -> Dict[int, Dict[str, Any]]:
+    def get_devices(self, format: bool = False) -> dict[int, dict[str, Any]]:
         devs = {}
         for i in range(self.num_devices):
             memory = dict(
@@ -197,7 +198,7 @@ class TorchConfig(PersistableContainer, Writable):
         return self._init_device().type != self._CPU_DEVICE
 
     @property
-    def cuda_devices(self) -> Tuple[torch.device]:
+    def cuda_devices(self) -> tuple[torch.device, ...]:
         """Return all cuda devices.
 
         """
@@ -205,7 +206,7 @@ class TorchConfig(PersistableContainer, Writable):
                          range(torch.cuda.device_count())))
 
     @property
-    def cuda_configs(self) -> Tuple[TorchConfig]:
+    def cuda_configs(self) -> tuple[TorchConfig, ...]:
         """Return a new set of configurations, one for each CUDA device."""
         def map_dev(device: int) -> TorchConfig:
             return TorchConfig(
@@ -216,7 +217,7 @@ class TorchConfig(PersistableContainer, Writable):
         return tuple(map(map_dev, range(torch.cuda.device_count())))
 
     @property
-    def cuda_device_index(self) -> Union[int, None]:
+    def cuda_device_index(self) -> int | None:
         """Return the CUDA device index if CUDA is being used for this
         configuration.  Otherwise return ``None``.
 
@@ -240,13 +241,13 @@ class TorchConfig(PersistableContainer, Writable):
             tensor_or_model.device == device
 
     @staticmethod
-    def in_memory_tensors() -> List[Tensor]:
+    def in_memory_tensors() -> list[Tensor]:
         """Returns all in-memory tensors and parameters.
 
         :see: :meth:`~zensols.deeplearn.cli.app.show_leaks`
 
         """
-        arrs: List[Tensor] = []
+        arrs: list[Tensor] = []
         for obj in gc.get_objects():
             try:
                 if torch.is_tensor(obj) or \
@@ -257,7 +258,7 @@ class TorchConfig(PersistableContainer, Writable):
         return arrs
 
     @classmethod
-    def write_in_memory_tensors(cls: Type, writer: TextIOBase = sys.stdout,
+    def write_in_memory_tensors(cls: type, writer: TextIOBase = sys.stdout,
                                 filter_device: torch.device = None):
         """Prints in-memory tensors and parameters.
 
@@ -266,7 +267,7 @@ class TorchConfig(PersistableContainer, Writable):
         :see: :class:`~zensols.deeplearn.torchconfig.TorchConfig`
 
         """
-        objs: List[Tensor] = cls.in_memory_tensors()
+        objs: list[Tensor] = cls.in_memory_tensors()
         for obj in objs:
             if filter_device is None or filter_device == obj.device:
                 writer.write(
@@ -300,7 +301,7 @@ class TorchConfig(PersistableContainer, Writable):
         return CudaInfo()
 
     @property
-    def tensor_class(self) -> Type[torch.dtype]:
+    def tensor_class(self) -> type[torch.dtype]:
         """Return the class type based on the current configuration of this
         instance.  For example, if using ``torch.float32`` on the GPU,
         ``torch.cuda.FloatTensor`` is returned.
@@ -309,15 +310,14 @@ class TorchConfig(PersistableContainer, Writable):
         return TorchTypes.get_tensor_class(self.data_type, self.using_cpu)
 
     @property
-    def numpy_data_type(self) -> Type[torch.dtype]:
+    def numpy_data_type(self) -> type[torch.dtype]:
         """Return the numpy type that corresponds to this instance's configured
         ``data_type``.
 
         """
         return TorchTypes.get_numpy_type(self.data_type)
 
-    def to(self, tensor_or_model: Union[nn.Module, Tensor]) -> \
-            Union[nn.Module, Tensor]:
+    def to(self, tensor_or_model: nn.Module | Tensor) -> nn.Module | Tensor:
         """Copy the tensor or model to the device this to that of this
         configuration.
 
@@ -331,8 +331,8 @@ class TorchConfig(PersistableContainer, Writable):
         return tensor_or_model
 
     @classmethod
-    def to_cpu_deallocate(cls, *arrs: Tuple[Tensor]) -> \
-            Union[Tuple[Tensor], Tensor]:
+    def to_cpu_deallocate(cls, *arrs: tuple[Tensor, ...]) -> \
+            tuple[Tensor, ...] | Tensor:
         """Safely copy detached memory to the CPU and delete local instance
         (possibly GPU) memory to speed up resource deallocation.  If the tensor
         is already on the CPU, it's simply passed back.  Otherwise the tensor is
@@ -378,7 +378,7 @@ class TorchConfig(PersistableContainer, Writable):
         type and device in the current instance configuration.
 
         """
-        params: Dict[str, Any] = {}
+        params: dict[str, Any] = {}
         if not isinstance(array, tuple) and not isinstance(array, list):
             array = tuple(array)
         self._populate_defaults(params)
@@ -407,8 +407,8 @@ class TorchConfig(PersistableContainer, Writable):
         self._populate_defaults(kwargs)
         return torch.tensor(*args, **kwargs)
 
-    def sparse(self, indicies: Tuple[int], values: Tuple[float],
-               shape: Tuple[int, int]):
+    def sparse(self, indicies: tuple[int], values: tuple[float, ...],
+               shape: tuple[int, int]):
         """Create a sparce tensor from indexes and values.
 
         """
@@ -467,7 +467,7 @@ class TorchConfig(PersistableContainer, Writable):
         return arr
 
     @property
-    def float_type(self) -> Type:
+    def float_type(self) -> type:
         """Return the float type that represents this configuration, converting
         to the corresponding precision from integer if necessary.
 
@@ -482,7 +482,7 @@ class TorchConfig(PersistableContainer, Writable):
             return dtype
 
     @property
-    def int_type(self) -> Type:
+    def int_type(self) -> type:
         """Return the int type that represents this configuration, converting to
         the corresponding precision from integer if necessary.
 
@@ -517,7 +517,7 @@ class TorchConfig(PersistableContainer, Writable):
         ix = nn.CrossEntropyLoss().ignore_index
         return torch.tensor([ix], device=self.device, dtype=self.data_type)
 
-    def cross_entropy_pad(self, size: Tuple[int]) -> Tensor:
+    def cross_entropy_pad(self, size: tuple[int, ...]) -> Tensor:
         """Create a padded tensor of size ``size`` using the repeated pad
         :obj:`~torch.nn.CrossEntropyLoss.ignore_index`.
 
@@ -526,7 +526,7 @@ class TorchConfig(PersistableContainer, Writable):
         return pad.repeat(size)
 
     @classmethod
-    def get_random_seed(cls: Type) -> int:
+    def get_random_seed(cls: type) -> int:
         """Get the cross system random seed, meaning the seed applied to CUDA
         and the Python *random* library.
 
@@ -535,7 +535,7 @@ class TorchConfig(PersistableContainer, Writable):
             return cls._RANDOM_SEED['seed']
 
     @classmethod
-    def get_random_seed_context(cls: Type) -> Dict[str, Any]:
+    def get_random_seed_context(cls: type) -> dict[str, Any]:
         """Return the random seed context given to :py:meth:`set_random_seed` to
         restore across models for consistent results.
 
@@ -543,7 +543,7 @@ class TorchConfig(PersistableContainer, Writable):
         return cls._RANDOM_SEED
 
     @classmethod
-    def set_random_seed(cls: Type, seed: int = 0, disable_cudnn: bool = True,
+    def set_random_seed(cls: type, seed: int = 0, disable_cudnn: bool = True,
                         rng_state: bool = True):
         """Set the random number generator for PyTorch.
 
@@ -586,8 +586,8 @@ class TorchConfig(PersistableContainer, Writable):
             torch.use_deterministic_algorithms(True)
 
     @classmethod
-    def init(cls: Type, spawn_multiproc: str = 'spawn',
-             seed_kwargs: Dict[str, Any] = {}):
+    def init(cls: type, spawn_multiproc: str = 'spawn',
+             seed_kwargs: dict[str, Any] = {}):
         """Initialize the PyTorch framework.  This includes:
 
           * Configuration of PyTorch multiprocessing so subprocesses can access

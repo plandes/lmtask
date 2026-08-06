@@ -2,8 +2,7 @@
 
 """
 __author__ = 'Paul Landes'
-
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any
 from dataclasses import dataclass, field
 import sys
 import logging
@@ -52,7 +51,7 @@ class NShotTaskRequest(InstructTaskRequest):
     """A request that adds training examples to the prompt.
 
     """
-    examples: Tuple[Any, ...] = field(default=None)
+    examples: tuple[Any, ...] = field(default=None)
     """The examples given for N-shot learning."""
 
 
@@ -93,15 +92,15 @@ class InstructTask(GenerateTask):
     role: str = field(default='You are a helpful assistant.')
     """The role of the chat dialogue."""
 
-    train_template: Union[str, Path] = field(
+    train_template: str | Path = field(
         default='### Question: {{ instruction }}\n### Answer: {{ output }}')
     """Used to create format the datasets training text :obj:`generator`."""
 
-    inference_template: Union[str, Path] = field(
+    inference_template: str | Path = field(
         default='{{request.instruction}}')
     """The instructions given to :obj:`generator`."""
 
-    chat_template_args: Dict[str, Any] = field(
+    chat_template_args: dict[str, Any] = field(
         default_factory=lambda: dict(add_generation_prompt=True))
     """Arguments given to ``apply_chat_template``."""
 
@@ -123,7 +122,7 @@ class InstructTask(GenerateTask):
                          "but not needed since it applies a chat template."),
                 category=UserWarning)
 
-    def _apply_messages(self, prompt: str) -> List[Dict[str, str]]:
+    def _apply_messages(self, prompt: str) -> list[dict[str, str]]:
         role_namme: str = self.resource.system_role_name
         return [
             {'role': role_namme, 'content': self.role},
@@ -132,7 +131,7 @@ class InstructTask(GenerateTask):
     def _apply_instruct_chat_template(self, prompt: str) -> str:
         """Format ``prompt`` into one that conforms to the instruct syntax."""
         tokenizer: PreTrainedTokenizer = self.resource.tokenizer
-        args: Dict[str, Any] = {}
+        args: dict[str, Any] = {}
         if isinstance(self.generator, ModelTextGenerator):
             args.update(self.generator.chat_template_args)
         args.update(self.chat_template_args)
@@ -142,7 +141,7 @@ class InstructTask(GenerateTask):
             return_dict=False,
             **args)
 
-    def _create_template(self, template: Union[str, Path]) -> Template:
+    def _create_template(self, template: str | Path) -> Template:
         with openread(template, interpret_str=True) as f:
             content: str = f.read()
         env = Environment(loader=BaseLoader, keep_trailing_newline=True)
@@ -167,10 +166,10 @@ class InstructTask(GenerateTask):
 
     def _prepare_dataset(self, ds: Dataset, factory: TaskDatasetFactory) -> \
             Dataset:
-        def map_batch(batch: LazyBatch) -> Dict[str, List[Dict[str, Any]]]:
-            texts: List[Union[str, List[Dict[str, str]]]] = []
+        def map_batch(batch: LazyBatch) -> dict[str, list[dict[str, Any]]]:
+            texts: list[str | list[dict[str, str]]] = []
             for data in zip(*tuple(map(lambda k: batch[k], keys))):
-                params: Dict[str, Any] = dict(zip(keys, data))
+                params: dict[str, Any] = dict(zip(keys, data))
                 params['task'] = self
                 prompt: str = template.render(**params)
                 if self.train_apply_chat_template:
@@ -182,7 +181,7 @@ class InstructTask(GenerateTask):
         field: str = factory.text_field if self.train_apply_chat_template \
             else factory.messages_field
         template: Template = self._create_template(self.train_template)
-        keys: Tuple[str, ...] = tuple(ds.features.keys())
+        keys: tuple[str, ...] = tuple(ds.features.keys())
         return ds.map(map_batch, batched=True)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):

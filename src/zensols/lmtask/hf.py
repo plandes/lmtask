@@ -1,7 +1,7 @@
 """HuggingFace trainer wrapper.
 
 """
-from typing import Any, Dict, Tuple
+from typing import Any
 from dataclasses import dataclass, field
 import logging
 from datasets import Dataset
@@ -32,7 +32,7 @@ class HFTrainerResource(TrainerResource):
     """The PEFT low-rank adapter configuration."""
 
     def _create_model_tokenizer(self) -> \
-            Tuple[PreTrainedTokenizer, PreTrainedModel]:
+            tuple[PreTrainedTokenizer, PreTrainedModel]:
         res: GeneratorResource = self.generator_resource
         return res.model, res.tokenizer
 
@@ -75,7 +75,7 @@ class HuggingFaceTrainer(Trainer):
     """The HuggingFace trainer.
 
     """
-    def _train(self, params: Dict[str, Any], train_ds: Dataset) -> TrainOutput:
+    def _train(self, params: dict[str, Any], train_ds: Dataset) -> TrainOutput:
         """Train using :class:`~transformers.sft.SFTTrainer.
 
         :link: `Quick Tour: <https://huggingface.co/docs/peft/en/quicktour>`_

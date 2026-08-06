@@ -2,8 +2,7 @@
 
 """
 __author__ = 'Paul Landes'
-
-from typing import Any, ClassVar, Dict, Set, Union, Tuple
+from typing import Any, ClassVar
 from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
 import logging
@@ -29,7 +28,7 @@ class TrainerResource(Dictable, Primeable, metaclass=ABCMeta):
     """Configures and instantiates the base mode, PEFT mode, and the tokenizer.
 
     """
-    model_args: Dict[str, Any] = field(default=None)
+    model_args: dict[str, Any] = field(default=None)
     """The parameters that create the base model and tokenzier."""
 
     cache: bool = field(default=True)
@@ -43,7 +42,7 @@ class TrainerResource(Dictable, Primeable, metaclass=ABCMeta):
 
     @abstractmethod
     def _create_model_tokenizer(self) -> \
-            Tuple[PreTrainedTokenizer, PreTrainedModel]:
+            tuple[PreTrainedTokenizer, PreTrainedModel]:
         pass
 
     @abstractmethod
@@ -52,7 +51,7 @@ class TrainerResource(Dictable, Primeable, metaclass=ABCMeta):
 
     @property
     @persisted('_model_tokenizer_pw')
-    def _model_tokenizer(self) -> Tuple[Any, Any]:
+    def _model_tokenizer(self) -> tuple[Any, Any]:
         return self._create_model_tokenizer()
 
     @property
@@ -81,7 +80,7 @@ class ModelResult(Dictable):
     """The trained model config, location and configuration used to train it.
 
     """
-    _DICTABLE_ATTRIBUTES: ClassVar[Set[str]] = frozenset(
+    _DICTABLE_ATTRIBUTES: ClassVar[set[str]] = frozenset(
         'global_step training_loss metrics'.split())
 
     train_output: TrainOutput = field(repr=False)
@@ -90,7 +89,7 @@ class ModelResult(Dictable):
     output_dir: Path = field(default=None)
     """The directory of the models checkpoints."""
 
-    train_params: Dict[str, Any] = field(default=None)
+    train_params: dict[str, Any] = field(default=None)
     """The training parameters used to configure the trainer."""
 
     config: Configurable = field(default=None)
@@ -107,13 +106,13 @@ class ModelResult(Dictable):
         return self.train_output.training_loss
 
     @property
-    def metrics(self) -> Dict[str, float]:
+    def metrics(self) -> dict[str, float]:
         """Training metrics from :obj:`train_output`."""
         return self.train_output.metrics
 
-    def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
+    def _from_dictable(self, *args, **kwargs) -> dict[str, Any]:
         targs: TrainingArguments = self.train_params['args']
-        dct: Dict[str, Any] = super()._from_dictable(*args, **kwargs)
+        dct: dict[str, Any] = super()._from_dictable(*args, **kwargs)
         dct = cp.deepcopy(dct)
         dct['train_params'].pop('args')
         dct['train_params']['args'] = json.loads(targs.to_json_string())
@@ -123,7 +122,7 @@ class ModelResult(Dictable):
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_training_arguments: bool = False,
               include_config: bool = False):
-        dct: Dict[str, Any] = cp.deepcopy(self.asdict())
+        dct: dict[str, Any] = cp.deepcopy(self.asdict())
         # move long params to end since now dicts are stable ordered
         for key in 'train_params config'.split():
             dct[key] = dct.pop(key)
@@ -148,10 +147,10 @@ class Trainer(Dictable, metaclass=ABCMeta):
     resource: TrainerResource = field()
     """Used to create the model and tokenizer."""
 
-    train_params: Dict[str, Any] = field()
+    train_params: dict[str, Any] = field()
     """The training parameters used to configure the trainer."""
 
-    eval_params: Dict[str, Any] = field()
+    eval_params: dict[str, Any] = field()
     """The evaluation parameters used to configure the trainer."""
 
     train_source: TaskDatasetFactory = field()
@@ -160,10 +159,10 @@ class Trainer(Dictable, metaclass=ABCMeta):
     eval_source: TaskDatasetFactory = field()
     """A factory that creates new datasets used to evaluation."""
 
-    peft_output_dir: Union[str, Path] = field()
+    peft_output_dir: str | Path = field()
     """The directory in which to save the PEFT adapter."""
 
-    merged_output_dir: Union[str, Path] = field()
+    merged_output_dir: str | Path = field()
     """The directory in which to save the base model with the PEFT adapter
     merged.
 
@@ -174,9 +173,9 @@ class Trainer(Dictable, metaclass=ABCMeta):
             if isinstance(val, str):
                 setattr(self, attr, Path(val))
 
-    def _get_training_params(self) -> Dict[str, Any]:
+    def _get_training_params(self) -> dict[str, Any]:
         from trl import SFTConfig
-        params: Dict[str, Any] = cp.deepcopy(self.train_params)
+        params: dict[str, Any] = cp.deepcopy(self.train_params)
         args: SFTConfig = params['args']
         assert isinstance(args, SFTConfig)
         assert hasattr(args, 'dataset_text_field')
@@ -187,13 +186,13 @@ class Trainer(Dictable, metaclass=ABCMeta):
         return params
 
     @abstractmethod
-    def _train(self, params: Dict[str, Any], train_ds: Dataset,
+    def _train(self, params: dict[str, Any], train_ds: Dataset,
                eval_ds: Dataset = None) -> TrainOutput:
         pass
 
     def train(self) -> ModelResult:
         """Train the model."""
-        params: Dict[str, Any] = self._get_training_params()
+        params: dict[str, Any] = self._get_training_params()
         train_dataset: Dataset = self.train_source.create()
         checkpoint_dir = Path(params['args'].output_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -209,14 +208,14 @@ class Trainer(Dictable, metaclass=ABCMeta):
             logger.info(f'training complete: {result}')
         return result
 
-    def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
-        dct: Dict[str, Any] = super()._from_dictable(*args, **kwargs)
+    def _from_dictable(self, *args, **kwargs) -> dict[str, Any]:
+        dct: dict[str, Any] = super()._from_dictable(*args, **kwargs)
         dct['train_params'] = self._get_training_params()
         return dct
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_training_arguments: bool = False):
-        dct: Dict[str, Any] = cp.deepcopy(self.asdict())
+        dct: dict[str, Any] = cp.deepcopy(self.asdict())
         args: TrainingArguments = dct['train_params'].pop('args')
         dct.pop('train_source')
         if include_training_arguments:

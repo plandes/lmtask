@@ -3,10 +3,8 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import (
-    List, Tuple, Dict, Iterable, Any, Union, Type, Optional, ClassVar,
-    Pattern, TypeAlias
-)
+from typing import Any, ClassVar, TypeAlias
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
 import sys
@@ -36,7 +34,7 @@ from . import TaskError, Task, TaskRequest, TaskResponse, TaskDatasetFactory
 logger = logging.getLogger(__name__)
 
 
-Replacement: TypeAlias = tuple[Union[str, Pattern[str]], str, Optional[str]]
+Replacement: TypeAlias = tuple[str | re.Pattern, str, str | None]
 Replacements: TypeAlias = tuple[Replacement, ...]
 
 
@@ -56,24 +54,24 @@ class GeneratorResource(Dictable):
     name: str = field()
     """The section of this configured instance in the application config."""
 
-    model_id: Union[str, Path] = field()
+    model_id: str | Path = field()
     """The HF model ID or path to the model."""
 
-    model_class: Type[AutoModel] = field(default=AutoModelForCausalLM)
+    model_class: type[AutoModel] = field(default=AutoModelForCausalLM)
     """The class used to create the model with
     :meth:`~transformers.AutoModel.from_pretrained`.
 
     """
-    tokenizer_class: Type[AutoTokenizer] = field(default=AutoTokenizer)
+    tokenizer_class: type[AutoTokenizer] = field(default=AutoTokenizer)
     """The class used to create the tokenizer with
     :meth:`~transformers.AutoTokenizer.from_pretrained.
 
     """
-    peft_model_id: Union[str, Path] = field(default=None)
+    peft_model_id: str | Path = field(default=None)
     """The HF model ID or path to the Peft model or ``None`` if there is none.
 
     """
-    peft_model_class: Type[AutoModel] = field(default=AutoPeftModelForCausalLM)
+    peft_model_class: type[AutoModel] = field(default=AutoPeftModelForCausalLM)
     """The class used to create the model with
     :meth:`~transformers.AutoModel.from_pretrained`.
 
@@ -84,10 +82,10 @@ class GeneratorResource(Dictable):
     system_role_name: str = field(default='system')
     """The default name of the system's role."""
 
-    tokenizer_args: Dict[str, Any] = field(default_factory=dict)
+    tokenizer_args: dict[str, Any] = field(default_factory=dict)
     """The arguments given to the HF tokenizer ``from_pretrained`` method."""
 
-    model_args: Dict[str, Any] = field(default_factory=dict)
+    model_args: dict[str, Any] = field(default_factory=dict)
     """The arguments given to the HF model ``from_pretrained`` method."""
 
     def __post_init__(self):
@@ -99,11 +97,11 @@ class GeneratorResource(Dictable):
             logger.debug(f'created generator: {self.name}')
 
     @classmethod
-    def _shorten_model_id(cls: Type, model_id: str):
+    def _shorten_model_id(cls: type, model_id: str):
         return re.sub(cls._MODEL_DESC_PAT, r'\1', model_id)
 
     @classmethod
-    def get_model_path(cls: Type, model_id: str, parent: Path = None) -> Path:
+    def get_model_path(cls: type, model_id: str, parent: Path = None) -> Path:
         """Create a normalized file name from a HF model ID string useful for
         creating checkpoint directory names.
 
@@ -125,7 +123,7 @@ class GeneratorResource(Dictable):
 
     @property
     @persisted('_resource_cache_pw', cache_global=True)
-    def _resource_cache(self) -> Dict[str, _Resource]:
+    def _resource_cache(self) -> dict[str, _Resource]:
         return collections.defaultdict(_Resource)
 
     def _configure_tokenizer(self, tokenizer: PreTrainedTokenizer):
@@ -147,7 +145,7 @@ class GeneratorResource(Dictable):
         model_id: str = self.model_id
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating tokenizer: {model_id}')
-        params: Dict[str, Any] = dict(self.tokenizer_args)
+        params: dict[str, Any] = dict(self.tokenizer_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'tokenizer params: {params}')
         tokenizer = self.tokenizer_class.from_pretrained(model_id, **params)
@@ -156,7 +154,7 @@ class GeneratorResource(Dictable):
 
     def _load_model(self) -> PreTrainedModel:
         model_id: str = self.model_id
-        params: Dict[str, Any] = dict(self.model_args)
+        params: dict[str, Any] = dict(self.model_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'model params: {params}')
         with time(f'loaded model: {model_id}', logging.DEBUG):
@@ -239,7 +237,7 @@ class GeneratorOutput(Dictable):
     model_output: str = field()
     """The unmodified raw model output."""
 
-    parsed: Tuple[str, ...] = field()
+    parsed: tuple[str, ...] = field()
     """The processed model output with special tokens stripped."""
 
 
@@ -303,28 +301,28 @@ class ModelTextGenerator(TextGenerator):
     resource: GeneratorResource = field()
     """The class that creates resources such as the tokenizer and model."""
 
-    tokenize_params: Dict[str, Any] = field(
+    tokenize_params: dict[str, Any] = field(
         default_factory=lambda: {'return_tensors': 'pt'})
     """Parameters to add or override in the model tokenize call."""
 
-    tokenize_decode_params: Dict[str, Any] = field(default_factory=dict)
+    tokenize_decode_params: dict[str, Any] = field(default_factory=dict)
     """Parameters to add or override in the model tokenize call."""
 
-    generate_params: Dict[str, Any] = field(default_factory=dict)
+    generate_params: dict[str, Any] = field(default_factory=dict)
     """Parameters given to the model's inference method for each prompt."""
 
-    generation_config: Dict[str, Any] = field(default_factory=dict)
+    generation_config: dict[str, Any] = field(default_factory=dict)
     """The generation parameter for the model defaults ``generation_config``."""
 
-    remove_generation_config: Tuple[str, ...] = field(default=())
+    remove_generation_config: tuple[str, ...] = field(default=())
     """Attributes to set to ``None`` on the generation config."""
 
-    stream_args: Dict[str, Any] = field(
+    stream_args: dict[str, Any] = field(
         default_factory=lambda: dict(
             skip_prompt=False, skip_special_tokens=True))
     """The arguments given to the streamer in :meth:`stream`."""
 
-    chat_template_args: Dict[str, Any] = field(default_factory=dict)
+    chat_template_args: dict[str, Any] = field(default_factory=dict)
     """Arguments given to ``apply_chat_template``.  Some models require chat
     templates that all :class:`.instruct.InstructTask` should add.  For example,
     Qwen 3 always needs ``add_generation_prompt=True``.
@@ -351,16 +349,16 @@ class ModelTextGenerator(TextGenerator):
         """Make any necessary changes in ``text`` of the model output."""
         return text
 
-    def _get_tokenize_params(self) -> Dict[str, Any]:
+    def _get_tokenize_params(self) -> dict[str, Any]:
         return self.tokenize_params
 
-    def _get_tokenize_decode_params(self) -> Dict[str, Any]:
+    def _get_tokenize_decode_params(self) -> dict[str, Any]:
         return self.tokenize_decode_params
 
-    def _get_generate_params(self) -> Dict[str, Any]:
+    def _get_generate_params(self) -> dict[str, Any]:
         mr: GeneratorResource = self.resource
         tokenizer: PreTrainedTokenizer = mr.tokenizer
-        params: Dict[str, Any] = dict(self.generate_params)
+        params: dict[str, Any] = dict(self.generate_params)
         params.update(dict(
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
@@ -487,7 +485,7 @@ class ReplaceTextGenerator(ModelTextGenerator):
 
     """
     def __post_init__(self):
-        def map_expr(expr: Tuple[Union[str, re.Pattern, Optional[str]], str]):
+        def map_expr(expr: tuple[re.Pattern | str | None, str]):
             expr = list(expr)
             if isinstance(expr[0], str):
                 try:
@@ -532,7 +530,7 @@ class ReplaceTextGenerator(ModelTextGenerator):
         return reduce(or_, flags)
 
     def _replace_output(self, text: str) -> str:
-        tup: Tuple[Any, ...]
+        tup: tuple[Any, ...]
         for tup in self.replacements:
             expr: str = tup[0]
             repl: str = tup[1]
@@ -618,7 +616,7 @@ class GenerateTask(Task):
         add an end of sequence token to each row of the dataset.
 
         """
-        def map_batch(batch: LazyBatch) -> Dict[str, List[Dict[str, Any]]]:
+        def map_batch(batch: LazyBatch) -> dict[str, list[dict[str, Any]]]:
             return {field: list(map(lambda s: s + eos_token, batch[field]))}
 
         if self.train_add_eos:
