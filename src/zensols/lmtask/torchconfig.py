@@ -55,7 +55,7 @@ class CudaInfo(Writable):
             )
             if format:
                 for k, v in memory.items():
-                    memory[k] = f'{memory[k]/1e9:.2f} GB'
+                    memory[k] = f'{memory[k] / 1e9:.2f} GB'
             devs[i] = dict(name=cuda.get_device_name(i), memory=memory)
         return devs
 
