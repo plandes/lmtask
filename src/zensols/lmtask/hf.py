@@ -42,7 +42,8 @@ class HFTrainerResource(TrainerResource):
     def _create_peft_model(self) -> PeftModelForCausalLM:
         """Create the Peft model for LoRA training.  The quantization is set
         :obj:`model_args` in the ``quantization_config``, which is called in
-        :meth:`load_model`.  The LoRA configuration is set in :obj:`peft_config`.
+        :meth:`load_model`.  The LoRA configuration is set in
+        :obj:`peft_config`.
 
         :link: `HF: <https://huggingface.co/docs/peft/en/developer_guides/quantization>`_
 
@@ -94,7 +95,7 @@ class HuggingFaceTrainer(Trainer):
         out: TrainOutput = trainer.train()
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'trained: {out}')
-        model.save_pretrained(self.peft_output_dir, save_embedding_layers=True)
+        model.save_pretrained(self.peft_output_dir, save_embedding_layers=False)
         logger.info(f'saved peft adapter: {self.peft_output_dir}')
         if self.merged_output_dir is not None:
             model = model.merge_and_unload()
