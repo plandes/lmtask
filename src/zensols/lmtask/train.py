@@ -200,8 +200,8 @@ class Trainer(Dictable, metaclass=ABCMeta):
     def train(self) -> TrainResult:
         """Train the model."""
         if self.model_exists:
-            raise ('Can not overwrite existing model; ' +
-                   f'delete first: {self.peft_output_dir}')
+            raise TrainError('Can not overwrite existing model; ' +
+                             f'delete first: {self.peft_output_dir}')
         params: dict[str, Any] = self._get_training_params()
         train_dataset: Dataset = self.train_source.create()
         checkpoint_dir = Path(params['args'].output_dir)
