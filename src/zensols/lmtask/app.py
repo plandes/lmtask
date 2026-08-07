@@ -2,7 +2,6 @@
 
 """
 __author__ = 'Paul Landes'
-from typing import Any
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum, auto
@@ -173,16 +172,12 @@ class Application(object):
 
     def train(self):
         """Train a new model on a configured (``--config``) dataset."""
-        from .train import Trainer, ModelResult
-        import pickle
+        from .train import Trainer, TrainResult
         trainer: Trainer = self.trainer
         trainer.write(include_training_arguments=True)
         print('_' * 79)
-        result: ModelResult = trainer.train()
-        result_path: Path = result.output_dir / 'model-result.dat'
-        with open(result_path, 'wb') as f:
-            pickle.dump(result, f)
-        logger.info(f'wrote: {result_path}')
+        result: TrainResult = trainer.train()
+        trainer.save_result(result)
 
     def test(self, output_file: Path = Path('-'),
              output_format: _Format = None):
@@ -193,19 +188,27 @@ class Application(object):
         :param output_format: data format for the output
 
         """
-        import pandas as pd
-        from .test import Tester
-        output_format = _Format.csv if output_format is None else output_format
+        from .test import Tester, TestResult
+        output_format = _Format.json if output_format is None else output_format
         tester: Tester = self.config_factory('lmtask_tester')
-        res: dict[str, Any] = tester.test()
+        res: TestResult
+        if tester.result_exists:
+            res = tester.load_result()
+        else:
+            res = tester.test()
         with stdout(output_file, extension=output_format.name,
                     logger=logger) as f:
             fn: Callable = {
-                _Format.json: lambda: print(
-                    '\n'.join(map(json.dumps, res)), file=f),
-                _Format.csv: lambda: pd.DataFrame(res).to_csv(f, index=False),
+                _Format.json: lambda: res.write_jsonl(writer=f),
+                _Format.csv: lambda: res.dataframe.to_csv(f, index=False),
             }.get(output_format)
             if fn is None:
                 raise ApplicationError(
                     f'Format {output_format} is not supported')
             fn()
+
+    def benchmark(self):
+        """Test the model and output benchmark files."""
+        from .benchmark import BenchmarkRunner
+        bench: BenchmarkRunner = self.config_factory('lmtask_benchmark')
+        bench.run()

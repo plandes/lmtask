@@ -525,6 +525,28 @@ class TorchConfig(PersistableContainer, Writable):
         pad = self._cross_entropy_pad()
         return pad.repeat(size)
 
+    def reset_peak_memory_stats(self):
+        """Reset peak CUDA memory statistics on all visible devices."""
+        for i in range(self.num_devices):
+            cuda.reset_peak_memory_stats(i)
+
+    def get_peak_memory(self, format: bool = False) -> \
+            dict[int, dict[str, int | str]]:
+        """Return peak allocated and reserved CUDA memory for visible devices.
+
+        """
+        devs: dict[int, dict[str, int | str]] = {}
+        for i in range(self.num_devices):
+            memory = dict(
+                allocated=cuda.max_memory_allocated(i),
+                reserved=cuda.max_memory_reserved(i))
+            if format:
+                memory = {
+                    k: f'{v / (1024 ** 3):.2f} GiB'
+                    for k, v in memory.items()}
+            devs[i] = memory
+        return devs
+
     @classmethod
     def get_random_seed(cls: type) -> int:
         """Get the cross system random seed, meaning the seed applied to CUDA

@@ -7,7 +7,9 @@ from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
 import logging
 import sys
+import pickle
 import copy as cp
+from time import perf_counter
 from pathlib import Path
 from io import TextIOBase, StringIO
 import json
@@ -15,12 +17,17 @@ from datasets import Dataset
 from transformers import PreTrainedModel, PreTrainedTokenizer, TrainingArguments
 from transformers.trainer_utils import TrainOutput
 from peft import PeftModelForCausalLM
+from zensols.util.fail import APIError
 from zensols.util.time import time
 from zensols.config import Dictable, Configurable
 from zensols.persist import PersistedWork, Primeable, persisted
 from .task import TaskDatasetFactory
 
 logger = logging.getLogger(__name__)
+
+
+class TrainError(APIError):
+    pass
 
 
 @dataclass
@@ -76,7 +83,7 @@ class TrainerResource(Dictable, Primeable, metaclass=ABCMeta):
 
 
 @dataclass(repr=False)
-class ModelResult(Dictable):
+class TrainResult(Dictable):
     """The trained model config, location and configuration used to train it.
 
     """
@@ -86,14 +93,17 @@ class ModelResult(Dictable):
     train_output: TrainOutput = field(repr=False)
     """The output returned from the trainer."""
 
-    output_dir: Path = field(default=None)
+    peft_output_dir: Path = field()
     """The directory of the models checkpoints."""
 
-    train_params: dict[str, Any] = field(default=None)
+    train_params: dict[str, Any] = field()
     """The training parameters used to configure the trainer."""
 
-    config: Configurable = field(default=None)
+    config: Configurable = field()
     """The application configuration used to configure the trainer."""
+
+    time_elapsed: int = field()
+    """Time in seconds it took to train."""
 
     @property
     def global_step(self) -> int:
@@ -159,19 +169,11 @@ class Trainer(Dictable, metaclass=ABCMeta):
     eval_source: TaskDatasetFactory = field()
     """A factory that creates new datasets used to evaluation."""
 
-    peft_output_dir: str | Path = field()
+    peft_output_dir: Path = field()
     """The directory in which to save the PEFT adapter."""
 
-    merged_output_dir: str | Path = field()
-    """The directory in which to save the base model with the PEFT adapter
-    merged.
-
-    """
-    def __post_init__(self):
-        for attr in 'peft_output_dir merged_output_dir'.split():
-            val = getattr(self, attr)
-            if isinstance(val, str):
-                setattr(self, attr, Path(val))
+    result_file: Path = field()
+    """The file to save the training statistics for benchmarking."""
 
     def _get_training_params(self) -> dict[str, Any]:
         from trl import SFTConfig
@@ -190,23 +192,50 @@ class Trainer(Dictable, metaclass=ABCMeta):
                eval_ds: Dataset = None) -> TrainOutput:
         pass
 
-    def train(self) -> ModelResult:
+    @property
+    def model_exists(self) -> bool:
+        """Whether the trained model already exists."""
+        return self.peft_output_dir.is_dir()
+
+    def train(self) -> TrainResult:
         """Train the model."""
+        if self.model_exists:
+            raise ('Can not overwrite existing model; ' +
+                   f'delete first: {self.peft_output_dir}')
         params: dict[str, Any] = self._get_training_params()
         train_dataset: Dataset = self.train_source.create()
         checkpoint_dir = Path(params['args'].output_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
         self.peft_output_dir.mkdir(parents=True, exist_ok=True)
-        if self.merged_output_dir is not None:
-            self.merged_output_dir.mkdir(parents=True, exist_ok=True)
-        with time('model trained'):
-            output: TrainOutput = self._train(params, train_dataset)
-            result: ModelResult = ModelResult(output)
-            result.output_dir = self.peft_output_dir
-            result.train_params = params
-            result.config = self.config
-            logger.info(f'training complete: {result}')
+        start: float = perf_counter()
+        output: TrainOutput = self._train(params, train_dataset)
+        time_elapsed: float = perf_counter() - start
+        result: TrainResult = TrainResult(
+            train_output=output,
+            peft_output_dir=self.peft_output_dir,
+            train_params=params,
+            config=self.config,
+            time_elapsed=time_elapsed)
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(time.format_elapse('training finished', time_elapsed))
         return result
+
+    def save_result(self, result: TrainResult):
+        """Save the result to the file system."""
+        result_path: Path = self.result_file
+        result_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(result_path, 'wb') as f:
+            pickle.dump(result, f)
+        logger.info(f'wrote: {result_path}')
+
+    def load_result(self) -> TrainResult:
+        """Load the model results."""
+        path: Path = self.result_file
+        if not path.is_file():
+            raise TrainError(
+                f'It apperas the model exists but missing result file: {path}')
+        with open(path, 'rb') as f:
+            return pickle.load(f)
 
     def _from_dictable(self, *args, **kwargs) -> dict[str, Any]:
         dct: dict[str, Any] = super()._from_dictable(*args, **kwargs)

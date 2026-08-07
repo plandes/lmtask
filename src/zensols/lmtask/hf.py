@@ -97,11 +97,5 @@ class HuggingFaceTrainer(Trainer):
             logger.info(f'trained: {out}')
         model.save_pretrained(self.peft_output_dir, save_embedding_layers=False)
         logger.info(f'saved peft adapter: {self.peft_output_dir}')
-        if self.merged_output_dir is not None:
-            model = model.merge_and_unload()
-            model.save_pretrained(
-                self.merged_output_dir,
-                save_embedding_layers=True)
-            logger.info(f'saved merged model: {self.merged_output_dir}')
         logger.debug('hf trainer complete')
         return out

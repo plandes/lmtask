@@ -247,7 +247,6 @@ class Task(Dictable, metaclass=ABCMeta):
         pass
 
     def _assert_class(self, request: TaskRequest):
-        if 1: return  # TODO
         if not isinstance(request, self.request_class):
             raise TaskError(f'Expecting request type {self.request_class}, ' +
                             f'but got: {type(request)}')

@@ -16,3 +16,21 @@ lmtask_tester:
   class_name: zensols.lmtask.test.Tester
   source: 'instance: lmtask_dataset_test_source'
   task: 'instance: lmtask_task_dataset'
+  result_file: 'path: ${lmtask_tester_default:result_file}'
+
+
+## Benchmark
+#
+lmtask_benchmark:
+  class_name: zensols.lmtask.benchmark.BenchmarkRunner
+  name: ${lmtask_dataset:dataset_name}_${lmtask_dataset:model_name}
+  # lmtask_benchmark_metrics is given for each model in *-shared.yml type files
+  metrics_calculator: 'instance: lmtask_benchmark_metrics'
+  trainer: 'alias: lmtask_trainer_default:trainer_name'
+  tester: 'instance: lmtask_tester'
+  executor: >-
+    object({'param': {'logger': logging.getLogger('zensols.lmtask.benchmark.exec')}}):
+        zensols.util.executor.Executor
+  config_file: "call({'param': {'attribute': 'config_path'}}): config_cli"
+  template_dir: 'resource(zensols.lmtask): resources/benchmark'
+  result_dir: 'path: ${default:data_dir}/benchmark'

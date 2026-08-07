@@ -10,11 +10,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - Support for Python 3.11.
+- Merged embeddings output.  Base and PEFT models are still written to disk.
 
 ### Added
 - New models: Qwen3, Gemma4, DeepSeek R1 Distill Qwen
 - Support for Python 3.12 and 3.13
 - Basic model testing (evaluation) functionality.
+- Model benchmarking library and CLI.
 
 ### Changed
 - Replace the Llama specific generator with a generic code + config based

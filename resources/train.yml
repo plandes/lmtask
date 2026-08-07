@@ -127,6 +127,6 @@ lmtask_trainer_hf:
   resource: 'instance: lmtask_trainer_hf_train_resource'
   train_params: 'asdict: lmtask_trainer_hf_trainer_arguments'
   eval_params: 'asdict: lmtask_trainer_hf_eval_arguments'
-  peft_output_dir: ${lmtask_trainer_default:peft_output_dir}
-  merged_output_dir: ${lmtask_trainer_default:merged_output_dir}
   eval_source: null
+  peft_output_dir: 'path: ${lmtask_trainer_default:peft_output_dir}'
+  result_file: 'path: ${lmtask_trainer_default:result_file}'
