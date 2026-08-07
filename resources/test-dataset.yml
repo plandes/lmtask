@@ -1,0 +1,18 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "test models trained with train-dataset.yml configs", date: "2026-08-06"}
+#@meta {doc: "create new task: copy this, test-dataset-{base/instruct}, replace `_dataset`"}
+
+
+## Test
+#
+lmtask_dataset_test_source:
+  class_name: zensols.lmtask.dataset.LoadedTaskDatasetFactory
+  task: 'instance: lmtask_task_dataset'
+  # don't apply the chat template, that will be applied for each inference
+  messages_field: null
+
+
+lmtask_tester:
+  class_name: zensols.lmtask.test.Tester
+  source: 'instance: lmtask_dataset_test_source'
+  task: 'instance: lmtask_task_dataset'

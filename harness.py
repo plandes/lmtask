@@ -23,13 +23,14 @@ def run():
         0: None,
         1: 'tinystory',
         2: 'imdb',
-    }[2]
+        3: 'fpb',
+    }[3]
     model: str = {
         0: 'llama3',
         1: 'qwen3',
         2: 'gemma4',
         3: 'dsr1qwen3',
-    }[3]
+    }[2]
     harness: ConfigurationImporterCliHarness = create_harness(task, model)
     harness.run()
 

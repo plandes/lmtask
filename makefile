@@ -71,7 +71,7 @@ traintinystory:
 			@for model in $(MODELS) ; do \
 				$(MAKE) $(PY_MAKE_ARGS) \
 					TASK=tinystory TEST_MODEL=$$model trainmodel ; \
-			done
+			@echo done
 
 # retrain all tinystory task models
 .PHONY:			retraintinystory
@@ -88,13 +88,26 @@ trainimdb:
 			@for model in $(MODELS) ; do \
 				$(MAKE) $(PY_MAKE_ARGS) \
 					TASK=imdb TEST_MODEL=$$model trainmodel ; \
-			done
+			@echo done
 
 # retrain all imdb task models
 .PHONY:			retrainimdb
 retrainimdb:
 			rm -fr data/imdb
 			@$(MAKE) $(PY_MAKE_ARGS) trainimdb
+
+
+# Financial PhraseBank benchmark
+.PHONY:			trainfpb
+trainfpb:
+			$(MAKE) $(PY_MAKE_ARGS) TASK=fpb TEST_MODEL=gemma4 trainmodel
+			@echo done
+
+# retrain all fpb task models
+.PHONY:			retrainfpb
+retrainfpb:
+			rm -fr data/fpb
+			@$(MAKE) $(PY_MAKE_ARGS) trainfpb
 
 
 ## Train

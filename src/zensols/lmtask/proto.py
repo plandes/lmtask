@@ -93,15 +93,16 @@ class PrototypeApplication(object):
             res.write(include_model_output=True)
             print('_' * 80)
 
-    def _dump_tiny(self):
+    def _dump_train(self, name: str):
         from datasets import Dataset
-        from . import TaskDatasetFactory
+        from .task import TaskDatasetFactory
         from .train import Trainer
-        trainer: Trainer = self.app._get_trainer()
+        trainer: Trainer = self.app.trainer
         dsf: TaskDatasetFactory = trainer.train_source
         ds: Dataset = dsf.create()
-        with open('tiny.txt', 'w') as f:
+        with open(f'{name}.txt', 'w') as f:
             for row in ds:
+                print(row.keys())
                 print(row['text'], file=f)
                 print('_' * 40, file=f)
 

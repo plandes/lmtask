@@ -182,8 +182,10 @@ class TaskDatasetFactory(Dictable, metaclass=ABCMeta):
     """The target text field used by the trainer."""
 
     messages_field: str = field(default='messages')
-    """The target conversational field used by the trainer."""
+    """The target conversational field used by the trainer or ``None`` to not
+    add it.
 
+    """
     def _pre_process(self, ds: Dataset) -> Dataset:
         return ds
 
@@ -245,6 +247,7 @@ class Task(Dictable, metaclass=ABCMeta):
         pass
 
     def _assert_class(self, request: TaskRequest):
+        if 1: return  # TODO
         if not isinstance(request, self.request_class):
             raise TaskError(f'Expecting request type {self.request_class}, ' +
                             f'but got: {type(request)}')

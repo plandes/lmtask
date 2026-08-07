@@ -2,7 +2,8 @@
 
 """
 __author__ = 'Paul Landes'
-
+from typing import Any
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import logging
@@ -10,6 +11,7 @@ from pathlib import Path
 import json
 import yaml
 from zensols.config import ConfigFactory
+from zensols.util.std import stdout
 from zensols.cli import ApplicationError
 from .instruct import InstructTaskRequest
 from . import TaskResponse, JSONTaskResponse, Task, TaskFactory
@@ -22,6 +24,7 @@ class _Format(Enum):
     text = auto()
     json = auto()
     yaml = auto()
+    csv = auto()
 
 
 @dataclass
@@ -74,6 +77,8 @@ class Application(object):
 
         :param role: the role the model takes
 
+        :param output_format: data format for the output
+
         """
         def write_text():
             for text in res.model_output:
@@ -101,15 +106,19 @@ class Application(object):
         output_format = _Format.full if output_format is None else output_format
         req = InstructTaskRequest(instruction=instruction)
         res: TaskResponse = task.process(req)
-        {
+        fn: Callable = {
             _Format.full: res.write,
             _Format.text: write_text,
             _Format.json: write_json,
             _Format.yaml: write_yaml,
-        }[output_format]()
+        }.get(output_format)
+        if fn is None:
+            raise ApplicationError(f'Format {output_format} is not supported')
+        fn()
 
-    def _get_trainer(self):
-        """Print a sample of the configured (``--config``) dataset."""
+    @property
+    def trainer(self) -> 'Trainer':
+        """The currently configured :class:`.train.Trainer`."""
         from zensols.config import Settings
         from .train import Trainer
         def_sec: str = 'lmtask_trainer_default'
@@ -126,6 +135,13 @@ class Application(object):
                 f'Configuration did not set train source on {trainer_name}')
         return trainer
 
+    @property
+    def tester(self) -> 'Tester':
+        """The currently configured :class:`.test.Tester`."""
+        from .test import Tester
+        tester: Tester = self.config_factory('lmtask_tester')
+        return tester
+
     def dataset_sample(self, max_sample: int = 1):
         """Print sample(s) of the configured (``--config``) dataset.
 
@@ -137,7 +153,7 @@ class Application(object):
         from datasets import Dataset
         from . import TaskDatasetFactory
         from .train import Trainer
-        trainer: Trainer = self._get_trainer()
+        trainer: Trainer = self.trainer
         dsf: TaskDatasetFactory = trainer.train_source
         ds: Dataset = dsf.create()
         for row in it.islice(ds, max_sample):
@@ -152,14 +168,14 @@ class Application(object):
 
         """
         from .train import Trainer
-        trainer: Trainer = self._get_trainer()
+        trainer: Trainer = self.trainer
         trainer.write(include_training_arguments=long_output)
 
     def train(self):
         """Train a new model on a configured (``--config``) dataset."""
         from .train import Trainer, ModelResult
         import pickle
-        trainer: Trainer = self._get_trainer()
+        trainer: Trainer = self.trainer
         trainer.write(include_training_arguments=True)
         print('_' * 79)
         result: ModelResult = trainer.train()
@@ -167,3 +183,29 @@ class Application(object):
         with open(result_path, 'wb') as f:
             pickle.dump(result, f)
         logger.info(f'wrote: {result_path}')
+
+    def test(self, output_file: Path = Path('-'),
+             output_format: _Format = None):
+        """Test a trained model on a configured (``--config``) dataset.
+
+        :param output_file: output file name, ``-`` for standard out
+
+        :param output_format: data format for the output
+
+        """
+        import pandas as pd
+        from .test import Tester
+        output_format = _Format.csv if output_format is None else output_format
+        tester: Tester = self.config_factory('lmtask_tester')
+        res: dict[str, Any] = tester.test()
+        with stdout(output_file, extension=output_format.name,
+                    logger=logger) as f:
+            fn: Callable = {
+                _Format.json: lambda: print(
+                    '\n'.join(map(json.dumps, res)), file=f),
+                _Format.csv: lambda: pd.DataFrame(res).to_csv(f, index=False),
+            }.get(output_format)
+            if fn is None:
+                raise ApplicationError(
+                    f'Format {output_format} is not supported')
+            fn()

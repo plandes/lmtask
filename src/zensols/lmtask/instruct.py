@@ -180,9 +180,11 @@ class InstructTask(GenerateTask):
 
         field: str = factory.text_field if self.train_apply_chat_template \
             else factory.messages_field
-        template: Template = self._create_template(self.train_template)
-        keys: tuple[str, ...] = tuple(ds.features.keys())
-        return ds.map(map_batch, batched=True)
+        if field is not None:
+            template: Template = self._create_template(self.train_template)
+            keys: tuple[str, ...] = tuple(ds.features.keys())
+            ds = ds.map(map_batch, batched=True)
+        return ds
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         dct = self.asdict()
