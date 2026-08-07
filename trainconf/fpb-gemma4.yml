@@ -1,0 +1,174 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "Financial PhraseBank sentiment classification with Gemma 4", date: "2026-08-06"}
+#@meta {url: "https://huggingface.co/datasets/takala/financial_phrasebank"}
+#@meta {url: "https://huggingface.co/docs/trl/en/sft_trainer"}
+
+
+## Imports
+#
+project:
+  import:
+    # gemma 4 model and tokenizer configuration
+    model_imp:
+      config_file: 'resource(zensols.lmtask): resources/models/gemma4.conf'
+      type: importini
+    # shared LMTask dataset-training components
+    train_imp:
+      config_file: 'resource(zensols.lmtask): resources/train-dataset.yml'
+      type: importyaml
+    # shared LMTask dataset-test components
+    test_imp:
+      config_file: 'resource(zensols.lmtask): resources/test-dataset.yml'
+      type: importyaml
+
+
+## Defaults
+#
+lmtask_dataset:
+  dataset_name: fpb
+  model_name: gemma4
+  is_base: false
+
+
+# The all-agree configuration contains 2,264 examples. Each source repeats the
+# same deterministic, stratified split procedure:
+#
+# * training:   1,752 examples
+# * validation:   256 examples
+# * test:         256 examples
+#
+fpb_dataset_split:
+  test: 256
+  eval: 256
+
+
+## Dataset
+#
+# The Financial PhraseBank repository still uses a legacy Hugging Face dataset
+# script on its main branch.  The `datasets` package no longer execute those
+# scripts, so load the converted Parquet file directly from the repository.
+#
+# Stratification preserves the negative, neutral, and positive label
+# proportions across all three partitions.
+lmtask_dataset_train_source:
+  source: parquet
+  load_args:
+    data_files:
+      train: 'https://huggingface.co/datasets/takala/financial_phrasebank/resolve/refs%2Fpr%2F10/sentences_allagree/train-00000-of-00001.parquet'
+    split: train
+  pre_process: |-
+    # reserve 512 stratified examples for validation and test
+    split = ds.train_test_split(
+        test_size=(${fpb_dataset_split:test} + ${fpb_dataset_split:eval}),
+        seed=0,
+        stratify_by_column='label')
+    ds = split['train']
+    # convert the Parquet ClassLabel IDs to textual task labels:
+    # 0 = negative, 1 = neutral, 2 = positive.
+    ds = ds.map(lambda x: {
+        'output': {
+            0: 'negative',
+            1: 'neutral',
+            2: 'positive',
+        }[x['label']]})
+    # normalize the source text field to LMTask's instruction field
+    ds = ds.rename_column('sentence', 'instruction')
+
+
+lmtask_dataset_eval_source:
+  source: parquet
+  load_args:
+    data_files:
+      train: 'https://huggingface.co/datasets/takala/financial_phrasebank/resolve/refs%2Fpr%2F10/sentences_allagree/train-00000-of-00001.parquet'
+    split: train
+  pre_process: |-
+    # reproduce the same 512-example stratified holdout
+    split = ds.train_test_split(
+        test_size=(${fpb_dataset_split:test} + ${fpb_dataset_split:eval}),
+        seed=0,
+        stratify_by_column='label')
+    # divide the holdout equally into validation and test partitions
+    holdout = split['test'].train_test_split(
+        test_size=${fpb_dataset_split:eval},
+        seed=0,
+        stratify_by_column='label')
+    ds = holdout['train']
+    # apply the same label transformation used for the training data
+    ds = ds.map(lambda x: {
+        'output': {
+            0: 'negative',
+            1: 'neutral',
+            2: 'positive',
+        }[x['label']]})
+    # normalize the source text field to LMTask's instruction field
+    ds = ds.rename_column('sentence', 'instruction')
+
+
+## Training
+#
+lmtask_trainer_hf_training_arguments:
+  num_train_epochs: 1
+  optim: 'paged_adamw_32bit'
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  logging_steps: 2
+
+
+lmtask_trainer_hf_peft:
+  r: 128
+  lora_alpha: 32
+  lora_dropout: 0.05
+
+
+## Task prompts
+#
+# For instruct configurations, both training and inference templates are
+# required so inference uses the same output contract learned during SFT.
+lmtask_task_dataset:
+  role: 'You are a financial-news sentiment classifier.'
+  train_template: |-
+    Classify the financial sentiment of the sentence.
+    Only output one label (and nothing else) as either ```negative```, ```neutral```, or ```positive```.
+    ### Financial sentence:{{ instruction }}
+    ### Sentiment:```{{ output }}```
+  inference_template: |-
+    Classify the financial sentiment of the sentence.
+    Only output one label (and nothing else) as either 'negative', 'neutral', or 'positive'.
+    ### Financial sentence:{{ request.instruction }}
+    ### Sentiment:
+
+
+## Testing
+#
+lmtask_dataset_test_source:
+  source: parquet
+  load_args:
+    data_files:
+      train: 'https://huggingface.co/datasets/takala/financial_phrasebank/resolve/refs%2Fpr%2F10/sentences_allagree/train-00000-of-00001.parquet'
+    split: train
+  pre_process: |-
+    # reproduce the same 512-example stratified holdout
+    split = ds.train_test_split(
+        test_size=(${fpb_dataset_split:test} + ${fpb_dataset_split:eval}),
+        seed=0,
+        stratify_by_column='label')
+    # divide the holdout equally into validation and test partitions
+    holdout = split['test'].train_test_split(
+        test_size=${fpb_dataset_split:test},
+        seed=0,
+        stratify_by_column='label')
+    ds = holdout['test']
+    # apply the same label transformation used for training and validation
+    ds = ds.map(lambda x: {
+        'output': {
+            0: 'negative',
+            1: 'neutral',
+            2: 'positive',
+        }[x['label']]})
+    # replace the numeric label with the string category
+    ds = ds.remove_columns('label')
+    ds = ds.rename_column('output', 'label')
+    # add a unique ID
+    ds = ds.add_column('id', range(len(ds)))
+    # normalize the source text field to LMTask's instruction field
+    ds = ds.rename_column('sentence', 'instruction')
