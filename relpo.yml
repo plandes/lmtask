@@ -12,12 +12,24 @@ github:
 project:
   domain: zensols
   name: lmtask
-  short_description: Large langauage model experimentation.
+  short_description: Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference.
   long_description: >-
-    A large language model (LLM) API to train and inference specifically for
-    tasks.
+    LMTask is a configuration-driven framework for dataset preparation,
+    parameter-efficient supervised fine-tuning, structured inference, and
+    deployment of task-specialized language models.
   keywords:
-    - tooling
+    - llm
+    - large-language-model
+    - fine-tuning
+    - supervised-fine-tuning
+    - peft
+    - lora
+    - transformers
+    - huggingface
+    - structured-output
+    - local-llm
+    - agent-tools
+    - machine-learning
   python:
     # Python interpreter versions
     version:

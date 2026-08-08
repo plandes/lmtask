@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <rect width="1280" height="640" fill="#111827"/>
+  <text x="80" y="155" fill="#ffffff" font-family="sans-serif" font-size="92" font-weight="700">LMTask</text>
+  <text x="80" y="225" fill="#d1d5db" font-family="sans-serif" font-size="34">Train and deploy task-specialized language models</text>
+  <g font-family="sans-serif" font-size="26" text-anchor="middle">
+    <rect x="70" y="340" width="190" height="88" rx="14" fill="#f9fafb"/>
+    <text x="165" y="395" fill="#111827">Dataset</text>
+    <text x="300" y="395" fill="#9ca3af" font-size="42">→</text>
+    <rect x="340" y="340" width="230" height="88" rx="14" fill="#f9fafb"/>
+    <text x="455" y="380" fill="#111827">PEFT / LoRA</text>
+    <text x="455" y="411" fill="#111827">SFT</text>
+    <text x="610" y="395" fill="#9ca3af" font-size="42">→</text>
+    <rect x="650" y="340" width="235" height="88" rx="14" fill="#f9fafb"/>
+    <text x="768" y="380" fill="#111827">Specialized</text>
+    <text x="768" y="411" fill="#111827">task</text>
+    <text x="925" y="395" fill="#9ca3af" font-size="42">→</text>
+    <rect x="965" y="340" width="245" height="88" rx="14" fill="#f9fafb"/>
+    <text x="1088" y="380" fill="#111827">Application</text>
+    <text x="1088" y="411" fill="#111827">or agent</text>
+  </g>
+  <text x="80" y="535" fill="#9ca3af" font-family="sans-serif" font-size="28">Structured inference • adapters or merged models • configuration-driven tasks</text>
+</svg>

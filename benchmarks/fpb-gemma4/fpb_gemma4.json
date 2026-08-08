@@ -1,0 +1,199 @@
+{
+    "name": "fpb_gemma4",
+    "task_name": "Financial PhraseBank",
+    "model_name": "Gemma 4",
+    "config_file": "trainconf/fpb-gemma4.yml",
+    "created": "2026-08-07T18:19:12.018977-05:00",
+    "git": {
+        "commit": "e4deeee630568375c248f6a597f3e5137e06e0c4",
+        "describe": "v0.0.1-101-ge4deeee-dirty",
+        "dirty": true
+    },
+    "environment": {
+        "python": "3.13.13",
+        "os": "Linux-4.18.0-553.124.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "kernel": "4.18.0-553.124.1.el8_10.x86_64",
+        "cuda_visible_devices": "4,5,6,7",
+        "cuda_runtime": "12.8",
+        "nvidia_driver": "580.142",
+        "packages": {
+            "scikit-learn": "1.9.0",
+            "torch": "2.10.0",
+            "transformers": "5.5.4",
+            "trl": "1.0.0",
+            "peft": "0.18.1",
+            "accelerate": "1.13.0",
+            "datasets": "4.8.5",
+            "pandas": "2.3.3",
+            "pyarrow": "24.0.0",
+            "huggingface-hub": "1.16.1"
+        },
+        "gpus": [
+            {
+                "index": 0,
+                "name": "NVIDIA RTX A6000",
+                "total_memory": 50897289216,
+                "peak_allocated": null,
+                "peak_reserved": null
+            },
+            {
+                "index": 1,
+                "name": "NVIDIA RTX A6000",
+                "total_memory": 50897289216,
+                "peak_allocated": null,
+                "peak_reserved": null
+            },
+            {
+                "index": 2,
+                "name": "NVIDIA RTX A6000",
+                "total_memory": 50897289216,
+                "peak_allocated": null,
+                "peak_reserved": null
+            },
+            {
+                "index": 3,
+                "name": "NVIDIA RTX A6000",
+                "total_memory": 50897289216,
+                "peak_allocated": null,
+                "peak_reserved": null
+            }
+        ]
+    },
+    "datasets": {
+        "splits": [
+            {
+                "name": "train",
+                "examples": 1752,
+                "class_counts": {
+                    "positive": 441,
+                    "neutral": 1076,
+                    "negative": 235
+                }
+            },
+            {
+                "name": "validation",
+                "examples": 256,
+                "class_counts": {
+                    "neutral": 157,
+                    "negative": 34,
+                    "positive": 65
+                }
+            },
+            {
+                "name": "test",
+                "examples": 256,
+                "class_counts": {
+                    "neutral": 158,
+                    "negative": 34,
+                    "positive": 64
+                }
+            }
+        ]
+    },
+    "training": {
+        "elapsed_seconds": 871.952988111414,
+        "global_step": 110,
+        "training_loss": 18.653328254006126,
+        "metrics": {
+            "train_runtime": 851.2863,
+            "train_samples_per_second": 2.058,
+            "train_steps_per_second": 0.129,
+            "total_flos": 2861561936736000.0,
+            "train_loss": 18.653328254006126
+        },
+        "result_dir": "data/fpb/gemma4/model/peft",
+        "adapter_size": 955622176
+    },
+    "testing": {
+        "test_result": {
+            "prediction_col": "prediction",
+            "raw_col": null,
+            "time_elapsed": 821.2801033789292
+        },
+        "predictions_file": "data/fpb/gemma4/benchmark/fpb_gemma4.jsonl"
+    },
+    "metrics": {
+        "primary": {
+            "name": "f1",
+            "value": 0.939582211279526,
+            "average": "macro"
+        },
+        "metrics": [
+            {
+                "name": "accuracy",
+                "value": 0.94921875,
+                "average": null
+            },
+            {
+                "name": "precision",
+                "value": 0.94921875,
+                "average": "micro"
+            },
+            {
+                "name": "recall",
+                "value": 0.94921875,
+                "average": "micro"
+            },
+            {
+                "name": "f1",
+                "value": 0.94921875,
+                "average": "micro"
+            },
+            {
+                "name": "precision",
+                "value": 0.9358155809521672,
+                "average": "macro"
+            },
+            {
+                "name": "recall",
+                "value": 0.9462878505832713,
+                "average": "macro"
+            },
+            {
+                "name": "f1",
+                "value": 0.939582211279526,
+                "average": "macro"
+            },
+            {
+                "name": "precision",
+                "value": 0.9511156061874786,
+                "average": "weighted"
+            },
+            {
+                "name": "recall",
+                "value": 0.94921875,
+                "average": "weighted"
+            },
+            {
+                "name": "f1",
+                "value": 0.9493941209990766,
+                "average": "weighted"
+            }
+        ],
+        "per_class": [
+            {
+                "label": "negative",
+                "precision": 0.868421052631579,
+                "recall": 0.9705882352941176,
+                "f1": 0.9166666666666666,
+                "support": 34
+            },
+            {
+                "label": "neutral",
+                "precision": 0.9559748427672956,
+                "recall": 0.9620253164556962,
+                "f1": 0.9589905362776026,
+                "support": 158
+            },
+            {
+                "label": "positive",
+                "precision": 0.9830508474576272,
+                "recall": 0.90625,
+                "f1": 0.943089430894309,
+                "support": 64
+            }
+        ],
+        "invalid_count": 0
+    },
+    "notes": []
+}

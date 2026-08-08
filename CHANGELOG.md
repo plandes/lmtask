@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Canonical IMDB sentiment specialization tutorial.
+- Framework-neutral agent-tool integration example.
+- Benchmark and reproducibility protocol.
+- GitHub presentation guidance, social-preview source, and issue templates.
 
+### Changed
+- Reposition the README around LMTask's complete dataset-to-PEFT-to-task
+  lifecycle.
+- Correct training terminology to parameter-efficient supervised fine-tuning.
+- Expand package metadata and search keywords.
+- Improve contribution guidance for model integrations and task examples.
+
+
+## [1.0.0] - 2026-08-06
 ### Removed
 - Support for Python 3.11.
 - Merged embeddings output.  Base and PEFT models are still written to disk.
@@ -64,7 +78,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/lmtask/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/plandes/lmtask/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/plandes/lmtask/compare/v0.1.1...v1.0.0
 [0.1.1]: https://github.com/plandes/lmtask/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/plandes/lmtask/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/plandes/lmtask/compare/v0.0.0...v0.0.1
