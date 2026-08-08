@@ -8,6 +8,7 @@
 PROJ_TYPE =		python
 PROJ_MODULES =		python/doc python/package python/deploy markdown
 PY_TEST_ALL_TARGETS +=	streamdefault classifydefault
+PY_DOC_STAGE_EX +=	benchmarks trainconf examples
 ADD_CLEAN +=		tmp_trainer train.log
 ADD_CLEAN_ALL +=	data
 

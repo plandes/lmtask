@@ -64,7 +64,7 @@ class GeneratorResource(Dictable):
     """
     tokenizer_class: type[AutoTokenizer] = field(default=AutoTokenizer)
     """The class used to create the tokenizer with
-    :meth:`~transformers.AutoTokenizer.from_pretrained.
+    :meth:`~transformers.AutoTokenizer.from_pretrained`.
 
     """
     peft_model_id: str | Path = field(default=None)

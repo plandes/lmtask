@@ -8,11 +8,13 @@ Detailed benchmark reports are generated per task/model combination. This file
 is the stable benchmark index and usage guide; the full generated reports live
 under [`benchmarks/`](benchmarks/).
 
+
 ## Results
 
 | Task                 | Model   | Test examples | Accuracy |   Macro-F1 | Report                                         |
 |----------------------|---------|--------------:|---------:|-----------:|------------------------------------------------|
 | Financial PhraseBank | Gemma 4 |           256 |   0.9531 | **0.9434** | [details](benchmarks/fpb-gemma4/fpb_gemma4.md) |
+
 
 ## Run a benchmark
 
@@ -38,6 +40,7 @@ The metric layer is task-specific. Classification tasks can report accuracy,
 micro/macro/weighted precision, recall and F1, per-class metrics, and invalid
 prediction counts. Other task types can select their own scorer without
 changing the benchmark runner.
+
 
 ## Runtime artifacts
 
@@ -69,6 +72,7 @@ The `benchmark/` directory is created only by the benchmark workflow:
 Without running `benchmark`, `test-result.dat` and the `benchmark/` artifacts
 are not created.
 
+
 ## Published benchmark artifacts
 
 Large model artifacts and runtime state under `data/` should not be committed
@@ -85,6 +89,7 @@ benchmarks/
 The Markdown and JSON files should normally be committed. The JSONL prediction
 file is optional: commit it only when the source data is redistributable and
 the file is small enough to be useful in the repository.
+
 
 ## Reproducibility
 
