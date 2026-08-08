@@ -403,6 +403,12 @@ and caching; the orchestration layer remains responsible for planning and tool
 selection. A complete framework-neutral example is available in
 [`examples/agent-tool`](examples/agent-tool).
 
+For more detail on the framework internals and task lifecycle, see the
+[configuration], [training], and [inference] documentation. These cover
+configuration composition and task contracts, PEFT/LoRA specialization and
+persisted training state, and the shared inference path used by applications
+and held-out testing.
+
 
 ## Dataset configuration
 
@@ -543,3 +549,6 @@ Copyright (c) 2024–2026 Paul Landes
 [ludwig]: https://ludwig.ai/latest/getting_started/llm_finetuning/
 [trl]: https://huggingface.co/docs/trl/
 [peft]: https://huggingface.co/docs/peft/
+[configuration]: doc/configuration.md
+[training]: doc/training.md
+[inference]: doc/inference.md
