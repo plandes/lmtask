@@ -11,9 +11,12 @@ under [`benchmarks/`](benchmarks/).
 
 ## Results
 
-| Task                 | Model   | Test examples | Accuracy |   Macro-F1 | Report                                         |
-|----------------------|---------|--------------:|---------:|-----------:|------------------------------------------------|
-| Financial PhraseBank | Gemma 4 |           256 |   0.9531 | **0.9434** | [details](benchmarks/fpb-gemma4/fpb_gemma4.md) |
+| Task                 | Model                      | Test examples | Accuracy |   Macro-F1 | Report                                               |
+|----------------------|----------------------------|--------------:|---------:|-----------:|------------------------------------------------------|
+| Financial PhraseBank | Gemma 4                    |           256 |   0.9531 | **0.9434** | [details](benchmarks/fpb-gemma4/fpb_gemma4.md)       |
+| Financial PhraseBank | Llama 3                    |           256 |   0.8867 |     0.8688 | [details](benchmarks/fpb-llama3/fpb_llama3.md)       |
+| Financial PhraseBank | DeepSeek-R1-Distill-Qwen 3 |           256 |   0.7969 |     0.8147 | [details](benchmarks/fpb-dsr1qwen3/fpb_dsr1qwen3.md) |
+| Financial PhraseBank | Qwen 3                     |           256 |   0.2227 |     0.3858 | [details](benchmarks/fpb-qwen3/fpb_qwen3.md)         |
 
 
 ## Run a benchmark

@@ -1,0 +1,35 @@
+#@meta {author: "Paul Landes"}
+#@meta {desc: "Financial PhraseBank sentiment classification with Llama 3", date: "2026-08-06"}
+#@meta {url: "https://huggingface.co/datasets/takala/financial_phrasebank"}
+#@meta {url: "https://huggingface.co/docs/trl/en/sft_trainer"}
+
+
+## Imports
+#
+project:
+  import:
+    # gemma 4 model and tokenizer configuration
+    model_imp:
+      config_file: 'resource(zensols.lmtask): resources/models/llama3.conf'
+      type: importini
+    # shared LMTask dataset-training components
+    train_imp:
+      config_file: 'resource(zensols.lmtask): resources/train-dataset.yml'
+      type: importyaml
+    # shared LMTask dataset-test components
+    test_imp:
+      config_file: 'resource(zensols.lmtask): resources/test-dataset.yml'
+      type: importyaml
+    # shared task config
+    shared_imp:
+      config_file: 'resource(zensols.lmtask): trainconf/fpb-shared.yml'
+      type: importyaml
+
+
+## Defaults
+#
+lmtask_dataset:
+  dataset_name: fpb
+  model_name: llama3
+  model_desc: Llama 3
+  is_base: false

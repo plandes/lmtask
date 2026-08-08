@@ -1,0 +1,199 @@
+{
+    "name": "fpb_qwen3",
+    "task_name": "Financial PhraseBank",
+    "model_name": "Qwen 3",
+    "config_file": "trainconf/fpb-qwen3.yml",
+    "created": "2026-08-08T15:02:34.921283-05:00",
+    "git": {
+        "commit": "51cf677d65e9b7c9deffa2878c505dba82b59d89",
+        "describe": "v0.0.1-105-g51cf677",
+        "dirty": true
+    },
+    "environment": {
+        "python": "3.13.13",
+        "os": "Linux-4.18.0-553.124.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "kernel": "4.18.0-553.124.1.el8_10.x86_64",
+        "cuda_visible_devices": "4,5,6,7",
+        "cuda_runtime": "12.8",
+        "nvidia_driver": "580.142",
+        "packages": {
+            "scikit-learn": "1.9.0",
+            "torch": "2.10.0",
+            "transformers": "5.5.4",
+            "trl": "1.0.0",
+            "peft": "0.18.1",
+            "accelerate": "1.13.0",
+            "datasets": "4.8.5",
+            "pandas": "2.3.3",
+            "pyarrow": "24.0.0",
+            "huggingface-hub": "1.16.1"
+        },
+        "gpus": [
+            {
+                "index": 0,
+                "name": "NVIDIA RTX A6000",
+                "total_memory": 50897289216,
+                "peak_allocated": null,
+                "peak_reserved": null
+            },
+            {
+                "index": 1,
+                "name": "NVIDIA RTX A6000",
+                "total_memory": 50897289216,
+                "peak_allocated": null,
+                "peak_reserved": null
+            },
+            {
+                "index": 2,
+                "name": "NVIDIA RTX A6000",
+                "total_memory": 50897289216,
+                "peak_allocated": null,
+                "peak_reserved": null
+            },
+            {
+                "index": 3,
+                "name": "NVIDIA RTX A6000",
+                "total_memory": 50897289216,
+                "peak_allocated": null,
+                "peak_reserved": null
+            }
+        ]
+    },
+    "datasets": {
+        "splits": [
+            {
+                "name": "train",
+                "examples": 1752,
+                "class_counts": {
+                    "positive": 441,
+                    "neutral": 1076,
+                    "negative": 235
+                }
+            },
+            {
+                "name": "validation",
+                "examples": 256,
+                "class_counts": {
+                    "neutral": 157,
+                    "negative": 34,
+                    "positive": 65
+                }
+            },
+            {
+                "name": "test",
+                "examples": 256,
+                "class_counts": {
+                    "neutral": 158,
+                    "negative": 34,
+                    "positive": 64
+                }
+            }
+        ]
+    },
+    "training": {
+        "elapsed_seconds": 468.9997567497194,
+        "global_step": 110,
+        "training_loss": 1.875404831496152,
+        "metrics": {
+            "train_runtime": 437.4713,
+            "train_samples_per_second": 4.005,
+            "train_steps_per_second": 0.251,
+            "total_flos": 8467400973090816.0,
+            "train_loss": 1.875404831496152
+        },
+        "result_dir": "data/fpb/qwen3/model/peft",
+        "adapter_size": 1476660944
+    },
+    "testing": {
+        "test_result": {
+            "prediction_col": "prediction",
+            "raw_col": null,
+            "time_elapsed": 5379.432321292348
+        },
+        "predictions_file": "data/fpb/qwen3/benchmark/fpb_qwen3.jsonl"
+    },
+    "metrics": {
+        "primary": {
+            "name": "f1",
+            "value": 0.3857907207826951,
+            "average": "macro"
+        },
+        "metrics": [
+            {
+                "name": "accuracy",
+                "value": 0.22265625,
+                "average": null
+            },
+            {
+                "name": "precision",
+                "value": 0.95,
+                "average": "micro"
+            },
+            {
+                "name": "recall",
+                "value": 0.22265625,
+                "average": "micro"
+            },
+            {
+                "name": "f1",
+                "value": 0.36075949367088606,
+                "average": "micro"
+            },
+            {
+                "name": "precision",
+                "value": 0.9705882352941176,
+                "average": "macro"
+            },
+            {
+                "name": "recall",
+                "value": 0.2624759555721023,
+                "average": "macro"
+            },
+            {
+                "name": "f1",
+                "value": 0.3857907207826951,
+                "average": "macro"
+            },
+            {
+                "name": "precision",
+                "value": 0.9779411764705882,
+                "average": "weighted"
+            },
+            {
+                "name": "recall",
+                "value": 0.22265625,
+                "average": "weighted"
+            },
+            {
+                "name": "f1",
+                "value": 0.33670083553084157,
+                "average": "weighted"
+            }
+        ],
+        "per_class": [
+            {
+                "label": "negative",
+                "precision": 1.0,
+                "recall": 0.17647058823529413,
+                "f1": 0.3,
+                "support": 34
+            },
+            {
+                "label": "neutral",
+                "precision": 1.0,
+                "recall": 0.12658227848101267,
+                "f1": 0.2247191011235955,
+                "support": 158
+            },
+            {
+                "label": "positive",
+                "precision": 0.9117647058823529,
+                "recall": 0.484375,
+                "f1": 0.6326530612244898,
+                "support": 64
+            }
+        ],
+        "invalid_count": 196
+    },
+    "notes": []
+}
