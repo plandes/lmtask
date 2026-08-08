@@ -6,8 +6,8 @@
 #
 # type of project
 PROJ_TYPE =		python
-PROJ_MODULES =		python/doc python/package python/deploy
-PY_TEST_ALL_TARGETS +=	stream classify
+PROJ_MODULES =		python/doc python/package python/deploy markdown
+PY_TEST_ALL_TARGETS +=	streamdefault classifydefault
 ADD_CLEAN +=		tmp_trainer train.log
 ADD_CLEAN_ALL +=	data
 
@@ -28,6 +28,13 @@ include ./zenbuild/main.mk
 ## Train and inference function-like
 #
 # stream text with the default base generation task
+.PHONY:			streamdefault
+streamdefault:
+			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
+				ARG="stream base_generate $(GEN_PROMPT) \
+				--override=lmtask_model_generate_args.temperature=0.2"
+
+# stream using a specific model
 .PHONY:			stream
 stream:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
@@ -36,19 +43,18 @@ stream:
 				--override=lmtask_model_generate_args.temperature=0.2"
 
 # classify two sentences as sentiment
+.PHONY:			classifydefault
+classifydefault:
+			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
+				ARG="instruct sentiment \
+				'HuggingFace is a great API!\nBut the docs could improve.'"
+
+# classify two sentences as sentiment for a specific model
 .PHONY:			classify
 classify:
 			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
 				ARG="instruct sentiment \
 				-c 'resource(zensols.lmtask): resources/models/$(TEST_MODEL).conf' \
-				'HuggingFace is a great API!\nBut the docs could improve.'"
-
-# classify two sentences as sentiment
-.PHONY:			classifytrained
-classifytrained:
-			@$(MAKE) $(PY_MAKE_ARGS) pyharn \
-				ARG="instruct sentiment \
-				-c $(TRAIN_CONF_DIR)/imdb-$(TEST_MODEL).yml \
 				'HuggingFace is a great API!\nBut the docs could improve.'"
 
 # train a new model
