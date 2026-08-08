@@ -10,10 +10,11 @@ structured inference.**
 [![MIT License][license-badge]][license-link]
 
 <p align="center">
-  <img src=".github/social-preview.svg"
+  <img src="doc/img/lmtask.svg"
        alt="LMTask: task-specialized language model training, testing, and deployment"
        width="760">
 </p>
+
 
 LMTask turns an existing base or instruction-tuned language model into a
 reusable, task-specific component. It provides one configuration-driven
