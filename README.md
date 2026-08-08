@@ -30,13 +30,10 @@ flowchart LR
     A[Source dataset] --> B[Task formatting]
     B --> C[PEFT / LoRA SFT]
     C --> D[Adapter]
-    C --> E[Optional merged model]
-    D --> F[Held-out task testing]
-    E --> F
-    F --> G[Predictions / metrics]
-    D --> H[Structured task inference]
-    E --> H
-    H --> I[Application or agent workflow]
+    D --> E[Held-out task testing]
+    E --> F[Predictions / metrics]
+    D --> G[Structured task inference]
+    G --> H[Application or agent workflow]
 ```
 
 **Benchmark snapshot:** Gemma 4 specialized on Financial PhraseBank achieves
