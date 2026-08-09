@@ -84,11 +84,10 @@ doc:
       nlp:
         modules: ['zensols.db']
         url: '{RP_DOC_IM_URL}/{package}/'
-envdist:
-  platforms: [linux-64]
-doc:
   copy:
     BENCHMARKS.md:
     benchmarks:
     trainconf:
     examples:
+envdist:
+  platforms: [linux-64]
