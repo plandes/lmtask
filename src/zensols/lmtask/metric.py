@@ -115,8 +115,8 @@ class ClassificationMetricsCalculator(MetricsCalculator):
 
     """
     def calculate(self, df: pd.DataFrame) -> MetricsResult:
-        y_true = df[self.label_column]
-        y_pred = df[self.prediction_column]
+        y_true: pd.Series = df[self.label_column]
+        y_pred: pd.Series = df[self.prediction_column]
 
         labels: tuple[str, ...]
         if self.labels is None:
@@ -124,13 +124,10 @@ class ClassificationMetricsCalculator(MetricsCalculator):
         else:
             labels = self.labels
 
-        valid = y_pred.isin(labels)
+        valid: pd.Series[bool] = y_pred.isin(labels)
         invalid_count = int((~valid).sum())
-
-        metrics = [
-            Metric('accuracy', float(accuracy_score(y_true, y_pred)))
-        ]
-
+        metrics = [Metric('accuracy', float(accuracy_score(y_true, y_pred)))]
+        average: str
         for average in self.averages:
             precision, recall, f1, _ = precision_recall_fscore_support(
                 y_true,
@@ -141,8 +138,7 @@ class ClassificationMetricsCalculator(MetricsCalculator):
             metrics.extend((
                 Metric('precision', float(precision), average),
                 Metric('recall', float(recall), average),
-                Metric('f1', float(f1), average),
-            ))
+                Metric('f1', float(f1), average)))
 
         precision, recall, f1, support = precision_recall_fscore_support(
             y_true,
