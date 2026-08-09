@@ -43,8 +43,8 @@ project:
       package_host: '3.13.12'
     # pypi dependencies added to 'project'
     dependencies:
-      - 'jinja2~=3.1'
       ## third party frameworks
+      - 'jinja2~=3.1'
       - 'transformers~=5.5.0'
       # parsing
       - 'partial-json-parser==0.2.1.1.post5'
@@ -54,10 +54,11 @@ project:
       - 'peft==0.18.1'
       - 'trl==1.0.0'
       - 'torch~=2.10.0'
+      # performance metrics
+      - 'scikit-learn~=1.8.0'
       ## caching
-      - 'numpy~=2.4.0'
-      - 'zensols.util~=1.16.15'
       - 'zensols.db~=1.5.0'
+      - 'zensols.datdesc~=1.4.9'
   # the program is called on the command line
   has_entry_points: true
 build:
