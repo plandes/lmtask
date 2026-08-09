@@ -91,6 +91,17 @@ LMTask keeps the complete task lifecycle together:
 * model loading, generation, response cleanup, and caching, and
 * a stable request/response API for downstream software.
 
+A difficult part of making that lifecycle reliable is **model-specific chat
+formatting**. Instruction-tuned models do not all expose the same usable chat
+template or special-token conventions, and those differences can otherwise leak
+into dataset preparation, training, testing, and application inference. LMTask
+centralizes this compatibility work: model resources can define or repair the
+tokenizer chat template, replace model-specific control tokens where needed,
+and apply the resulting formatting through the task. This keeps the prompt seen
+during specialization aligned with the prompt used for held-out testing and
+deployment instead of requiring each project to rediscover and patch
+model-specific tokenization behavior.
+
 This makes LMTask a better fit than an orchestration-first framework when the
 central problem is **specializing and deploying the model that performs a
 particular task**. The two approaches are complementary: LMTask supplies a
@@ -350,6 +361,17 @@ computed from predictions on the separate held-out test split.
 
 
 ## Python API
+
+Specialized models created with LMTask's reusable training configuration
+([`trainconf/`](trainconf/)) are exposed by default as the task named
+`dataset`. The configured task names, including the default `dataset` task for
+specialized models, are available from
+[`TaskFactory.task_names`](https://plandes.github.io/lmtask/api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory.task_names). The
+name reflects the configuration convention: the task represents the model
+specialized on the configured training dataset, while the reusable
+task/training machinery remains the same across datasets and models. This is
+only a default convention; custom task configurations can register the trained
+model under any task name.
 
 Use a configured task directly:
 
