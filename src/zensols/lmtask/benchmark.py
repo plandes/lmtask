@@ -21,7 +21,7 @@ import pandas as pd
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from zensols.config import Dictable
 from zensols.util.executor import Executor
-from zensols.persist import persisted
+from zensols.persist import persisted, PersistedWork
 from .torchconfig import CudaInfo
 from .train import Trainer, TrainResult
 from .test import Tester, TestResult
@@ -268,11 +268,14 @@ class BenchmarkRunner(Dictable):
     NVIDIA information.
 
     """
-    result_dir: Path = field(default=Path('benchmarks'))
+    result_dir: Path = field()
     """Output director for the generated benchmark files."""
 
-    template_dir: Path = field(default=Path('resources'))
+    template_dir: Path = field()
     """The directory containing benchmark Jinja2 templates."""
+
+    temporary_dir: Path = field()
+    """Directory to story temporary files."""
 
     detail_template: str = field(default='overview.md.jinja2')
     """The Jinja2 template filename used to render the per-benchmark Markdown
@@ -289,6 +292,12 @@ class BenchmarkRunner(Dictable):
     class counting.
 
     """
+    def __post_init__(self):
+        self._result = PersistedWork(
+            path=self.temporary_dir / 'result.pkl',
+            owner=self,
+            mkdir=True)
+
     def _exec(self, command: str) -> str:
         """Execute ``command`` and return its standard output."""
         out = StringIO()
@@ -473,3 +482,7 @@ class BenchmarkRunner(Dictable):
         self._write_json(result)
         self._write_markdown(result)
         return result
+
+    def clear(self):
+        """Remove all cached data."""
+        self._result.clear()

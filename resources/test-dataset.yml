@@ -34,3 +34,4 @@ lmtask_benchmark:
   config_file: "call({'param': {'attribute': 'config_path'}}): config_cli"
   template_dir: 'resource(zensols.lmtask): resources/benchmark'
   result_dir: 'path: ${default:data_dir}/benchmark'
+  temporary_dir: 'path: ${default:data_dir}/temp'

@@ -107,11 +107,7 @@ class PrototypeApplication(object):
                 print('_' * 40, file=f)
 
     def _tmp(self):
-        if 1:
-            from .app import _Format
-            self.app.test(output_format=_Format.csv)
-        else:
-            self.app.benchmark()
+        pass
 
     def proto(self, run: int = 0):
         {
