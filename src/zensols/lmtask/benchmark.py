@@ -275,7 +275,7 @@ class BenchmarkRunner(Dictable):
     """The directory containing benchmark Jinja2 templates."""
 
     temporary_dir: Path = field()
-    """Directory to story temporary files."""
+    """Directory to store temporary files."""
 
     detail_template: str = field(default='overview.md.jinja2')
     """The Jinja2 template filename used to render the per-benchmark Markdown
