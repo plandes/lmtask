@@ -207,8 +207,12 @@ class Application(object):
                     f'Format {output_format} is not supported')
             fn()
 
+    @property
+    def benchmark_runner(self) -> 'BenchmarkRunner':
+        return self.config_factory('lmtask_benchmark')
+
     def benchmark(self):
         """Test the model and output benchmark files."""
         from .benchmark import BenchmarkRunner
-        bench: BenchmarkRunner = self.config_factory('lmtask_benchmark')
-        bench.run()
+        bench: BenchmarkRunner = self.benchmark_runner
+        bench.save_benchmark()

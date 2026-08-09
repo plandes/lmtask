@@ -466,7 +466,8 @@ class BenchmarkRunner(Dictable):
                 predictions_file=pred_file),
             metrics=metrics)
 
-    def run(self) -> BenchmarkResult:
+    def save_benchmark(self) -> BenchmarkResult:
+        """Write the benchmark files."""
         result: BenchmarkResult = self.result
         result.testing.test_result.write_jsonl(result.testing.predictions_file)
         self._write_json(result)
