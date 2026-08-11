@@ -64,7 +64,7 @@ Invalid/unrecognized predictions: **{{ benchmark.metrics.invalid_count }}**
 
 | Field | Value |
 |---|---|
-| Examples | {{ benchmark.testing.examples }} |
+| Examples | {{ benchmark.testing.count }} |
 | Runtime | {{ '%.1f' | format(benchmark.testing.elapsed_seconds) }} s |
 | Predictions | `{{ benchmark.testing.predictions_file }}` |
 

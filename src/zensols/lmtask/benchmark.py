@@ -89,6 +89,7 @@ class GpuResult(Dictable):
     """The CUDA device index visible to the current process."""
 
     name: str = field()
+    """The GPU card name."""
 
     total_memory: int = field()
     """The total device memory in bytes."""
