@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Framework-neutral agent-tool integration example.
 - Benchmark and reproducibility protocol.
 - GitHub presentation guidance, social-preview source, and issue templates.
+- Report output with datdesc for LaTeX, Excel, and table JSON report output.
 
 ### Changed
 - Reposition the README around LMTask's complete dataset-to-PEFT-to-task

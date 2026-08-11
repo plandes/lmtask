@@ -3,11 +3,10 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Dict, Any, Type
+from typing import Any
 import sys
 from zensols.cli import ActionResult, CliHarness
 from zensols.cli import ApplicationFactory as CliApplicationFactory
-from .generate import TextGenerator
 from . import TaskFactory
 
 
@@ -17,16 +16,20 @@ class ApplicationFactory(CliApplicationFactory):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def get_application(cls: Type) -> TextGenerator:
+    def get_application(cls: type, args: str | list[str] = None):
         """Get a text generator instance."""
-        return cls.create_harness().get_application()
+        return cls.create_harness().get_application(args)
 
     @classmethod
-    def get_task_factory(cls: Type) -> TaskFactory:
+    def get_task_factory(cls: type) -> TaskFactory:
         """Get the factory that creates tasks."""
         return cls.get_application().task_factory
 
+    @classmethod
+    def get_benchmark_runner(cls: type):
+        return cls.get_application().benchmark_result
 
-def main(args: List[str] = sys.argv, **kwargs: Dict[str, Any]) -> ActionResult:
+
+def main(args: list[str] = sys.argv, **kwargs: dict[str, Any]) -> ActionResult:
     harness: CliHarness = ApplicationFactory.create_harness(relocate=False)
     harness.invoke(args, **kwargs)

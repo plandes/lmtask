@@ -19,7 +19,6 @@ from zensols.persist import PersistableContainer, persisted
 from zensols.config import Dictable
 from .task import Task, TaskResponse, TaskDatasetFactory
 from .instruct import InstructTaskRequest
-from .metric import MetricsResult
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +49,6 @@ class TestResult(PersistableContainer, Dictable):
     def dataframe(self) -> pd.DataFrame:
         """The dataframe representation of :obj:`predictions`."""
         return pd.DataFrame(self.predictions)
-
-    # @property
-    # @persisted('_metrics', transient=True)
-    # def metrics(self) -> Metrics:
-    #     metrics: MetricsResult = self.metrics_calculator.calculate(self.dataframe)
 
     def write_jsonl(self, writer: Path | TextIOBase):
         """Write predictions to a JSONL file or data sink."""

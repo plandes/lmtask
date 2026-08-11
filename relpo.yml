@@ -58,7 +58,7 @@ project:
       - 'scikit-learn~=1.8.0'
       ## caching
       - 'zensols.db~=1.5.0'
-      - 'zensols.datdesc~=1.4.9'
+      - 'zensols.rend~=1.3.3'
   # the program is called on the command line
   has_entry_points: true
 build:

@@ -22,6 +22,7 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from zensols.config import Dictable
 from zensols.util.executor import Executor
 from zensols.persist import persisted, PersistedWork
+from zensols.datdesc import DataFrameDescriber, DataDescriber
 from .torchconfig import CudaInfo
 from .train import Trainer, TrainResult
 from .test import Tester, TestResult
@@ -41,16 +42,23 @@ class DatasetSplit(Dictable):
     """The number of examples in the split."""
 
     class_counts: dict[str, int] | None = field(default=None)
-    """The class label counts; ``None`` when class distribution does not apply
-    or was not requested.
+    """The class label counts or ``None`` when it does not apply."""
 
-    """
+    @property
+    def class_counts_to_series(self) -> pd.Series | None:
+        """The class counts as a series."""
+        if self.class_counts is not None:
+            ser = pd.Series(self.class_counts)
+            ser.name = self.name
+            return ser
 
 
 @dataclass
 class DatasetSplitsResult(Dictable):
     """Contains the dataset splits."""
-    splits: tuple[DatasetSplit] = field()
+
+    splits: tuple[DatasetSplit, ...] = field()
+    """The dataset splits."""
 
     def __iter__(self) -> Iterable[DatasetSplit]:
         return iter(self.splits)
@@ -135,7 +143,7 @@ class TrainingResult(Dictable):
     """Training facts captured from LMTask and the generated adapter."""
 
     elapsed_seconds: float = field()
-    """The elapsed time required to run held-out task inference."""
+    """Time in seconds it took to train."""
 
     global_step: int = field()
     """The final trainer global step."""
@@ -175,17 +183,17 @@ class TestingResult(Dictable):
         return self.test_result.time_elapsed
 
     @property
-    def examples(self) -> int:
+    def count(self) -> int:
         """Nummber of examples in the test set."""
         return len(self.test_result.predictions)
 
 
 @dataclass
 class BenchmarkResult(Dictable):
-    """Complete machine-readable benchmark record.
-    """
+    """Complete machine-readable benchmark record."""
+
     name: str = field()
-    """Name of this benchmark."""
+    """Name of the run copied from :obj:`.BenchmarkRunner.name`."""
 
     task_name: str = field()
     """The human-readable task or dataset name used in reports."""
@@ -207,7 +215,7 @@ class BenchmarkResult(Dictable):
     environment: EnvironmentResult = field()
     """The software, CUDA and hardware environment information."""
 
-    datasets: tuple[DatasetSplit, ...] = field()
+    datasets: DatasetSplitsResult = field()
     """The train, validation and held-out test split metadata."""
 
     training: TrainingResult = field()
@@ -217,9 +225,78 @@ class BenchmarkResult(Dictable):
     """The held-out task-inference metadata."""
 
     metrics: MetricsResult = field()
+    """The performance metrics for this benchmark."""
 
     notes: tuple[str, ...] = field(default=())
     """Optional free-form benchmark annotations."""
+
+    def _create_dfd(self, inst: object, member_names: Iterable[str] = None,
+                    renames: dict[str, str] = None) -> DataFrameDescriber:
+        dfd = DataFrameDescriber.from_dataclasses(
+            data=(inst,),
+            member_names=member_names)
+        if renames is not None:
+            for k, v in renames.items():
+                dfd.df = dfd.df.rename(columns=renames)
+                dfd.meta = dfd.meta.rename(index=renames)
+        return dfd
+
+    def _create_metrics_row(self) -> DataFrameDescriber:
+        dfd = DataFrameDescriber.from_dataclasses(
+            data=(self,),
+            member_names='task_name model_name config_file created'.split())
+        dfd = dfd.merge((
+            self._create_dfd(
+                inst=self.training,
+                member_names='adapter_size elapsed_seconds'.split(),
+                renames={'elapsed_seconds': 'train_seconds'}),
+            self._create_dfd(
+                inst=self.testing,
+                member_names=('elapsed_seconds', 'count'),
+                renames={
+                    'elapsed_seconds': 'test_seconds',
+                    'count': 'test_count'}),
+            self.metrics.aggregate_row))
+        return dfd
+
+    def _create_dataset_splits(self) -> tuple[DataFrameDescriber, ...]:
+        dfs: list[pd.DataFrame] = []
+        lrows: list[pd.Series] = []
+        split: DatasetSplit
+        for split in self.datasets.splits:
+            dfd: DataFrameDescriber = self._create_dfd(
+                inst=split,
+                member_names='name examples'.split())
+            lrows.append(split.class_counts_to_series)
+            dfs.append(dfd.df)
+        totals: DataFrameDescriber = dfd.derive(
+            df=pd.concat(dfs).reset_index(drop=True))
+        dfl = pd.DataFrame(lrows).fillna(0).astype(int).\
+            reset_index(names='split')
+        labels = DataFrameDescriber(
+            name='class-labels',
+            desc='example counts by class label',
+            df=dfl)
+        return (totals, labels)
+
+    @property
+    def describer(self) -> DataDescriber:
+        """Create a data describer for the results in this benchmark."""
+        def map_desc(s: str) -> str:
+            s = s[:-1] if s.endswith('.') else s
+            s = s[0].lower() + s[1:]
+            return s
+
+        dd = DataDescriber(
+            name=self.name,
+            describers=(
+                self._create_metrics_row(),
+                *self._create_dataset_splits(),
+                self._create_dfd(self.git)))
+        dfd: DataFrameDescriber
+        for dfd in dd.describers:
+            dfd.meta.description = dfd.meta.description.apply(map_desc)
+        return dd
 
 
 @dataclass
@@ -241,8 +318,10 @@ class BenchmarkRunner(Dictable):
         'huggingface-hub')
 
     name: str = field()
-    """Name of the runner."""
+    """Name of the run, usually taken from the ``lmtask_benchmark:name``, which
+    is composed of the dataset and model name.
 
+    """
     task_name: str = field()
     """Name of the task."""
 
@@ -293,8 +372,9 @@ class BenchmarkRunner(Dictable):
 
     """
     def __post_init__(self):
+        self._result_file: Path = self.temporary_dir / 'result.pkl'
         self._result = PersistedWork(
-            path=self.temporary_dir / 'result.pkl',
+            path=self._result_file,
             owner=self,
             mkdir=True)
 
@@ -372,7 +452,7 @@ class BenchmarkRunner(Dictable):
             class_counts=counts)
 
     @property
-    def datasets(self) -> DatasetSplit:
+    def datasets(self) -> DatasetSplitsResult:
         """Collect metadata for configured train, validation and test splits."""
         splits = []
         if self.trainer.train_source is not None:
@@ -395,7 +475,7 @@ class BenchmarkRunner(Dictable):
         path = self.result_dir / f'{self.name}.json'
         with open(path, 'w') as f:
             json.dump(result.asdict(), f, indent=4)
-        logger.info(f'wrote: {path}')
+            logger.info(f'wrote: {path}')
         return path
 
     def _write_markdown(self, result: BenchmarkResult) -> Path:
@@ -424,7 +504,6 @@ class BenchmarkRunner(Dictable):
     @persisted('_result')
     def result(self) -> BenchmarkResult:
         """Train, test, score, persist and render this benchmark."""
-        self.result_dir.mkdir(parents=True, exist_ok=True)
         cuda = CudaInfo()
         environment: EnvironmentResult = self._environment(cuda)
         datasets: DatasetSplitsResult = self.datasets
@@ -478,10 +557,16 @@ class BenchmarkRunner(Dictable):
     def save_benchmark(self) -> BenchmarkResult:
         """Write the benchmark files."""
         result: BenchmarkResult = self.result
+        self.result_dir.mkdir(parents=True, exist_ok=True)
         result.testing.test_result.write_jsonl(result.testing.predictions_file)
         self._write_json(result)
         self._write_markdown(result)
         return result
+
+    @property
+    def has_cached_result(self) -> bool:
+        """Whether there has been a benchmark cached for this instance yet."""
+        return self._result_file.is_file()
 
     def clear(self):
         """Remove all cached data."""

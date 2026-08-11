@@ -11,6 +11,7 @@ import json
 import yaml
 from zensols.config import ConfigFactory
 from zensols.util.std import stdout
+from zensols.persist import FileTextUtil
 from zensols.cli import ApplicationError
 from .instruct import InstructTaskRequest
 from . import TaskResponse, JSONTaskResponse, Task, TaskFactory
@@ -209,6 +210,10 @@ class Application(object):
 
     @property
     def benchmark_runner(self) -> 'BenchmarkRunner':
+        """Used to lTrain, test, score and render one configured LMTask
+        benchmark.
+
+        """
         return self.config_factory('lmtask_benchmark')
 
     def benchmark(self):
@@ -216,3 +221,59 @@ class Application(object):
         from .benchmark import BenchmarkRunner
         bench: BenchmarkRunner = self.benchmark_runner
         bench.save_benchmark()
+
+    def _collect_reports(self, configs: tuple[str, ...]) -> 'DataDescriber':
+        import pandas as pd
+        from zensols.datdesc import DataDescriber, DataFrameDescriber
+        from .cli import ApplicationFactory
+        from .benchmark import BenchmarkRunner
+
+        def create_summary(dds: list[DataDescriber], name: str) -> \
+                DataDescriber:
+            result_key: str = 'benchmark-result'
+            dfds: tuple[DataFrameDescriber, ...] = tuple(map(
+                lambda dd: dd[result_key], dds))
+            df_sum: pd.DataFrame = pd.concat(map(lambda dfd: dfd.df, dfds))
+            dfd_sum: DataFrameDescriber = dfds[0].derive(
+                df=df_sum.reset_index(drop=True))
+            dfds_sum: list[DataFrameDescriber] = [dfd_sum]
+            dfds_sum.extend(filter(lambda dfd: dfd.name != result_key, dds[0]))
+            return DataDescriber(
+                name=FileTextUtil.normalize_text(bm.task_name),
+                describers=tuple(dfds_sum))
+
+        dds: list[DataDescriber] = []
+        config_file: str
+        for config_file in configs:
+            app = ApplicationFactory.get_application(f'-c {config_file}')
+            bm: BenchmarkRunner = app.benchmark_runner
+            if not bm.has_cached_result:
+                raise ApplicationError(
+                    f'No benchmark has been run yet for {config_file}')
+            else:
+                dds.append(bm.result.describer)
+
+        if len(dds) == 0:
+            raise ApplicationError('No results found')
+        return create_summary(dds, bm.task_name)
+
+    def report(self, configs: tuple[str, ...], base_dir: Path = None):
+        """Create a report.
+
+        :param base_dir: root directory to create files, or render if not given
+
+        """
+        from zensols.datdesc import DataDescriber
+        dd: DataDescriber = self._collect_reports(configs)
+        if base_dir is None:
+            from zensols.rend import ApplicationFactory
+            ApplicationFactory.render(dd)
+        else:
+            name: str
+            for name in 'csv excel yaml'.split():
+                attr: str = f'default_{name}_dir'.upper()
+                path: Path = getattr(DataDescriber, attr)
+                path = base_dir / path
+                setattr(DataDescriber, attr, path)
+            dd.save(excel_path=True)
+            dd.save_json(DataDescriber.DEFAULT_EXCEL_DIR)
