@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+
+<html class="no-js" data-content_root="./" lang="en">
+<head><meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="genindex.html" rel="index" title="Index"/><link href="search.html" rel="search" title="Search"/><link href="doc/configuration.html" rel="next" title="Configuration"/><link href="top.html" rel="prev" title="Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference."/>
+<!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+<title>LMTask - Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference. 0.2.0 documentation</title>
+<link href="_static/pygments.css?v=03e43079" rel="stylesheet" type="text/css"/>
+<link href="_static/styles/furo.css?v=7bdb33bb" rel="stylesheet" type="text/css"/>
+<link href="_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="_static/sphinx-codeautolink.css?v=b2176991" rel="stylesheet" type="text/css"/>
+<link href="_static/graphviz.css" rel="stylesheet" type="text/css"/>
+<link href="_static/styles/furo-extensions.css?v=8dab3a3b" rel="stylesheet" type="text/css"/>
+<link href="_static/codeautolink.css?v=57550ae3" rel="stylesheet" type="text/css"/>
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+<body>
+<script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+<svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+<symbol id="svg-toc" viewbox="0 0 24 24">
+<title>Contents</title>
+<svg fill="currentColor" stroke="currentColor" stroke-width="0" viewbox="0 0 1024 1024">
+<path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"></path>
+</svg>
+</symbol>
+<symbol id="svg-menu" viewbox="0 0 24 24">
+<title>Menu</title>
+<svg class="feather-menu" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<line x1="3" x2="21" y1="12" y2="12"></line>
+<line x1="3" x2="21" y1="6" y2="6"></line>
+<line x1="3" x2="21" y1="18" y2="18"></line>
+</svg>
+</symbol>
+<symbol id="svg-arrow-right" viewbox="0 0 24 24">
+<title>Expand</title>
+<svg class="feather-chevron-right" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<polyline points="9 18 15 12 9 6"></polyline>
+</svg>
+</symbol>
+<symbol id="svg-sun" viewbox="0 0 24 24">
+<title>Light mode</title>
+<svg class="feather-sun" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="5"></circle>
+<line x1="12" x2="12" y1="1" y2="3"></line>
+<line x1="12" x2="12" y1="21" y2="23"></line>
+<line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+<line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+<line x1="1" x2="3" y1="12" y2="12"></line>
+<line x1="21" x2="23" y1="12" y2="12"></line>
+<line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+<line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+</svg>
+</symbol>
+<symbol id="svg-moon" viewbox="0 0 24 24">
+<title>Dark mode</title>
+<svg class="icon-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h24v24H0z" fill="none" stroke="none"></path>
+<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+</svg>
+</symbol>
+<symbol id="svg-sun-with-moon" viewbox="0 0 24 24">
+<title>Auto light/dark, in light mode</title>
+<svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z" style="opacity: 50%"></path>
+<line x1="14.5" x2="14.5" y1="3.25" y2="1.25"></line>
+<line x1="14.5" x2="14.5" y1="15.85" y2="17.85"></line>
+<line x1="10.044" x2="8.63" y1="5.094" y2="3.68"></line>
+<line x1="19" x2="20.414" y1="14.05" y2="15.464"></line>
+<line x1="8.2" x2="6.2" y1="9.55" y2="9.55"></line>
+<line x1="20.8" x2="22.8" y1="9.55" y2="9.55"></line>
+<line x1="10.044" x2="8.63" y1="14.006" y2="15.42"></line>
+<line x1="19" x2="20.414" y1="5.05" y2="3.636"></line>
+<circle cx="14.5" cy="9.55" r="3.6"></circle>
+</svg>
+</symbol>
+<symbol id="svg-moon-with-sun" viewbox="0 0 24 24">
+<title>Auto light/dark, in dark mode</title>
+<svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"></path>
+<line style="opacity: 50%" x1="18" x2="18" y1="3.705" y2="2.5"></line>
+<line style="opacity: 50%" x1="18" x2="18" y1="11.295" y2="12.5"></line>
+<line style="opacity: 50%" x1="15.316" x2="14.464" y1="4.816" y2="3.964"></line>
+<line style="opacity: 50%" x1="20.711" x2="21.563" y1="10.212" y2="11.063"></line>
+<line style="opacity: 50%" x1="14.205" x2="13.001" y1="7.5" y2="7.5"></line>
+<line style="opacity: 50%" x1="21.795" x2="23" y1="7.5" y2="7.5"></line>
+<line style="opacity: 50%" x1="15.316" x2="14.464" y1="10.184" y2="11.036"></line>
+<line style="opacity: 50%" x1="20.711" x2="21.563" y1="4.789" y2="3.937"></line>
+<circle cx="18" cy="7.5" r="2.169" style="opacity: 50%"></circle>
+</svg>
+</symbol>
+<symbol id="svg-pencil" viewbox="0 0 24 24">
+<svg class="icon-tabler-pencil-code" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
+<path d="M13.5 6.5l4 4"></path>
+<path d="M20 21l2 -2l-2 -2"></path>
+<path d="M17 17l-2 2l2 2"></path>
+</svg>
+</symbol>
+<symbol id="svg-eye" viewbox="0 0 24 24">
+<svg class="icon-tabler-eye-code" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h24v24H0z" fill="none" stroke="none"></path>
+<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+<path d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008"></path>
+<path d="M20 21l2 -2l-2 -2"></path>
+<path d="M17 17l-2 2l2 2"></path>
+</svg>
+</symbol>
+</svg>
+<input aria-label="Toggle site navigation sidebar" class="sidebar-toggle" id="__navigation" name="__navigation" type="checkbox"/>
+<input aria-label="Toggle table of contents sidebar" class="sidebar-toggle" id="__toc" name="__toc" type="checkbox"/>
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+<div class="page">
+<header class="mobile-header">
+<div class="header-left">
+<label class="nav-overlay-icon" for="__navigation">
+<span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+</label>
+</div>
+<div class="header-center">
+<a href="top.html"><div class="brand">Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference. 0.2.0 documentation</div></a>
+</div>
+<div class="header-right">
+<div class="theme-toggle-container theme-toggle-header">
+<button aria-label="Toggle Light / Dark / Auto color theme" class="theme-toggle">
+<svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+<svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+<svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+<svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+</button>
+</div>
+<label class="toc-overlay-icon toc-header-icon" for="__toc">
+<span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+</label>
+</div>
+</header>
+<aside class="sidebar-drawer">
+<div class="sidebar-container">
+<div class="sidebar-sticky"><a class="sidebar-brand" href="top.html">
+<span class="sidebar-brand-text">Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference. 0.2.0 documentation</span>
+</a><form action="search.html" class="sidebar-search-container" method="get" role="search">
+<input aria-label="Search" class="sidebar-search" name="q" placeholder="Search"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/training.html">Training</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.lmtask.html">zensols.lmtask package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<div class="main">
+<div class="content">
+<div class="article-container">
+<a class="back-to-top muted-link" href="#">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+</svg>
+<span>Back to top</span>
+</a>
+<div class="content-icon-container">
+<div class="view-this-page">
+<a class="muted-link" href="_sources/index.md.txt" title="View this page">
+<svg><use href="#svg-eye"></use></svg>
+<span class="visually-hidden">View this page</span>
+</a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+<button aria-label="Toggle Light / Dark / Auto color theme" class="theme-toggle">
+<svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+<svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+<svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+<svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+</button>
+</div>
+<label class="toc-overlay-icon toc-content-icon" for="__toc">
+<span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+</label>
+</div>
+<article id="furo-main-content" role="main">
+<section id="lmtask">
+<h1>LMTask<a class="headerlink" href="#lmtask" title="Link to this heading">¶</a></h1>
+<p><strong>Train and deploy task-specialized language models with PEFT/LoRA and
+structured inference.</strong></p>
+<p><a class="reference external" href="https://pypi.org/project/zensols.lmtask/"><img alt="PyPI" src="https://img.shields.io/pypi/v/zensols.lmtask.svg"/></a>
+<a class="reference external" href="https://github.com/plandes/lmtask/actions/workflows/test.yml"><img alt="CI" src="https://github.com/plandes/lmtask/actions/workflows/test.yml/badge.svg"/></a>
+<a class="reference external" href="https://plandes.github.io/lmtask/index.html"><img alt="Documentation" src="https://img.shields.io/badge/docs-latest-blue.svg"/></a>
+<a class="reference external" href="https://www.python.org/"><img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-blue.svg"/></a>
+<a class="reference internal" href="LICENSE.html"><span class="std std-doc"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-green.svg"/></span></a></p>
+<p align="center">
+<img alt="LMTask: task-specialized language model training, testing, and deployment" src="doc/img/lmtask.svg" width="760"/>
+</p>
+<p>LMTask turns an existing base or instruction-tuned language model into a
+reusable, task-specific component. It provides one configuration-driven
+workflow for preparing datasets, performing parameter-efficient supervised
+fine-tuning, saving or merging adapters, testing specialized models on held-out
+datasets, and running structured inference.</p>
+<p>Use LMTask to build model-backed classifiers, extractors, taggers,
+transformers, and generators that can be called directly from Python, the
+command line, a service, or an agentic workflow.</p>
+<pre class="mermaid">
+        flowchart LR
+    A[Source dataset] --&gt; B[Task formatting]
+    B --&gt; C[PEFT / LoRA SFT]
+    C --&gt; D[Adapter]
+    D --&gt; E[Held-out task testing]
+    E --&gt; F[Predictions / metrics]
+    D --&gt; G[Structured task inference]
+    G --&gt; H[Application or agent workflow]
+    </pre><p><strong>Benchmark snapshot:</strong> Gemma 4 specialized on Financial PhraseBank achieves
+<strong>95.31% accuracy</strong> and <strong>94.34% macro-F1</strong> on a 256-example held-out test set.
+See <a class="reference internal" href="BENCHMARKS.html"><span class="std std-doc">Benchmarks</span></a> for the generated report and reproducibility
+details.</p>
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#why-lmtask">Why LMTask?</a></p>
+<ul>
+<li><p><a class="reference internal" href="#how-lmtask-is-different">How LMTask is different</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#features">Features</a></p>
+<ul>
+<li><p><a class="reference internal" href="#model-specialization">Model specialization</a></p></li>
+<li><p><a class="reference internal" href="#task-definition">Task definition</a></p></li>
+<li><p><a class="reference internal" href="#data-preparation">Data preparation</a></p></li>
+<li><p><a class="reference internal" href="#reliable-inference">Reliable inference</a></p></li>
+<li><p><a class="reference internal" href="#model-testing-and-benchmarking">Model testing and benchmarking</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#installation">Installation</a></p>
+<ul>
+<li><p><a class="reference internal" href="#runtime-expectations">Runtime expectations</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#quick-start">Quick start</a></p></li>
+<li><p><a class="reference internal" href="#specialize-a-model-with-peft-lora-sft">Specialize a model with PEFT/LoRA SFT</a></p></li>
+<li><p><a class="reference internal" href="#test-and-benchmark-a-specialized-model">Test and benchmark a specialized model</a></p>
+<ul>
+<li><p><a class="reference internal" href="#compare-and-report-benchmark-results">Compare and report benchmark results</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#python-api">Python API</a></p></li>
+<li><p><a class="reference internal" href="#use-an-lmtask-task-in-an-agentic-workflow">Use an LMTask task in an agentic workflow</a></p></li>
+<li><p><a class="reference internal" href="#dataset-configuration">Dataset configuration</a></p></li>
+<li><p><a class="reference internal" href="#supported-model-configurations">Supported model configurations</a></p></li>
+<li><p><a class="reference internal" href="#documentation">Documentation</a></p></li>
+<li><p><a class="reference internal" href="#evidence-and-reproducibility">Evidence and reproducibility</a></p></li>
+<li><p><a class="reference internal" href="#alternatives">Alternatives</a></p></li>
+<li><p><a class="reference internal" href="#community">Community</a></p></li>
+<li><p><a class="reference internal" href="#changelog">Changelog</a></p></li>
+<li><p><a class="reference internal" href="#license">License</a></p></li>
+</ul>
+<!-- markdown-toc end -->
+</section>
+<section id="why-lmtask">
+<h2>Why LMTask?<a class="headerlink" href="#why-lmtask" title="Link to this heading">¶</a></h2>
+<p>Low-level libraries such as Transformers, TRL, and PEFT provide the individual
+training primitives. Agent frameworks primarily orchestrate calls among models
+and tools. LMTask connects the layer between them: it creates the specialized,
+model-backed task that an application or agent invokes.</p>
+<p>LMTask keeps the complete task lifecycle together:</p>
+<ul class="simple">
+<li><p>the task’s training and inference prompt contracts,</p></li>
+<li><p>dataset loading, preprocessing, and model-specific formatting,</p></li>
+<li><p>PEFT/LoRA supervised fine-tuning with TRL <code class="docutils literal notranslate"><span class="pre">SFTTrainer</span></code>,</p></li>
+<li><p>adapter persistence and optional model merging,</p></li>
+<li><p>held-out dataset testing through the same task inference path,</p></li>
+<li><p>configurable task-level scoring and reproducible benchmark reports,</p></li>
+<li><p>cross-benchmark reporting with automatically generated LaTeX performance
+tables</p></li>
+<li><p>prediction export for downstream analysis and reproducibility,</p></li>
+<li><p>model loading, generation, response cleanup, and caching, and</p></li>
+<li><p>a stable request/response API for downstream software.</p></li>
+</ul>
+<p>A difficult part of making that lifecycle reliable is <strong>model-specific chat
+formatting</strong>. Instruction-tuned models do not all expose the same usable chat
+template or special-token conventions, and those differences can otherwise leak
+into dataset preparation, training, testing, and application inference. LMTask
+centralizes this compatibility work: model resources can define or repair the
+tokenizer chat template, replace model-specific control tokens where needed,
+and apply the resulting formatting through the task. This keeps the prompt seen
+during specialization aligned with the prompt used for held-out testing and
+deployment instead of requiring each project to rediscover and patch
+model-specific tokenization behavior.</p>
+<p>This makes LMTask a better fit than an orchestration-first framework when the
+central problem is <strong>specializing and deploying the model that performs a
+particular task</strong>. The two approaches are complementary: LMTask supplies a
+trained capability, while an agent framework decides when to call it.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head text-center"><p>Raw Transformers / TRL</p></th>
+<th class="head text-center"><p>Agent framework</p></th>
+<th class="head text-center"><p>LMTask</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Dataset-to-SFT workflow</p></td>
+<td class="text-center"><p>Manual assembly</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Integrated</p></td>
+</tr>
+<tr class="row-odd"><td><p>PEFT/LoRA training</p></td>
+<td class="text-center"><p>Low-level primitives</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Integrated</p></td>
+</tr>
+<tr class="row-even"><td><p>Shared train/inference task contract</p></td>
+<td class="text-center"><p>Manual</p></td>
+<td class="text-center"><p>Usually inference only</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>Adapter loading and merging</p></td>
+<td class="text-center"><p>Manual</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Integrated</p></td>
+</tr>
+<tr class="row-even"><td><p>Held-out task-level model testing</p></td>
+<td class="text-center"><p>Custom</p></td>
+<td class="text-center"><p>Usually custom</p></td>
+<td class="text-center"><p>Integrated</p></td>
+</tr>
+<tr class="row-odd"><td><p>Partial-JSON recovery</p></td>
+<td class="text-center"><p>Manual</p></td>
+<td class="text-center"><p>Varies</p></td>
+<td class="text-center"><p>Built in</p></td>
+</tr>
+<tr class="row-even"><td><p>Reusable task request/response API</p></td>
+<td class="text-center"><p>Custom</p></td>
+<td class="text-center"><p>Tool wrapper</p></td>
+<td class="text-center"><p>Built in</p></td>
+</tr>
+<tr class="row-odd"><td><p>Agent planning and orchestration</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Integrates with it</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="how-lmtask-is-different">
+<h3>How LMTask is different<a class="headerlink" href="#how-lmtask-is-different" title="Link to this heading">¶</a></h3>
+<p>LMTask is not primarily a general-purpose fine-tuning launcher or an agent
+orchestrator. Its central abstraction is a <strong>named task</strong> whose data
+preparation, training prompt, inference prompt, model configuration, response
+handling, and application API remain connected throughout the task lifecycle.</p>
+<p>That distinction matters after training. A trained adapter is only an artifact;
+an LMTask task is an application-ready capability that also knows how to:</p>
+<ul class="simple">
+<li><p>format requests consistently with its training data,</p></li>
+<li><p>load the correct model and adapter,</p></li>
+<li><p>recover and validate structured responses,</p></li>
+<li><p>cache repeated requests,</p></li>
+<li><p>test and score a specialized model over a held-out dataset using the same
+inference path used by applications, and</p></li>
+<li><p>expose a stable request/response contract to services and agent tools.</p></li>
+</ul>
+<p>In other words, LMTask focuses on turning model specialization into reusable
+software, rather than ending the workflow when training produces an adapter.</p>
+</section>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
+<section id="model-specialization">
+<h3>Model specialization<a class="headerlink" href="#model-specialization" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Parameter-efficient supervised fine-tuning with PEFT and LoRA. The source
+model parameters remain frozen during training; LMTask optimizes the adapter
+parameters.</p></li>
+<li><p>Hugging Face Transformers and TRL <code class="docutils literal notranslate"><span class="pre">SFTTrainer</span></code> integration.</p></li>
+<li><p>Base-model and instruction-model workflows.</p></li>
+<li><p>Lightweight adapter output or optional adapter merging for deployment.</p></li>
+<li><p>Optional 4-bit and 8-bit quantization configuration.</p></li>
+</ul>
+</section>
+<section id="task-definition">
+<h3>Task definition<a class="headerlink" href="#task-definition" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Configuration-driven classification, extraction, tagging, transformation,
+and generation tasks.</p></li>
+<li><p>Separate Jinja templates for training examples and inference requests.</p></li>
+<li><p>Native tokenizer chat-template integration with model-specific arguments.</p></li>
+<li><p>Explicit request and response classes for reusable application contracts.</p></li>
+</ul>
+</section>
+<section id="data-preparation">
+<h3>Data preparation<a class="headerlink" href="#data-preparation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Hugging Face datasets, local Arrow/text sources, Pandas data frames,
+<code class="docutils literal notranslate"><span class="pre">datasets.Dataset</span></code> instances, and Zensols stashes.</p></li>
+<li><p>Declarative preprocessing and postprocessing for mapping, filtering,
+shuffling, selecting, and renaming fields.</p></li>
+<li><p>Dataset sampling from the CLI so formatted examples can be inspected before
+training begins.</p></li>
+</ul>
+</section>
+<section id="reliable-inference">
+<h3>Reliable inference<a class="headerlink" href="#reliable-inference" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Raw-text and machine-readable JSON task responses.</p></li>
+<li><p>Recovery of usable data from partial JSON when generation reaches a token
+limit.</p></li>
+<li><p>Streaming text generation.</p></li>
+<li><p>Optional SQLite response caching.</p></li>
+<li><p>Extension points for tokenizer, model, quantization, generation, output
+cleanup, dataset, and trainer behavior.</p></li>
+</ul>
+</section>
+<section id="model-testing-and-benchmarking">
+<h3>Model testing and benchmarking<a class="headerlink" href="#model-testing-and-benchmarking" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Run a configured specialized model over a held-out Hugging Face
+<code class="docutils literal notranslate"><span class="pre">Dataset</span></code> using the same task request and generation path used at inference.</p></li>
+<li><p>Preserve gold fields from each test row while adding a configurable
+prediction column.</p></li>
+<li><p>Optionally retain raw model output for error analysis.</p></li>
+<li><p>Limit the number of test examples for smoke tests and development runs.</p></li>
+<li><p>Export standalone test predictions as CSV or newline-delimited JSON.</p></li>
+<li><p>Configure task-specific benchmark scoring in <code class="docutils literal notranslate"><span class="pre">trainconf/*</span></code>; the included
+classification scorer reports accuracy, micro/macro/weighted precision,
+recall and F1, per-class metrics, and invalid-output counts.</p></li>
+<li><p>Generate a machine-readable benchmark record and a rendered Markdown report
+together with the held-out predictions.</p></li>
+<li><p>Aggregate results from multiple benchmark configurations into a comparative
+report and automatically generate LaTeX performance tables (via
+<a class="reference external" href="https://github.com/plandes/datdesc">zensols.datdesc</a>) for papers and other technical reports.</p></li>
+</ul>
+<p>The repository includes task and training configurations for sentiment
+analysis, named entity recognition, general generation, IMDB specialization,
+Financial PhraseBank specialization, testing and benchmarking, and TinyStories
+continuation.</p>
+</section>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>Install the released package from <a class="reference external" href="https://pypi.org/project/zensols.lmtask/">PyPI</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>zensols.lmtask
+</pre></div>
+</div>
+<section id="runtime-expectations">
+<h3>Runtime expectations<a class="headerlink" href="#runtime-expectations" title="Link to this heading">¶</a></h3>
+<p>LMTask’s documented training workflow targets Linux with a CUDA-capable GPU.
+The Linux environment also installs <code class="docutils literal notranslate"><span class="pre">bitsandbytes</span></code> and <code class="docutils literal notranslate"><span class="pre">xformers</span></code>. Dataset
+preparation and some small-model inference may work in other environments, but
+memory, quantization, and hardware requirements depend on the selected model.
+Always review the upstream model license and access requirements.</p>
+</section>
+</section>
+<section id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
+<p>List the configured tasks:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>task
+</pre></div>
+</div>
+<p>Run sentiment classification:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>instruct<span class="w"> </span>sentiment<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s1">'The interface is excellent, but installation was frustrating.'</span>
+</pre></div>
+</div>
+<p>Run named entity recognition:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>instruct<span class="w"> </span>ner<span class="w"> </span><span class="s1">'UIC is in Chicago.'</span>
+</pre></div>
+</div>
+<p>Example structured output:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model_output_json</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ORG</span>
+<span class="w">    </span><span class="nt">span</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">UIC</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">O</span>
+<span class="w">    </span><span class="nt">span</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">is</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">O</span>
+<span class="w">    </span><span class="nt">span</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">7</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">9</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">in</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LOC</span>
+<span class="w">    </span><span class="nt">span</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">10</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">15</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">text</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Chicago</span>
+</pre></div>
+</div>
+<p>Stream generation from a configured base model:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>stream<span class="w"> </span>base_generate<span class="w"> </span><span class="s1">'In a world long, long ago'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--override<span class="o">=</span>lmtask_model_generate_args.temperature<span class="o">=</span><span class="m">0</span>.9
+</pre></div>
+</div>
+</section>
+<section id="specialize-a-model-with-peft-lora-sft">
+<h2>Specialize a model with PEFT/LoRA SFT<a class="headerlink" href="#specialize-a-model-with-peft-lora-sft" title="Link to this heading">¶</a></h2>
+<p>The canonical training example specializes Qwen 3 for IMDB sentiment
+classification. First inspect the model-formatted dataset:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>-c<span class="w"> </span>trainconf/imdb-qwen3.yml<span class="w"> </span>sample<span class="w"> </span>-m<span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+<p>Then train the adapter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>-c<span class="w"> </span>trainconf/imdb-qwen3.yml<span class="w"> </span>train
+</pre></div>
+</div>
+<p>LMTask saves a PEFT adapter and can optionally save a model with that adapter
+merged into the source checkpoint. The merge changes the exported deployment
+artifact; it does not mean that the original model weights were directly
+optimized during training.</p>
+<p>See the complete <a class="reference internal" href="examples/imdb-sentiment/README.html"><span class="std std-doc">IMDB sentiment tutorial</span></a>
+for the configuration lifecycle, outputs, and application integration.</p>
+</section>
+<section id="test-and-benchmark-a-specialized-model">
+<h2>Test and benchmark a specialized model<a class="headerlink" href="#test-and-benchmark-a-specialized-model" title="Link to this heading">¶</a></h2>
+<p>LMTask can run a trained task over a held-out dataset through the same inference
+path used by applications. The Financial PhraseBank Gemma 4 configuration in
+<a class="reference download internal" download="" href="_downloads/7dc542f032f421f9330581336d1b4d9c/fpb-gemma4.yml"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">trainconf/fpb-gemma4.yml</span></code></span></a> demonstrates the complete
+workflow with deterministic stratified training, validation, and test
+partitions.</p>
+<p>To run only held-out inference and write predictions:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>-c<span class="w"> </span>trainconf/fpb-gemma4.yml<span class="w"> </span><span class="nb">test</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-o<span class="w"> </span>fpb-gemma4.jsonl<span class="w"> </span>-f<span class="w"> </span>json
+</pre></div>
+</div>
+<p>CSV output is also available with <code class="docutils literal notranslate"><span class="pre">-f</span> <span class="pre">csv</span></code>.</p>
+<p>To run the complete benchmark action:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>-c<span class="w"> </span>trainconf/fpb-gemma4.yml<span class="w"> </span>benchmark
+</pre></div>
+</div>
+<p>The benchmark action creates the trained model when it does not already exist,
+otherwise it reuses the persisted training result. It similarly runs and
+persists held-out testing when needed, computes the task-specific metrics
+configured by <code class="docutils literal notranslate"><span class="pre">trainconf/*</span></code>, and renders the benchmark artifacts.</p>
+<p>For Financial PhraseBank, the generated data layout is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>data/fpb/gemma4/
+├── model/
+│   ├── base/
+│   │   └── checkpoint-110/
+│   │       └── ...
+│   ├── peft/
+│   │   ├── README.md
+│   │   ├── adapter_config.json
+│   │   └── adapter_model.safetensors
+│   └── result/
+│       ├── train-result.dat
+│       └── test-result.dat
+└── benchmark/
+    ├── fpb_gemma4.jsonl
+    ├── fpb_gemma4.json
+    └── fpb_gemma4.md
+</pre></div>
+</div>
+<p>The exact checkpoint files under <code class="docutils literal notranslate"><span class="pre">model/base/</span></code> are produced by the underlying
+trainer and depend on its checkpoint configuration. <code class="docutils literal notranslate"><span class="pre">model/peft/</span></code> contains the
+final PEFT adapter, while <code class="docutils literal notranslate"><span class="pre">model/result/train-result.dat</span></code> persists LMTask’s
+training result and statistics.</p>
+<p>The benchmark-specific files are created only by the benchmark workflow:
+<code class="docutils literal notranslate"><span class="pre">model/result/test-result.dat</span></code> persists the held-out test result,
+<code class="docutils literal notranslate"><span class="pre">benchmark/fpb_gemma4.jsonl</span></code> contains the row-level gold labels and predictions,
+<code class="docutils literal notranslate"><span class="pre">benchmark/fpb_gemma4.json</span></code> is the machine-readable benchmark record, and
+<code class="docutils literal notranslate"><span class="pre">benchmark/fpb_gemma4.md</span></code> is the rendered human-readable report. Without running
+<code class="docutils literal notranslate"><span class="pre">benchmark</span></code>, the <code class="docutils literal notranslate"><span class="pre">test-result.dat</span></code> and <code class="docutils literal notranslate"><span class="pre">benchmark/</span></code> artifacts are not created.</p>
+<p>This keeps training-time validation distinct from final task-level testing.
+Trainer statistics such as validation loss and token accuracy describe the
+language-model objective on the validation split; benchmark metrics are
+computed from predictions on the separate held-out test split.</p>
+<section id="compare-and-report-benchmark-results">
+<h3>Compare and report benchmark results<a class="headerlink" href="#compare-and-report-benchmark-results" title="Link to this heading">¶</a></h3>
+<p>Once benchmarks have been run, the <code class="docutils literal notranslate"><span class="pre">report</span></code> action reads their persisted
+results directly from the supplied configuration files and combines them into
+one comparative performance table:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>report<span class="w"> </span>&lt;config<span class="w"> </span>file<span class="w"> </span><span class="m">1</span>&gt;<span class="w"> </span><span class="o">[</span>,<span class="w"> </span>&lt;config<span class="w"> </span>file<span class="w"> </span><span class="m">2</span>&gt;<span class="w"> </span>...<span class="o">]</span>
+</pre></div>
+</div>
+<p>This reporting step keeps comparative results derived from the same benchmark
+records used for evaluation and can automatically generate LaTeX tables for
+direct inclusion in papers and technical reports. Pass <code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">DIR</span></code> to write the
+generated report artifacts beneath a base directory; without <code class="docutils literal notranslate"><span class="pre">-b</span></code>, the report
+is rendered directly.</p>
+</section>
+</section>
+<section id="python-api">
+<h2>Python API<a class="headerlink" href="#python-api" title="Link to this heading">¶</a></h2>
+<p>Specialized models created with LMTask’s reusable training configuration
+(<a class="reference internal" href="#trainconf/"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">trainconf/</span></code></span></a>) are exposed by default as the task named
+<code class="docutils literal notranslate"><span class="pre">dataset</span></code>. The configured task names, including the default <code class="docutils literal notranslate"><span class="pre">dataset</span></code> task for
+specialized models, are available from <a class="reference external" href="https://plandes.github.io/lmtask/api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory.task_names"><code class="docutils literal notranslate"><span class="pre">TaskFactory.task_names</span></code></a>. The name
+reflects the configuration convention: the task represents the model
+specialized on the configured training dataset, while the reusable
+task/training machinery remains the same across datasets and models. This is
+only a default convention; custom task configurations can register the trained
+model under any task name.</p>
+<p>Use a configured task directly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/json.html#module-json" title="json"><span class="nn">json</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#module-zensols.lmtask" title="zensols.lmtask"><span class="nn">zensols.lmtask</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.cli.ApplicationFactory" title="zensols.lmtask.cli.ApplicationFactory"><span class="n">ApplicationFactory</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.instruct.InstructTaskRequest" title="zensols.lmtask.instruct.InstructTaskRequest"><span class="n">InstructTaskRequest</span></a>
+
+<a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory" title="zensols.lmtask.task.TaskFactory"><span class="n">factory</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.cli.ApplicationFactory.get_task_factory" title="zensols.lmtask.cli.ApplicationFactory.get_task_factory"><span class="n">ApplicationFactory</span><span class="o">.</span><span class="n">get_task_factory</span></a><span class="p">()</span>
+<a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.Task" title="zensols.lmtask.task.Task"><span class="n">task</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory.create" title="zensols.lmtask.task.TaskFactory.create"><span class="n">factory</span><span class="o">.</span><span class="n">create</span></a><span class="p">(</span><span class="s1">'sentiment'</span><span class="p">)</span>
+
+<a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.instruct.InstructTaskRequest" title="zensols.lmtask.instruct.InstructTaskRequest"><span class="n">request</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.instruct.InstructTaskRequest" title="zensols.lmtask.instruct.InstructTaskRequest"><span class="n">InstructTaskRequest</span></a><span class="p">(</span>
+    <span class="n">instruction</span><span class="o">=</span><span class="s1">'I love football.</span><span class="se">\n</span><span class="s1">I hate olives.</span><span class="se">\n</span><span class="s1">Earth is big.'</span><span class="p">)</span>
+<a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.TaskResponse" title="zensols.lmtask.task.TaskResponse"><span class="n">response</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.Task.process" title="zensols.lmtask.task.Task.process"><span class="n">task</span><span class="o">.</span><span class="n">process</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.instruct.InstructTaskRequest" title="zensols.lmtask.instruct.InstructTaskRequest"><span class="n">request</span></a><span class="p">)</span>
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/json.html#json.dumps" title="json.dumps"><span class="n">json</span><span class="o">.</span><span class="n">dumps</span></a><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">model_output_json</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Example result:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"sentence"</span><span class="p">:</span><span class="w"> </span><span class="s2">"I love football."</span><span class="p">,</span><span class="w"> </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"+"</span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">"sentence"</span><span class="p">:</span><span class="w"> </span><span class="s2">"I hate olives."</span><span class="p">,</span><span class="w"> </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"-"</span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span><span class="nt">"index"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nt">"sentence"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Earth is big."</span><span class="p">,</span><span class="w"> </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"n"</span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="use-an-lmtask-task-in-an-agentic-workflow">
+<h2>Use an LMTask task in an agentic workflow<a class="headerlink" href="#use-an-lmtask-task-in-an-agentic-workflow" title="Link to this heading">¶</a></h2>
+<p>An LMTask task is an ordinary Python component. Wrap it as a narrow tool without
+moving task logic into an agent prompt:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#module-zensols.lmtask" title="zensols.lmtask"><span class="nn">zensols.lmtask</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.cli.ApplicationFactory" title="zensols.lmtask.cli.ApplicationFactory"><span class="n">ApplicationFactory</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.instruct.InstructTaskRequest" title="zensols.lmtask.instruct.InstructTaskRequest"><span class="n">InstructTaskRequest</span></a>
+
+<a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory" title="zensols.lmtask.task.TaskFactory"><span class="n">factory</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.cli.ApplicationFactory.get_task_factory" title="zensols.lmtask.cli.ApplicationFactory.get_task_factory"><span class="n">ApplicationFactory</span><span class="o">.</span><span class="n">get_task_factory</span></a><span class="p">()</span>
+<a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.Task" title="zensols.lmtask.task.Task"><span class="n">sentiment_task</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory.create" title="zensols.lmtask.task.TaskFactory.create"><span class="n">factory</span><span class="o">.</span><span class="n">create</span></a><span class="p">(</span><span class="s1">'sentiment'</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">classify_sentiment</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Classify one or more statements with the configured model."""</span>
+    <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.TaskResponse" title="zensols.lmtask.task.TaskResponse"><span class="n">response</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.task.Task.process" title="zensols.lmtask.task.Task.process"><span class="n">sentiment_task</span><span class="o">.</span><span class="n">process</span></a><span class="p">(</span>
+        <a class="sphinx-codeautolink-a" href="api/zensols.lmtask.html#zensols.lmtask.instruct.InstructTaskRequest" title="zensols.lmtask.instruct.InstructTaskRequest"><span class="n">InstructTaskRequest</span></a><span class="p">(</span><span class="n">instruction</span><span class="o">=</span><span class="n">text</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">model_output_json</span>
+</pre></div>
+</div>
+<p>The agent or application receives a stable callable capability. LMTask remains
+responsible for model loading, task formatting, generation, response recovery,
+and caching; the orchestration layer remains responsible for planning and tool
+selection. A complete framework-neutral example is available in
+<a class="reference internal" href="#examples/agent-tool"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">examples/agent-tool</span></code></span></a>.</p>
+<p>For more detail on the framework internals and task lifecycle, see the
+<a class="reference internal" href="doc/configuration.html"><span class="std std-doc">configuration</span></a>, <a class="reference internal" href="doc/training.html"><span class="std std-doc">training</span></a>, and <a class="reference internal" href="doc/inference.html"><span class="std std-doc">inference</span></a> documentation. These cover
+configuration composition and task contracts, PEFT/LoRA specialization and
+persisted training state, and the shared inference path used by applications
+and held-out testing.</p>
+</section>
+<section id="dataset-configuration">
+<h2>Dataset configuration<a class="headerlink" href="#dataset-configuration" title="Link to this heading">¶</a></h2>
+<p>The IMDB example loads the source data, creates text labels, renames the input
+field, shuffles the records, and selects a training subset:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">lmtask_dataset_train_source</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># Load the public IMDB review dataset from the Hugging Face Hub.</span>
+<span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stanfordnlp/imdb</span>
+<span class="w">  </span><span class="nt">load_args</span><span class="p">:</span>
+<span class="w">    </span><span class="c1"># Use the source training split for adapter training.</span>
+<span class="w">    </span><span class="nt">split</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">train</span>
+<span class="w">  </span><span class="nt">pre_process</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|-</span>
+<span class="w">    </span><span class="no"># Convert the numeric source label into the text expected by the task.</span>
+<span class="w">    </span><span class="no">ds = ds.map(lambda x: {</span>
+<span class="w">        </span><span class="no">'output': 'positive' if x['label'] == 1 else 'negative'})</span>
+
+<span class="w">    </span><span class="no"># Normalize the review field to the task's input contract.</span>
+<span class="w">    </span><span class="no">ds = ds.rename_column('text', 'instruction')</span>
+
+<span class="w">    </span><span class="no"># Make sampling reproducible, then use a small tutorial subset.</span>
+<span class="w">    </span><span class="no">ds = ds.shuffle(seed=0)</span>
+<span class="w">    </span><span class="no">ds = ds.select(range(1_000))</span>
+</pre></div>
+</div>
+<p>The associated task then renders each row with its training template and uses a
+separate inference template after specialization. This minimizes train/serve
+format skew. Test datasets deliberately leave chat-template formatting to the
+task so held-out examples follow the same inference path as application
+requests.</p>
+</section>
+<section id="supported-model-configurations">
+<h2>Supported model configurations<a class="headerlink" href="#supported-model-configurations" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Family</p></th>
+<th class="head text-center"><p>Inference configuration</p></th>
+<th class="head text-center"><p>PEFT training configuration</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Llama 3</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td><p>Base and instruction-model resources</p></td>
+</tr>
+<tr class="row-odd"><td><p>Qwen 3</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td><p>Canonical IMDB example</p></td>
+</tr>
+<tr class="row-even"><td><p>DeepSeek-R1-Distill-Qwen</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td><p>Qwen-derived configuration</p></td>
+</tr>
+<tr class="row-odd"><td><p>Gemma 4</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td><p>Includes a Transformers 5.5 compatibility patch</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The exact checkpoint, access policy, memory footprint, and license are governed
+by the upstream model provider.</p>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://plandes.github.io/lmtask/index.html">Full documentation</a></p></li>
+<li><p><a class="reference external" href="https://plandes.github.io/lmtask/api.html">API reference</a></p></li>
+<li><p><a class="reference internal" href="examples/imdb-sentiment/README.html"><span class="std std-doc">IMDB sentiment tutorial</span></a></p></li>
+<li><p><a class="reference internal" href="examples/agent-tool/README.html"><span class="std std-doc">Agent-tool example</span></a></p></li>
+<li><p><a class="reference internal" href="BENCHMARKS.html"><span class="std std-doc">Benchmarks</span></a></p></li>
+<li><p><a class="reference download internal" download="" href="_downloads/7dc542f032f421f9330581336d1b4d9c/fpb-gemma4.yml"><span class="xref download myst">Financial PhraseBank benchmark configuration</span></a></p></li>
+<li><p><a class="reference internal" href="CONTRIBUTING.html"><span class="std std-doc">Contributing guide</span></a></p></li>
+</ul>
+</section>
+<section id="evidence-and-reproducibility">
+<h2>Evidence and reproducibility<a class="headerlink" href="#evidence-and-reproducibility" title="Link to this heading">¶</a></h2>
+<p>LMTask separates training-time validation from held-out task evaluation.
+<code class="docutils literal notranslate"><span class="pre">lmtask</span> <span class="pre">benchmark</span></code> records row-level predictions, configured task metrics,
+training/test metadata, Git revision, software versions, and CUDA/GPU
+information. Runtime artifacts remain under <code class="docutils literal notranslate"><span class="pre">data/&lt;dataset&gt;/&lt;model&gt;/</span></code>, while
+publishable benchmark records belong under top-level <a class="reference internal" href="#benchmarks/"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">benchmarks/</span></code></span></a>.</p>
+<p>See <a class="reference internal" href="BENCHMARKS.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">BENCHMARKS.md</span></code></span></a> for current results, reproducibility fields,
+and benchmark publication conventions.</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">¶</a></h2>
+<p>LMTask overlaps with several strong open-source projects, but they emphasize
+different parts of the model-specialization lifecycle:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.axolotl.ai/">Axolotl</a> is a broad post-training platform with extensive model
+coverage, distributed training, performance optimizations, preference
+tuning, reinforcement learning, inference, and adapter merging. Choose it
+when training breadth, scale, or optimization support is the main concern.</p></li>
+<li><p><a class="reference external" href="https://llamafactory.readthedocs.io/">LLaMA-Factory</a> provides broad model and fine-tuning support
+together with command-line, web, inference, and deployment interfaces.
+Choose it when model coverage or an integrated training UI is the priority.</p></li>
+<li><p><a class="reference external" href="https://ludwig.ai/latest/getting_started/llm_finetuning/">Ludwig</a> is a general declarative machine-learning framework that
+also supports LoRA/QLoRA language-model fine-tuning. Choose it when LLM
+specialization is one part of a broader tabular, text, or multimodal ML
+workflow.</p></li>
+<li><p><a class="reference external" href="https://huggingface.co/docs/trl/">TRL</a> and <a class="reference external" href="https://huggingface.co/docs/peft/">PEFT</a> provide the Hugging Face training primitives used
+by LMTask. Choose them directly when you need maximum control and are
+prepared to assemble dataset preparation, task contracts, inference,
+response handling, and application integration yourself.</p></li>
+</ul>
+<p>Choose LMTask when the desired output is not merely a trained adapter, but a
+configured, reusable task that carries the same contract from dataset
+preparation and PEFT training through held-out task testing and scoring,
+structured inference, and downstream application or agent use.</p>
+<p>These projects can also be complementary. For example, a team might use a
+large-scale training platform for a specialized training regime and use
+LMTask’s task and inference abstractions to integrate the resulting model into
+application code.</p>
+</section>
+<section id="community">
+<h2>Community<a class="headerlink" href="#community" title="Link to this heading">¶</a></h2>
+<p>Bug reports, model integrations, task examples, and documentation improvements
+are welcome. When reporting a model-specific problem, include the checkpoint,
+quantization configuration, Transformers version, operating system, GPU, and a
+minimal task configuration. See <a class="reference internal" href="CONTRIBUTING.html"><span class="std std-doc">CONTRIBUTING.md</span></a>.</p>
+<p>If LMTask is useful in your work, starring the repository helps other users find
+it.</p>
+</section>
+<section id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
+<p>See the <a class="reference internal" href="#CHANGELOG.md"><span class="xref myst">release history</span></a>.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="LICENSE.html"><span class="std std-doc">MIT License</span></a></p>
+<p>Copyright (c) 2024–2026 Paul Landes</p>
+<!-- links -->
+</section>
+</section>
+</article>
+</div>
+<footer>
+<div class="related-pages">
+<a class="next-page" href="doc/configuration.html">
+<div class="page-info">
+<div class="context">
+<span>Next</span>
+</div>
+<div class="title">Configuration</div>
+</div>
+<svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+</a>
+<a class="prev-page" href="top.html">
+<svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+<div class="page-info">
+<div class="context">
+<span>Previous</span>
+</div>
+<div class="title">Home</div>
+</div>
+</a>
+</div>
+<div class="bottom-of-page">
+<div class="left-details">
+<div class="copyright">
+                Copyright © 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+</div>
+<div class="right-details">
+</div>
+</div>
+</footer>
+</div>
+<aside class="toc-drawer">
+<div class="toc-sticky toc-scroll">
+<div class="toc-title-container">
+<span class="toc-title">
+            On this page
+          </span>
+</div>
+<div class="toc-tree-container">
+<div class="toc-tree">
+<ul>
+<li><a class="reference internal" href="#">LMTask</a><ul>
+<li><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
+<li><a class="reference internal" href="#why-lmtask">Why LMTask?</a><ul>
+<li><a class="reference internal" href="#how-lmtask-is-different">How LMTask is different</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#features">Features</a><ul>
+<li><a class="reference internal" href="#model-specialization">Model specialization</a></li>
+<li><a class="reference internal" href="#task-definition">Task definition</a></li>
+<li><a class="reference internal" href="#data-preparation">Data preparation</a></li>
+<li><a class="reference internal" href="#reliable-inference">Reliable inference</a></li>
+<li><a class="reference internal" href="#model-testing-and-benchmarking">Model testing and benchmarking</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#runtime-expectations">Runtime expectations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li><a class="reference internal" href="#specialize-a-model-with-peft-lora-sft">Specialize a model with PEFT/LoRA SFT</a></li>
+<li><a class="reference internal" href="#test-and-benchmark-a-specialized-model">Test and benchmark a specialized model</a><ul>
+<li><a class="reference internal" href="#compare-and-report-benchmark-results">Compare and report benchmark results</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#python-api">Python API</a></li>
+<li><a class="reference internal" href="#use-an-lmtask-task-in-an-agentic-workflow">Use an LMTask task in an agentic workflow</a></li>
+<li><a class="reference internal" href="#dataset-configuration">Dataset configuration</a></li>
+<li><a class="reference internal" href="#supported-model-configurations">Supported model configurations</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#evidence-and-reproducibility">Evidence and reproducibility</a></li>
+<li><a class="reference internal" href="#alternatives">Alternatives</a></li>
+<li><a class="reference internal" href="#community">Community</a></li>
+<li><a class="reference internal" href="#changelog">Changelog</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div><script src="_static/documentation_options.js?v=938c9ccc"></script>
+<script src="_static/doctools.js?v=9a2dae69"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="_static/scripts/furo.js?v=46bd48cc"></script>
+<script src="_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="_static/copybutton.js?v=f281be69"></script>
+<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
+
+const initStyles = () => {
+    const defaultStyle = document.createElement('style');
+    defaultStyle.textContent = "pre.mermaid {\n    /* Same as .mermaid-container > pre */\n    display: block;\n    width: 100%;\n}\n\npre.mermaid > svg {\n    /* Same as .mermaid-container > pre > svg */\n    height: auto;\n    width: 100%;\n    max-width: 100% !important;\n}";
+    document.head.appendChild(defaultStyle);
+
+    const fullscreenStyle = document.createElement('style');
+    fullscreenStyle.textContent = ".mermaid-container {\n    position: relative;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n}\n\n.mermaid-container > pre {\n    display: block;\n    width: 100%;\n}\n\n.mermaid-container > pre > svg {\n    height: auto;\n    width: 100%;\n    max-width: 100% !important;\n}\n\n.mermaid-fullscreen-btn {\n    position: absolute;\n    width: 28px;\n    height: 28px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.3);\n    border-radius: 4px;\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    transition: all 0.2s;\n    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);\n    font-size: 14px;\n    line-height: 1;\n    padding: 0;\n    color: #333;\n}\n\n.mermaid-fullscreen-btn:hover {\n    opacity: 100% !important;\n    background: rgba(255, 255, 255, 1);\n    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-btn.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-btn.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal {\n    display: none;\n    position: fixed !important;\n    top: 0 !important;\n    left: 0 !important;\n    width: 95vw;\n    height: 100vh;\n    background: rgba(255, 255, 255, 0.98);\n    z-index: 9999;\n    padding: 20px;\n    overflow: auto;\n}\n\n.mermaid-fullscreen-modal.dark-theme {\n    background: rgba(0, 0, 0, 0.98);\n}\n\n.mermaid-fullscreen-modal.active {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen {\n    position: relative;\n    width: 95vw;\n    height: 90vh;\n    max-width: 95vw;\n    max-height: 90vh;\n    background: white;\n    border-radius: 8px;\n    padding: 20px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);\n    overflow: auto;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen.dark-theme {\n    background: #1a1a1a;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);\n}\n\n.mermaid-container-fullscreen pre.mermaid {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.mermaid-container-fullscreen .mermaid svg {\n    height: 100% !important;\n    width: 100% !important;\n    cursor: grab;\n}\n\n.mermaid-fullscreen-close {\n    position: fixed !important;\n    top: 20px !important;\n    right: 20px !important;\n    width: 40px;\n    height: 40px;\n    background: rgba(255, 255, 255, 0.95);\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-radius: 50%;\n    cursor: pointer;\n    z-index: 10000;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);\n    transition: all 0.2s;\n    font-size: 24px;\n    line-height: 1;\n    color: #333;\n}\n\n.mermaid-fullscreen-close:hover {\n    background: white;\n    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);\n    transform: scale(1.1);\n}\n\n.mermaid-fullscreen-close.dark-theme {\n    background: rgba(50, 50, 50, 0.95);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n    color: #e0e0e0;\n}\n\n.mermaid-fullscreen-close.dark-theme:hover {\n    background: rgba(60, 60, 60, 1);\n    box-shadow: 0 6px 16px rgba(255, 255, 255, 0.2);\n}\n\n.mermaid-fullscreen-modal .mermaid-fullscreen-btn {\n    display: none !important;\n}";
+    document.head.appendChild(fullscreenStyle);
+}
+
+// Detect if page has dark background
+const isDarkTheme = () => {
+    // We use a set of heuristics:
+    // 1. Check for common dark mode classes or attributes
+    // 2. Check computed background color brightness
+    if (document.documentElement.classList.contains('dark') ||
+        document.documentElement.getAttribute('data-theme') === 'dark' ||
+        document.body.classList.contains('dark') ||
+        document.body.getAttribute('data-theme') === 'dark') {
+        // console.log("Dark theme detected via class/attribute");
+        return true;
+    }
+    if (document.documentElement.classList.contains('light') ||
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.body.classList.contains('light') ||
+        document.body.getAttribute('data-theme') === 'light') {
+        // console.log("Light theme detected via class/attribute");
+        return false;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // console.log("Dark theme detected via prefers-color-scheme");
+        return true;
+    }
+    const bgColor = window.getComputedStyle(document.body).backgroundColor;
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        // console.log("Background color brightness:", brightness);
+        return brightness < 128;
+    }
+    // console.log("No dark or light theme detected, defaulting to light theme");
+    return false;
+};
+
+let darkTheme = isDarkTheme();
+let modal = null;
+let modalContent = null;
+let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+let closeModal = () => {};
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+        closeModal();
+    }
+});
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
+
+const runMermaid = async (rerun) => {
+    console.log("Running mermaid diagrams, rerun =", rerun);
+    // clear all existing mermaid charts
+    let all_mermaids = document.querySelectorAll(".mermaid");
+
+    if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
+        all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
+            if(!el.hasAttribute("data-original-code")) {
+                // store original code
+                // console.log(`Storing original code for first run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+            if(el.getAttribute("data-processed") === "true") {
+                // remove and restore original
+                el.removeAttribute("data-processed");
+                // console.log(`Restoring original code for re-run: `, el.getAttribute('data-original-code'));
+                el.innerHTML = el.getAttribute('data-original-code');
+            } else {
+                // store original code
+                // console.log(`Storing original code for re-run: `, el.innerHTML);
+                el.setAttribute('data-original-code', el.innerHTML);
+            }
+        });
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if (false) {
+                                        addZoomToSvgs(d3.selectAll("").select(function() {
+                                            return this.querySelector("svg");
+                                        }));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
+    }
+
+    all_mermaids = document.querySelectorAll(".mermaid");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
+
+    if (false) {
+        const mermaids_to_add_zoom = 0 === -1 ? mermaids_active.length : 0;
+        if(mermaids_to_add_zoom > 0) {
+            var svgs = d3.selectAll("").select(function() {
+                return this.querySelector("svg");
+            });
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
+                setTimeout(() => runMermaid(false), 200);
+                return;
+            }
+            addZoomToSvgs(svgs);
+        }
+    } else if(mermaids_active.length !== mermaids_processed.length) {
+        // Wait for mermaid to process all diagrams
+        setTimeout(() => runMermaid(false), 200);
+        return;
+    }
+
+    // Stop here if not adding fullscreen capability
+    if (!true) return;
+
+    if (modal !== null ) {
+        // Destroy existing modal
+        modal.remove();
+        modal = null;
+        modalContent = null;
+    }
+
+    modal = document.createElement('div');
+    modal.className = 'mermaid-fullscreen-modal' + (darkTheme ? ' dark-theme' : '');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', 'Fullscreen diagram viewer');
+    modal.innerHTML = `
+        <button class="mermaid-fullscreen-close${darkTheme ? ' dark-theme' : ''}" aria-label="Close fullscreen">✕</button>
+        <div class="mermaid-container-fullscreen${darkTheme ? ' dark-theme' : ''}"></div>
+    `;
+    document.body.appendChild(modal);
+
+    modalContent = modal.querySelector('.mermaid-container-fullscreen');
+    const closeBtn = modal.querySelector('.mermaid-fullscreen-close');
+
+    closeModal = () => {
+        modal.classList.remove('active');
+        modalContent.innerHTML = '';
+        document.body.style.overflow = ''
+        window.scrollTo({left: previousScrollOffset[0], top: previousScrollOffset[1], behavior: 'instant'});
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.querySelectorAll('.mermaid').forEach((mermaidDiv) => {
+        if (mermaidDiv.parentNode.classList.contains('mermaid-container') ||
+            mermaidDiv.closest('.mermaid-fullscreen-modal')) {
+            // Already processed, adjust button class if needed
+            const existingBtn = mermaidDiv.parentNode.querySelector('.mermaid-fullscreen-btn');
+            if (existingBtn) {
+                existingBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+            }
+            return;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'mermaid-container';
+        mermaidDiv.parentNode.insertBefore(container, mermaidDiv);
+        container.appendChild(mermaidDiv);
+
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.className = 'mermaid-fullscreen-btn' + (darkTheme ? ' dark-theme' : '');
+        fullscreenBtn.setAttribute('aria-label', 'View diagram in fullscreen');
+        fullscreenBtn.textContent = "\u26f6";
+        fullscreenBtn.style.opacity = "50%";
+
+        // Calculate dynamic position based on diagram's margin and padding
+        const diagramStyle = window.getComputedStyle(mermaidDiv);
+        const marginTop = parseFloat(diagramStyle.marginTop) || 0;
+        const marginRight = parseFloat(diagramStyle.marginRight) || 0;
+        const paddingTop = parseFloat(diagramStyle.paddingTop) || 0;
+        const paddingRight = parseFloat(diagramStyle.paddingRight) || 0;
+        fullscreenBtn.style.top = `${marginTop + paddingTop + 4}px`;
+        fullscreenBtn.style.right = `${marginRight + paddingRight + 4}px`;
+
+        fullscreenBtn.addEventListener('click', () => {
+            previousScrollOffset = [window.scrollX, window.scrollY];
+            const clone = mermaidDiv.cloneNode(true);
+            modalContent.innerHTML = '';
+            modalContent.appendChild(clone);
+
+            const svg = clone.querySelector('svg');
+            if (svg) {
+                svg.removeAttribute('width');
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = '100%';
+                svg.style.display = 'block';
+
+                if (false) {
+                    setTimeout(() => {
+                        const g = svg.querySelector('g');
+                        if (g) {
+                            var svgD3 = d3.select(svg);
+                            svgD3.html("<g class='wrapper'>" + svgD3.html() + "</g>");
+                            var inner = svgD3.select("g");
+                            var zoom = d3.zoom().on("zoom", function(event) {
+                                inner.attr("transform", event.transform);
+                            });
+                            svgD3.call(zoom);
+                        }
+                    }, 100);
+                }
+            }
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        container.appendChild(fullscreenBtn);
+    });
+};
+
+
+
+const load = async () => {
+    initStyles();
+
+
+    await runMermaid(true);
+
+    const reRunIfThemeChanges = async () => {
+        const newDarkTheme = isDarkTheme();
+        if (newDarkTheme !== darkTheme) {
+            darkTheme = newDarkTheme;
+            console.log("Theme change detected, re-running mermaid with", darkTheme ? "dark" : "default", "theme");
+            await mermaid.initialize(
+                {...{"startOnLoad": false},
+                ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+                }
+            );
+            await runMermaid(true);
+        }
+    };
+
+    // Update theme classes when theme changes
+    const themeObserver = new MutationObserver(reRunIfThemeChanges);
+    themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+    themeObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme']
+    });
+};
+
+
+
+
+
+console.log("Initializing mermaid with", darkTheme ? "dark" : "default", "theme");
+mermaid.initialize(
+    {...{"startOnLoad": false},
+    ...{ darkMode: darkTheme, theme: darkTheme ? "dark" : "default" },
+    }
+);
+
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html class="no-js" data-content_root="../../" lang="en">
+<head><meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="../../genindex.html" rel="index" title="Index"/><link href="../../search.html" rel="search" title="Search"/>
+<!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+<title>IMDB sentiment specialization - Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference. 0.2.0 documentation</title>
+<link href="../../_static/pygments.css?v=03e43079" rel="stylesheet" type="text/css"/>
+<link href="../../_static/styles/furo.css?v=7bdb33bb" rel="stylesheet" type="text/css"/>
+<link href="../../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../../_static/sphinx-codeautolink.css?v=b2176991" rel="stylesheet" type="text/css"/>
+<link href="../../_static/graphviz.css" rel="stylesheet" type="text/css"/>
+<link href="../../_static/styles/furo-extensions.css?v=8dab3a3b" rel="stylesheet" type="text/css"/>
+<link href="../../_static/codeautolink.css?v=57550ae3" rel="stylesheet" type="text/css"/>
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+<body>
+<script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+<svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+<symbol id="svg-toc" viewbox="0 0 24 24">
+<title>Contents</title>
+<svg fill="currentColor" stroke="currentColor" stroke-width="0" viewbox="0 0 1024 1024">
+<path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"></path>
+</svg>
+</symbol>
+<symbol id="svg-menu" viewbox="0 0 24 24">
+<title>Menu</title>
+<svg class="feather-menu" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<line x1="3" x2="21" y1="12" y2="12"></line>
+<line x1="3" x2="21" y1="6" y2="6"></line>
+<line x1="3" x2="21" y1="18" y2="18"></line>
+</svg>
+</symbol>
+<symbol id="svg-arrow-right" viewbox="0 0 24 24">
+<title>Expand</title>
+<svg class="feather-chevron-right" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<polyline points="9 18 15 12 9 6"></polyline>
+</svg>
+</symbol>
+<symbol id="svg-sun" viewbox="0 0 24 24">
+<title>Light mode</title>
+<svg class="feather-sun" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="5"></circle>
+<line x1="12" x2="12" y1="1" y2="3"></line>
+<line x1="12" x2="12" y1="21" y2="23"></line>
+<line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+<line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+<line x1="1" x2="3" y1="12" y2="12"></line>
+<line x1="21" x2="23" y1="12" y2="12"></line>
+<line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+<line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+</svg>
+</symbol>
+<symbol id="svg-moon" viewbox="0 0 24 24">
+<title>Dark mode</title>
+<svg class="icon-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h24v24H0z" fill="none" stroke="none"></path>
+<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+</svg>
+</symbol>
+<symbol id="svg-sun-with-moon" viewbox="0 0 24 24">
+<title>Auto light/dark, in light mode</title>
+<svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z" style="opacity: 50%"></path>
+<line x1="14.5" x2="14.5" y1="3.25" y2="1.25"></line>
+<line x1="14.5" x2="14.5" y1="15.85" y2="17.85"></line>
+<line x1="10.044" x2="8.63" y1="5.094" y2="3.68"></line>
+<line x1="19" x2="20.414" y1="14.05" y2="15.464"></line>
+<line x1="8.2" x2="6.2" y1="9.55" y2="9.55"></line>
+<line x1="20.8" x2="22.8" y1="9.55" y2="9.55"></line>
+<line x1="10.044" x2="8.63" y1="14.006" y2="15.42"></line>
+<line x1="19" x2="20.414" y1="5.05" y2="3.636"></line>
+<circle cx="14.5" cy="9.55" r="3.6"></circle>
+</svg>
+</symbol>
+<symbol id="svg-moon-with-sun" viewbox="0 0 24 24">
+<title>Auto light/dark, in dark mode</title>
+<svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"></path>
+<line style="opacity: 50%" x1="18" x2="18" y1="3.705" y2="2.5"></line>
+<line style="opacity: 50%" x1="18" x2="18" y1="11.295" y2="12.5"></line>
+<line style="opacity: 50%" x1="15.316" x2="14.464" y1="4.816" y2="3.964"></line>
+<line style="opacity: 50%" x1="20.711" x2="21.563" y1="10.212" y2="11.063"></line>
+<line style="opacity: 50%" x1="14.205" x2="13.001" y1="7.5" y2="7.5"></line>
+<line style="opacity: 50%" x1="21.795" x2="23" y1="7.5" y2="7.5"></line>
+<line style="opacity: 50%" x1="15.316" x2="14.464" y1="10.184" y2="11.036"></line>
+<line style="opacity: 50%" x1="20.711" x2="21.563" y1="4.789" y2="3.937"></line>
+<circle cx="18" cy="7.5" r="2.169" style="opacity: 50%"></circle>
+</svg>
+</symbol>
+<symbol id="svg-pencil" viewbox="0 0 24 24">
+<svg class="icon-tabler-pencil-code" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
+<path d="M13.5 6.5l4 4"></path>
+<path d="M20 21l2 -2l-2 -2"></path>
+<path d="M17 17l-2 2l2 2"></path>
+</svg>
+</symbol>
+<symbol id="svg-eye" viewbox="0 0 24 24">
+<svg class="icon-tabler-eye-code" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h24v24H0z" fill="none" stroke="none"></path>
+<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+<path d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008"></path>
+<path d="M20 21l2 -2l-2 -2"></path>
+<path d="M17 17l-2 2l2 2"></path>
+</svg>
+</symbol>
+</svg>
+<input aria-label="Toggle site navigation sidebar" class="sidebar-toggle" id="__navigation" name="__navigation" type="checkbox"/>
+<input aria-label="Toggle table of contents sidebar" class="sidebar-toggle" id="__toc" name="__toc" type="checkbox"/>
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+<div class="page">
+<header class="mobile-header">
+<div class="header-left">
+<label class="nav-overlay-icon" for="__navigation">
+<span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+</label>
+</div>
+<div class="header-center">
+<a href="../../top.html"><div class="brand">Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference. 0.2.0 documentation</div></a>
+</div>
+<div class="header-right">
+<div class="theme-toggle-container theme-toggle-header">
+<button aria-label="Toggle Light / Dark / Auto color theme" class="theme-toggle">
+<svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+<svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+<svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+<svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+</button>
+</div>
+<label class="toc-overlay-icon toc-header-icon" for="__toc">
+<span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+</label>
+</div>
+</header>
+<aside class="sidebar-drawer">
+<div class="sidebar-container">
+<div class="sidebar-sticky"><a class="sidebar-brand" href="../../top.html">
+<span class="sidebar-brand-text">Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference. 0.2.0 documentation</span>
+</a><form action="../../search.html" class="sidebar-search-container" method="get" role="search">
+<input aria-label="Search" class="sidebar-search" name="q" placeholder="Search"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/inference.html">Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/training.html">Training</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/zensols.lmtask.html">zensols.lmtask package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LICENSE.html">License</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<div class="main">
+<div class="content">
+<div class="article-container">
+<a class="back-to-top muted-link" href="#">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+</svg>
+<span>Back to top</span>
+</a>
+<div class="content-icon-container">
+<div class="view-this-page">
+<a class="muted-link" href="../../_sources/examples/imdb-sentiment/README.md.txt" title="View this page">
+<svg><use href="#svg-eye"></use></svg>
+<span class="visually-hidden">View this page</span>
+</a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+<button aria-label="Toggle Light / Dark / Auto color theme" class="theme-toggle">
+<svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+<svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+<svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+<svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+</button>
+</div>
+<label class="toc-overlay-icon toc-content-icon" for="__toc">
+<span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+</label>
+</div>
+<article id="furo-main-content" role="main">
+<section id="imdb-sentiment-specialization">
+<h1>IMDB sentiment specialization<a class="headerlink" href="#imdb-sentiment-specialization" title="Link to this heading">¶</a></h1>
+<p>This is the canonical end-to-end LMTask example. It specializes the configured
+Qwen 3 instruction model for binary IMDB sentiment classification using
+PEFT/LoRA supervised fine-tuning.</p>
+<p>The configuration is split between:</p>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../_downloads/e2d2c973c5969aa586120cea3cd51eae/imdb-qwen3.yml"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">trainconf/imdb-qwen3.yml</span></code></span></a>, which selects
+the Qwen model resources; and</p></li>
+<li><p><a class="reference download internal" download="" href="../../_downloads/c87719c1489b02160ff54dc727241ad0/imdb-shared.yml"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">trainconf/imdb-shared.yml</span></code></span></a>, which defines
+the dataset transformation, task templates, and training parameters.</p></li>
+</ul>
+<section id="install-lmtask">
+<h2>1. Install LMTask<a class="headerlink" href="#install-lmtask" title="Link to this heading">¶</a></h2>
+<p>From PyPI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>zensols.lmtask
+</pre></div>
+</div>
+<p>For development, initialize the repository environment using the project’s
+existing build workflow.</p>
+</section>
+<section id="review-the-configuration">
+<h2>2. Review the configuration<a class="headerlink" href="#review-the-configuration" title="Link to this heading">¶</a></h2>
+<p>The shared configuration downloads <code class="docutils literal notranslate"><span class="pre">stanfordnlp/imdb</span></code>, maps the numeric labels
+to <code class="docutils literal notranslate"><span class="pre">positive</span></code> and <code class="docutils literal notranslate"><span class="pre">negative</span></code>, renames <code class="docutils literal notranslate"><span class="pre">text</span></code> to <code class="docutils literal notranslate"><span class="pre">instruction</span></code>, shuffles the
+records, and selects a 1,000-record training subset.</p>
+<p>The task has separate templates for training and inference. This keeps the
+output contract explicit while allowing the training record to include the
+expected answer.</p>
+</section>
+<section id="inspect-formatted-records">
+<h2>3. Inspect formatted records<a class="headerlink" href="#inspect-formatted-records" title="Link to this heading">¶</a></h2>
+<p>Always inspect at least one record before starting a training run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>-c<span class="w"> </span>trainconf/imdb-qwen3.yml<span class="w"> </span>sample<span class="w"> </span>-m<span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+<p>This verifies dataset access, preprocessing, task formatting, and the selected
+model’s chat-template behavior.</p>
+</section>
+<section id="inspect-the-trainer">
+<h2>4. Inspect the trainer<a class="headerlink" href="#inspect-the-trainer" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>-c<span class="w"> </span>trainconf/imdb-qwen3.yml<span class="w"> </span>trainer
+</pre></div>
+</div>
+<p>Use the CLI help if your installed release exposes a different trainer-inspect
+subcommand name:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>--help
+</pre></div>
+</div>
+</section>
+<section id="train-the-peft-adapter">
+<h2>5. Train the PEFT adapter<a class="headerlink" href="#train-the-peft-adapter" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>lmtask<span class="w"> </span>-c<span class="w"> </span>trainconf/imdb-qwen3.yml<span class="w"> </span>train
+</pre></div>
+</div>
+<p>LMTask constructs a PEFT model and trains its LoRA adapter parameters with TRL
+<code class="docutils literal notranslate"><span class="pre">SFTTrainer</span></code>. The original source-model parameters remain frozen during this
+optimization.</p>
+<p>The trainer writes the adapter to <code class="docutils literal notranslate"><span class="pre">peft_output_dir</span></code>. When
+<code class="docutils literal notranslate"><span class="pre">merged_output_dir</span></code> is configured, it also creates a deployment artifact by
+merging the trained adapter into a loaded copy of the source model.</p>
+</section>
+<section id="use-the-specialized-task">
+<h2>6. Use the specialized task<a class="headerlink" href="#use-the-specialized-task" title="Link to this heading">¶</a></h2>
+<p>The trained model is selected through configuration, so application code keeps
+the same request/response interface:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#module-zensols.lmtask" title="zensols.lmtask"><span class="nn">zensols.lmtask</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.cli.ApplicationFactory" title="zensols.lmtask.cli.ApplicationFactory"><span class="n">ApplicationFactory</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.instruct.InstructTaskRequest" title="zensols.lmtask.instruct.InstructTaskRequest"><span class="n">InstructTaskRequest</span></a>
+
+<a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory" title="zensols.lmtask.task.TaskFactory"><span class="n">factory</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.cli.ApplicationFactory.get_task_factory" title="zensols.lmtask.cli.ApplicationFactory.get_task_factory"><span class="n">ApplicationFactory</span><span class="o">.</span><span class="n">get_task_factory</span></a><span class="p">()</span>
+<a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.task.Task" title="zensols.lmtask.task.Task"><span class="n">task</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory.create" title="zensols.lmtask.task.TaskFactory.create"><span class="n">factory</span><span class="o">.</span><span class="n">create</span></a><span class="p">(</span><span class="s1">'sentiment'</span><span class="p">)</span>
+<a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.task.TaskResponse" title="zensols.lmtask.task.TaskResponse"><span class="n">response</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.task.Task.process" title="zensols.lmtask.task.Task.process"><span class="n">task</span><span class="o">.</span><span class="n">process</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="../../api/zensols.lmtask.html#zensols.lmtask.instruct.InstructTaskRequest" title="zensols.lmtask.instruct.InstructTaskRequest"><span class="n">InstructTaskRequest</span></a><span class="p">(</span>
+    <span class="n">instruction</span><span class="o">=</span><span class="s1">'A clever film with a disappointing ending.'</span><span class="p">))</span>
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">model_output_json</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The exact model-resource override needed to point at the resulting adapter or
+merged model depends on the output paths in your effective configuration. Use
+<code class="docutils literal notranslate"><span class="pre">lmtask</span> <span class="pre">-c</span> <span class="pre">trainconf/imdb-qwen3.yml</span> <span class="pre">trainer</span></code> and the generated model result to
+confirm those paths rather than copying an assumed local directory.</p>
+</section>
+<section id="record-a-reproducible-result">
+<h2>7. Record a reproducible result<a class="headerlink" href="#record-a-reproducible-result" title="Link to this heading">¶</a></h2>
+<p>Do not publish an accuracy number without its full experiment context. Use
+<a class="reference internal" href="../../BENCHMARKS.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">BENCHMARKS.md</span></code></span></a> to record:</p>
+<ul class="simple">
+<li><p>source checkpoint and revision;</p></li>
+<li><p>dataset revision and split;</p></li>
+<li><p>LoRA and SFT parameters;</p></li>
+<li><p>software versions;</p></li>
+<li><p>GPU and peak memory;</p></li>
+<li><p>wall-clock training time;</p></li>
+<li><p>adapter and merged-model sizes; and</p></li>
+<li><p>held-out accuracy, macro-F1, or other task metrics.</p></li>
+</ul>
+</section>
+<section id="other-included-model-configurations">
+<h2>Other included model configurations<a class="headerlink" href="#other-included-model-configurations" title="Link to this heading">¶</a></h2>
+<p>The same IMDB task is available for:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">trainconf/imdb-llama3.yml</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trainconf/imdb-gemma4.yml</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trainconf/imdb-dsr1qwen3.yml</span></code></p></li>
+</ul>
+<p>These are model-family configurations, not claims that all checkpoints have the
+same hardware requirements or produce equivalent task quality.</p>
+</section>
+</section>
+</article>
+</div>
+<footer>
+<div class="related-pages">
+</div>
+<div class="bottom-of-page">
+<div class="left-details">
+<div class="copyright">
+                Copyright © 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+</div>
+<div class="right-details">
+</div>
+</div>
+</footer>
+</div>
+<aside class="toc-drawer">
+<div class="toc-sticky toc-scroll">
+<div class="toc-title-container">
+<span class="toc-title">
+            On this page
+          </span>
+</div>
+<div class="toc-tree-container">
+<div class="toc-tree">
+<ul>
+<li><a class="reference internal" href="#">IMDB sentiment specialization</a><ul>
+<li><a class="reference internal" href="#install-lmtask">1. Install LMTask</a></li>
+<li><a class="reference internal" href="#review-the-configuration">2. Review the configuration</a></li>
+<li><a class="reference internal" href="#inspect-formatted-records">3. Inspect formatted records</a></li>
+<li><a class="reference internal" href="#inspect-the-trainer">4. Inspect the trainer</a></li>
+<li><a class="reference internal" href="#train-the-peft-adapter">5. Train the PEFT adapter</a></li>
+<li><a class="reference internal" href="#use-the-specialized-task">6. Use the specialized task</a></li>
+<li><a class="reference internal" href="#record-a-reproducible-result">7. Record a reproducible result</a></li>
+<li><a class="reference internal" href="#other-included-model-configurations">Other included model configurations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div><script src="../../_static/documentation_options.js?v=938c9ccc"></script>
+<script src="../../_static/doctools.js?v=9a2dae69"></script>
+<script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+<script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../../_static/copybutton.js?v=f281be69"></script>
+</body>
+</html>

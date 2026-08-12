@@ -1,0 +1,35 @@
+#@meta {desc: "Stanford IMDB movie sentiment", date: "2025-02-05"}
+#@meta {url: "https://huggingface.co/docs/trl/en/sft_trainer"}
+
+
+## Imports
+#
+project:
+  import:
+    # importyaml to avoid eager evaulate as this parent is a condyaml
+    model_imp:
+      config_file: 'resource(zensols.lmtask): resources/models/qwen3.conf'
+      type: importini
+    train_imp:
+      config_file: 'resource(zensols.lmtask): resources/train-dataset.yml'
+      type: importyaml
+    train_shared_imp:
+      config_file: 'resource(zensols.lmtask): trainconf/imdb-shared.yml'
+      type: importyaml
+
+
+## Defaults
+#
+lmtask_dataset:
+  dataset_name: imdb
+  model_name: qwen3
+  is_base: false
+
+
+## Overrides
+#
+lmtask_task_dataset:
+  chat_template_args:
+    # whether to enable reasoning, which adds <think> tags (only needed by base
+    # Qwen, which is also an instruct model)
+    enable_thinking: false

@@ -1,0 +1,21 @@
+Train and deploy task-specialized LLMs with PEFT/LoRA and structured inference.
+===============================================================================
+LMTask is a configuration-driven framework for dataset preparation, parameter-efficient supervised fine-tuning, structured inference, and deployment of task-specialized language models.
+
+.. toctree::
+   :maxdepth: 3
+   :glob:
+
+   Overview <index.md>
+   doc/*
+   API Reference <api.rst>
+   Contributing <CONTRIBUTING.md>
+   License <LICENSE.md>
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

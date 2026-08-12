@@ -1,0 +1,27 @@
+#@meta {desc: "tiny story trainer config", date: "2025-02-03"}
+#@meta {url: "https://colab.research.google.com/drive/1ef-tab5bhkvWmBOObepl1WgJvfvSzn5Q?usp=sharing"}
+#@meta {doc: "some parameters overwrite defaults to make it easy to port this config"}
+
+
+## Imports
+#
+project:
+  import:
+    # importyaml to avoid eager evaulate as this parent is a condyaml
+    model_imp:
+      config_file: 'resource(zensols.lmtask): resources/models/gemma4.conf'
+      type: importini
+    train_imp:
+      config_file: 'resource(zensols.lmtask): resources/train-dataset.yml'
+      type: importyaml
+    train_shared_imp:
+      config_file: 'resource(zensols.lmtask): trainconf/tinystory-shared.yml'
+      type: importyaml
+
+
+## Defaults
+#
+lmtask_dataset:
+  dataset_name: tinystory
+  model_name: gemma4
+  is_base: true
