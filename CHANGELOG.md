@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [0.2.0] - 2026-08-12
+Adds PEFT/LoRA supervised fine-tuning, model-specific chat-template
+normalization, held-out task evaluation, benchmark reporting, structured
+inference, and reusable application/agent APIs.
+
 ### Removed
 - Support for Python 3.11.
 - Merged embeddings output.  Base and PEFT models are still written to disk.
