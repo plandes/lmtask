@@ -110,7 +110,7 @@ class MetricsResult(Dictable):
     @property
     def count(self) -> int:
         """The sum of the per-class suppport labels."""
-        return sum(map(lambda m: m.support, self.per_class)) + \
+        return sum(map(lambda m: m.support, self.per_class)) - \
             self.invalid_count
 
     @property
