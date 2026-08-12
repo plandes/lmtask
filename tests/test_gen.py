@@ -14,8 +14,8 @@ class TestGenerate(TestBase):
         super().setUp()
         TorchConfig.set_random_seed()
 
-    def _test_generate(self, task_name: str, model: str, task: str = 'dataset',
-                       clear: bool = False, assert_period: bool = True):
+    def _test_generate_(self, task_name: str, model: str, task: str = 'dataset',
+                        clear: bool = False, assert_period: bool = True):
         task: Task = self._get_trained_task(task_name, model, task)
         if task is None:
             return
@@ -50,6 +50,16 @@ class TestGenerate(TestBase):
             self.assertTrue(
                 out.endswith('.'),
                 f'expected output to end with a period: <<{out}>>')
+
+    def _test_generate(self, task_name: str, model: str, task: str = 'dataset',
+                       clear: bool = False, assert_period: bool = True):
+        try:
+            return self._test_generate_(
+                task_name, model, task, clear, assert_period)
+        except RuntimeError as e:
+            if 'MPSGaph does not support tensor dims larger than INT_MAX' in str(e):
+                self.skipTest(f'MPS limitation: {e}')
+            raise
 
     def test_default_llama3(self):
         self._test_generate(None, 'llama3', 'base_generate', True, False)
