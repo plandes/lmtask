@@ -59,6 +59,7 @@ details.
 - [Quick start](#quick-start)
 - [Specialize a model with PEFT/LoRA SFT](#specialize-a-model-with-peftlora-sft)
 - [Test and benchmark a specialized model](#test-and-benchmark-a-specialized-model)
+  - [Compare and report benchmark results](#compare-and-report-benchmark-results)
 - [Python API](#python-api)
 - [Use an LMTask task in an agentic workflow](#use-an-lmtask-task-in-an-agentic-workflow)
 - [Dataset configuration](#dataset-configuration)
@@ -87,6 +88,8 @@ LMTask keeps the complete task lifecycle together:
 * adapter persistence and optional model merging,
 * held-out dataset testing through the same task inference path,
 * configurable task-level scoring and reproducible benchmark reports,
+* cross-benchmark reporting with automatically generated LaTeX performance
+  tables
 * prediction export for downstream analysis and reproducibility,
 * model loading, generation, response cleanup, and caching, and
 * a stable request/response API for downstream software.
@@ -197,6 +200,9 @@ software, rather than ending the workflow when training produces an adapter.
   recall and F1, per-class metrics, and invalid-output counts.
 * Generate a machine-readable benchmark record and a rendered Markdown report
   together with the held-out predictions.
+* Aggregate results from multiple benchmark configurations into a comparative
+  report and automatically generate LaTeX performance tables (via
+  [zensols.datdesc]) for papers and other technical reports.
 
 The repository includes task and training configurations for sentiment
 analysis, named entity recognition, general generation, IMDB specialization,
@@ -360,14 +366,30 @@ language-model objective on the validation split; benchmark metrics are
 computed from predictions on the separate held-out test split.
 
 
+### Compare and report benchmark results
+
+Once benchmarks have been run, the `report` action reads their persisted
+results directly from the supplied configuration files and combines them into
+one comparative performance table:
+
+```bash
+lmtask report <config file 1> [, <config file 2> ...]
+```
+
+This reporting step keeps comparative results derived from the same benchmark
+records used for evaluation and can automatically generate LaTeX tables for
+direct inclusion in papers and technical reports. Pass `-b DIR` to write the
+generated report artifacts beneath a base directory; without `-b`, the report
+is rendered directly.
+
+
 ## Python API
 
 Specialized models created with LMTask's reusable training configuration
 ([`trainconf/`](trainconf/)) are exposed by default as the task named
 `dataset`. The configured task names, including the default `dataset` task for
-specialized models, are available from
-[`TaskFactory.task_names`](https://plandes.github.io/lmtask/api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory.task_names). The
-name reflects the configuration convention: the task represents the model
+specialized models, are available from [`TaskFactory.task_names`]. The name
+reflects the configuration convention: the task represents the model
 specialized on the configured training dataset, while the reusable
 task/training machinery remains the same across datasets and models. This is
 only a default convention; custom task configurations can register the trained
@@ -574,3 +596,5 @@ Copyright (c) 2024–2026 Paul Landes
 [configuration]: doc/configuration.md
 [training]: doc/training.md
 [inference]: doc/inference.md
+[zensols.datdesc]: https://github.com/plandes/datdesc
+[`TaskFactory.task_names`]: https://plandes.github.io/lmtask/api/zensols.lmtask.html#zensols.lmtask.task.TaskFactory.task_names
