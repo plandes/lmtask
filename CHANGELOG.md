@@ -8,8 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [1.2.0] - 2026-08-12
+## [0.2.0] - 2026-08-12
+### Removed
+- Support for Python 3.11.
+- Merged embeddings output.  Base and PEFT models are still written to disk.
+
 ### Added
+- New models: Qwen3, Gemma4, DeepSeek R1 Distill Qwen
+- Support for Python 3.12 and 3.13
+- Basic model testing (evaluation) functionality.
+- Model benchmarking library and CLI.
 - Canonical IMDB sentiment specialization tutorial.
 - Framework-neutral agent-tool integration example.
 - Benchmark and reproducibility protocol.
@@ -23,20 +31,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Correct training terminology to parameter-efficient supervised fine-tuning.
 - Expand package metadata and search keywords.
 - Improve contribution guidance for model integrations and task examples.
-
-
-## [1.0.0] - 2026-08-06
-### Removed
-- Support for Python 3.11.
-- Merged embeddings output.  Base and PEFT models are still written to disk.
-
-### Added
-- New models: Qwen3, Gemma4, DeepSeek R1 Distill Qwen
-- Support for Python 3.12 and 3.13
-- Basic model testing (evaluation) functionality.
-- Model benchmarking library and CLI.
-
-### Changed
 - Replace the Llama specific generator with a generic code + config based
   class.
 - Fix Sphinx build by adding `numpy` dependency.
@@ -82,9 +76,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/lmtask/compare/v1.2.0...HEAD
-[1.2.0]: https://github.com/plandes/lmtask/compare/v1.0.0...v1.2.0
-[1.0.0]: https://github.com/plandes/lmtask/compare/v0.1.1...v1.0.0
+[Unreleased]: https://github.com/plandes/lmtask/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/plandes/lmtask/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/plandes/lmtask/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/plandes/lmtask/compare/v0.0.1...v0.1.0
 [0.0.1]: https://github.com/plandes/lmtask/compare/v0.0.0...v0.0.1
