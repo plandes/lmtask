@@ -132,12 +132,12 @@ handling, and application API remain connected throughout the task lifecycle.
 That distinction matters after training. A trained adapter is only an artifact;
 an LMTask task is an application-ready capability that also knows how to:
 
-* format requests consistently with its training data;
-* load the correct model and adapter;
-* recover and validate structured responses;
-* cache repeated requests;
+* format requests consistently with its training data,
+* load the correct model and adapter,
+* recover and validate structured responses,
+* cache repeated requests,
 * test and score a specialized model over a held-out dataset using the same
-  inference path used by applications; and
+  inference path used by applications, and
 * expose a stable request/response contract to services and agent tools.
 
 In other words, LMTask focuses on turning model specialization into reusable

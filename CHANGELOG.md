@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [1.2.0] - 2026-08-12
 ### Added
 - Canonical IMDB sentiment specialization tutorial.
 - Framework-neutral agent-tool integration example.
 - Benchmark and reproducibility protocol.
 - GitHub presentation guidance, social-preview source, and issue templates.
-- Report output with datdesc for LaTeX, Excel, and table JSON report output.
+- Report output with [zensols.datdesc] for LaTeX, Excel, and table JSON report
+  output.
 
 ### Changed
 - Reposition the README around LMTask's complete dataset-to-PEFT-to-task
@@ -79,7 +82,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/lmtask/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/plandes/lmtask/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/plandes/lmtask/compare/v1.0.0...v1.2.0
 [1.0.0]: https://github.com/plandes/lmtask/compare/v0.1.1...v1.0.0
 [0.1.1]: https://github.com/plandes/lmtask/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/plandes/lmtask/compare/v0.0.1...v0.1.0
@@ -87,3 +91,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [pixi]: https://pixi.sh
 [zensols.deeplearn]: https://github.com/plandes/deeplearn
+[zensols.datdesc]: https://github.com/plandes/datdesc

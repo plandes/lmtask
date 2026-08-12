@@ -1,5 +1,6 @@
 from zensols.lmtask import Task, TaskRequest, TaskResponse
 from zensols.lmtask.torchconfig import TorchConfig
+from huggingface_hub import try_to_load_from_cache
 from util import TestBase
 
 
@@ -14,10 +15,19 @@ class TestGenerate(TestBase):
         super().setUp()
         TorchConfig.set_random_seed()
 
+    def _is_model_cached(self, model_id: str) -> bool:
+        model = try_to_load_from_cache(
+            repo_id=model_id,
+            filename='config.json')
+        return model is not None
+
     def _test_generate_(self, task_name: str, model: str, task: str = 'dataset',
                         clear: bool = False, assert_period: bool = True):
         task: Task = self._get_trained_task(task_name, model, task)
         if task is None:
+            return
+        if not self._is_model_cached(task.resource.model_id):
+            self.skipTest(f'model not available: {task.resource.model_id}')
             return
         if clear:
             task.generator.resource.clear()
