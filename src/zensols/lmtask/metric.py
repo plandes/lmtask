@@ -109,7 +109,7 @@ class MetricsResult(Dictable):
     """
     @property
     def count(self) -> int:
-        """The number of examples for this result."""
+        """The sum of the per-class suppport labels."""
         return sum(map(lambda m: m.support, self.per_class)) + \
             self.invalid_count
 
@@ -130,8 +130,12 @@ class MetricsResult(Dictable):
         df: pd.DataFrame = self.aggregate_dataframe
         df = df.reset_index(names=['name'])
         df = pd.concat((df, pd.DataFrame([{
-            'name': 'count',
+            'name': 'support',
             'desc': 'number of examples',
+            'value': self.support,
+        }, {
+            'name': 'count',
+            'desc': 'sum of the per-class suppport labels',
             'value': self.count,
         }, {
             'name': 'invalid',

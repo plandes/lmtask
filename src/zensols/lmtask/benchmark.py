@@ -253,9 +253,8 @@ class BenchmarkResult(Dictable):
                 renames={'elapsed_seconds': 'train_seconds'}),
             self._create_dfd(
                 inst=self.testing,
-                member_names=('support', 'elapsed_seconds', 'count'),
+                member_names=('elapsed_seconds', 'count'),
                 renames={
-                    'support': 'test_support',
                     'elapsed_seconds': 'test_seconds',
                     'count': 'test_count'}),
             self.metrics.aggregate_row))
